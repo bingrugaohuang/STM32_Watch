@@ -4,13 +4,11 @@
 #include "main.h"
 #include "OLED.h"
 #include "OLED_Data.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "Key.h"
 #include "tim.h"
-#include "ShowFrames.h"
-
-extern TaskHandle_t MenuTaskHandle;
-extern TaskHandle_t FlashlightTaskHandle;
+#include "modules/ShowFrames.h"
+#include "common/app_handles.h"
 
 void Show_Flashlight(void);
 

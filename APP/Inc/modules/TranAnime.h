@@ -4,7 +4,7 @@
 #include "main.h"
 #include "OLED.h"
 #include "OLED_Data.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "task.h"
 
 #define TRANSITION_STEP      32

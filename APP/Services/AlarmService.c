@@ -1,8 +1,8 @@
-// #include "AlarmService.h"
+// #include "services/AlarmService.h"
 
-// #include "AlarmUI.h"
+// #include "ui/AlarmUI.h"
 // #include "menu.h"
-// #include "SleepManager.h"
+// #include "services/SleepManager.h"
 // #include <string.h>
 
 // #define ALARM_BKP_MAGIC       0xA55AU
@@ -464,10 +464,10 @@
  * 入口参数：argument 任务参数（未使用）
  * 返回值  ：无
  * */
-#include "AlarmService.h"
-#include "AlarmUI.h"
-#include "menu.h"
-#include "SleepManager.h"
+#include "services/AlarmService.h"
+#include "ui/AlarmUI.h"
+#include "common/app_handles.h"
+#include "services/SleepManager.h"
 #include <string.h>
 
 static AlarmConfig_t gAlarmCfg = {0U, 0U, 0U, 1U, ALARM_REPEAT_DAILY};
