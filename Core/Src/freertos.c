@@ -25,17 +25,19 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Queue.h"
+#include "queue.h"
 #include "Key.h"
 #include "usart.h"
 #include "OLED.h"
-#include "menu.h"
+#include "tasks/task_entry.h"
+#include "modules/StopWatch_APP.h"
+#include "modules/dino.h"
 #include <timers.h>
 #include <stdio.h>
 #include <string.h>
-#include "SleepManager.h"
-#include "StackMonitor_Task.h"
-#include "AlarmService.h"
+#include "services/SleepManager.h"
+#include "tasks/StackMonitor_Task.h"
+#include "services/AlarmService.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -190,4 +192,3 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 }
 
 /* USER CODE END Application */
-

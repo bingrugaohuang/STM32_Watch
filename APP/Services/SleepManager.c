@@ -1,5 +1,5 @@
-#include "SleepManager.h"
-#include "AlarmService.h"
+#include "services/SleepManager.h"
+#include "services/AlarmService.h"
 
 extern void SystemClock_Config(void);
 

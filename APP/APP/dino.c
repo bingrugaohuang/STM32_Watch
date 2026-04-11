@@ -1,4 +1,4 @@
-#include "dino.h"
+#include "modules/dino.h"
 
 
 static uint16_t Ground_Pos = 0;//地面数组中投射到屏幕上x为0的字节的下标，每20ms加一
