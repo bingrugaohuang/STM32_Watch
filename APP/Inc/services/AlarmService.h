@@ -5,29 +5,8 @@
 #include "rtc.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
-extern TaskHandle_t AlarmTaskHandle;
-
-typedef enum
-{
-	ALARM_REPEAT_ONCE = 0,
-	ALARM_REPEAT_DAILY = 1
-} AlarmRepeat_t;
-
-typedef struct 
-{
-	uint8_t Enabled;        // 闹钟使能：0关闭，1开启
-	uint8_t Hour;			// 闹钟小时：0~23
-	uint8_t Min;            // 闹钟分钟：0~59
-	uint8_t SnoozeMin;      // 贪睡分钟：1~30
-	AlarmRepeat_t Repeat;   // 重复模式：单次/每日
-}AlarmConfig_t;
-
-typedef enum
-{
-	ALARM_ACTION_STOP = 0,
-	ALARM_ACTION_SNOOZE = 1
-}AlarmAction_t;
+#include "common/app_handles.h"
+#include "common/app_types.h"
 
 void Alarm_ServiceInit(void);
 void Alarm_ServiceGetConfig(AlarmConfig_t *cfg);
@@ -37,23 +16,23 @@ void Alarm_ServiceTask(void *argument);
 
 // typedef enum
 // {
-// 	ALARM_REPEAT_ONCE = 0,   // 单次提醒
-// 	ALARM_REPEAT_DAILY = 1   // 每日重复
+// 	ALARM_REPEAT_ONCE = 0,   // 锟斤拷锟斤拷锟斤拷锟斤拷
+// 	ALARM_REPEAT_DAILY = 1   // 每锟斤拷锟截革拷
 // } AlarmRepeat_t;
 
 // typedef struct
 // {
-// 	uint8_t Enabled;         // 闹钟使能：0关闭，1开启
-// 	uint8_t Hour;            // 闹钟小时：0~23
-// 	uint8_t Minute;          // 闹钟分钟：0~59
-// 	uint8_t SnoozeMinutes;   // 贪睡分钟：1~30
-// 	AlarmRepeat_t Repeat;    // 重复模式：单次/每日
+// 	uint8_t Enabled;         // 锟斤拷锟斤拷使锟杰ｏ拷0锟截闭ｏ拷1锟斤拷锟斤拷
+// 	uint8_t Hour;            // 锟斤拷锟斤拷小时锟斤拷0~23
+// 	uint8_t Minute;          // 锟斤拷锟接凤拷锟接ｏ拷0~59
+// 	uint8_t SnoozeMinutes;   // 贪睡锟斤拷锟接ｏ拷1~30
+// 	AlarmRepeat_t Repeat;    // 锟截革拷模式锟斤拷锟斤拷锟斤拷/每锟斤拷
 // } AlarmConfig_t;
 
 // typedef enum
 // {
-// 	ALARM_ACTION_STOP = 0,   // 停止提醒
-// 	ALARM_ACTION_SNOOZE = 1  // 贪睡提醒
+// 	ALARM_ACTION_STOP = 0,   // 停止锟斤拷锟斤拷
+// 	ALARM_ACTION_SNOOZE = 1  // 贪睡锟斤拷锟斤拷
 // } AlarmAction_t;
 
 // void Alarm_ServiceInit(void);

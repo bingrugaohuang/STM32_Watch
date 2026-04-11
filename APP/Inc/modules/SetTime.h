@@ -5,10 +5,10 @@
 #include "OLED.h"
 #include "OLED_Data.h"
 #include "rtc.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "Key.h"
-#include "ShowFrames.h"
-#include "TranAnime.h"
+#include "modules/ShowFrames.h"
+#include "modules/TranAnime.h"
 
 
 //三级菜单——设置界面

@@ -4,13 +4,13 @@
 #include "main.h"
 #include "OLED.h"
 #include "OLED_Data.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "Key.h"
-#include "math.h"
+#include <math.h>
 #include "MPU6050.h"
-#include "ShowAngle.h"
-#include "ShowFrames.h"
-#include "TranAnime.h"
+#include "modules/ShowAngle.h"
+#include "modules/ShowFrames.h"
+#include "modules/TranAnime.h"
 
 uint8_t Gradienter(void);
 #endif
