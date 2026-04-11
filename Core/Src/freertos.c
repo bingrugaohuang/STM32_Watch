@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Queue.h"
+#include "queue.h"
 #include "Key.h"
 #include "usart.h"
 #include "OLED.h"

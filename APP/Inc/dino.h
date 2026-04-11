@@ -4,11 +4,11 @@
 #include "main.h"
 #include "OLED.h"
 #include "OLED_Data.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "Key.h"
-#include "math.h"
-#include "Timers.h"
-#include "stdlib.h"
+#include <math.h>
+#include "timers.h"
+#include <stdlib.h>
 #include "ShowFrames.h"
 #include "common/app_handles.h"
 

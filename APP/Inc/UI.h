@@ -5,7 +5,7 @@
 #include "OLED.h"
 #include "OLED_Data.h"
 #include "rtc.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "Key.h"
 #include "ShowFrames.h"
 #include "TranAnime.h"

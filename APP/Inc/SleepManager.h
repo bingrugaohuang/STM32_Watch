@@ -2,7 +2,7 @@
 #define _SLEEPMANAGER_H
 
 #include "main.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "OLED.h"
 //#include "Key.h"
 #include "task.h"

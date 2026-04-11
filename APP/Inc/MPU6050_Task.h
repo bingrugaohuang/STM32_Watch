@@ -4,9 +4,9 @@
 #include "main.h"
 #include "OLED.h"
 #include "OLED_Data.h"
-#include "freertos.h"
+#include "FreeRTOS.h"
 #include "Key.h"
-#include "math.h"
+#include <math.h>
 #include "MPU6050.h"
 #include "ShowFrames.h"
 #include "ShowAngle.h"
