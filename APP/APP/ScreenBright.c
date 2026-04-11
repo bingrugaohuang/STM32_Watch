@@ -1,4 +1,4 @@
-#include "ScreenBright.h"
+#include "modules/ScreenBright.h"
 
 //将亮度值限制在0~100范围内
 static uint8_t BrightnessClampPercent(int16_t value)

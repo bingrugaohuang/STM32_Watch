@@ -7,8 +7,8 @@
 #include "rtc.h"
 #include "FreeRTOS.h"
 #include "Key.h"
-#include "ShowFrames.h"
-#include "TranAnime.h"
+#include "modules/ShowFrames.h"
+#include "modules/TranAnime.h"
 #include "common/app_handles.h"
 
 

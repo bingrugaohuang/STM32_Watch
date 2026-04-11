@@ -1,13 +1,13 @@
 #include "menu.h"
 #include "Key.h"
-#include "UI.h"
-#include "Setting.h"
-#include "ShowMenu.h"
-#include "Time_Task.h"
-#include "Flashlight.h"
-#include "MPU6050_Task.h"
-#include "Game.h"
-#include "AlarmService.h"
+#include "ui/UI.h"
+#include "tasks/Setting.h"
+#include "tasks/ShowMenu.h"
+#include "tasks/Time_Task.h"
+#include "tasks/Flashlight.h"
+#include "tasks/MPU6050_Task.h"
+#include "tasks/Game.h"
+#include "services/AlarmService.h"
 
 //��ֵ��ȡ����
 void Key_Task(void *argument)

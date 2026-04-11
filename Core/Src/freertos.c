@@ -30,14 +30,14 @@
 #include "usart.h"
 #include "OLED.h"
 #include "tasks/task_entry.h"
-#include "StopWatch_APP.h"
-#include "dino.h"
+#include "modules/StopWatch_APP.h"
+#include "modules/dino.h"
 #include <timers.h>
 #include <stdio.h>
 #include <string.h>
-#include "SleepManager.h"
-#include "StackMonitor_Task.h"
-#include "AlarmService.h"
+#include "services/SleepManager.h"
+#include "tasks/StackMonitor_Task.h"
+#include "services/AlarmService.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

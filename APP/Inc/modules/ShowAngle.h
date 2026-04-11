@@ -8,8 +8,8 @@
 #include "Key.h"
 #include <math.h>
 #include "MPU6050.h"
-#include "ShowFrames.h"
-#include "TranAnime.h"
+#include "modules/ShowFrames.h"
+#include "modules/TranAnime.h"
 #include "common/app_handles.h"
 
 typedef struct{

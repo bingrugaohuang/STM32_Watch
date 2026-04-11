@@ -5,10 +5,10 @@
 #include "OLED.h"
 #include "OLED_Data.h"
 #include "Key.h"
-#include "ShowFrames.h"
-#include "freertos.h"
-#include "AlarmService.h"
-#include "SleepManager.h"
+#include "modules/ShowFrames.h"
+#include "FreeRTOS.h"
+#include "services/AlarmService.h"
+#include "services/SleepManager.h"
 
 uint8_t AlarmUI_ShowSettingPage(void);
 AlarmAction_t AlarmUI_ShowRingingPage(const AlarmConfig_t *cfg);

@@ -1,16 +1,15 @@
-#ifndef _GAME_H
-#define _GAME_H
+#ifndef _FLASHLIGHT_H_
+#define _FLASHLIGHT_H_
 
 #include "main.h"
 #include "OLED.h"
 #include "OLED_Data.h"
 #include "FreeRTOS.h"
 #include "Key.h"
-#include "dino.h"
-#include "ShowFrames.h"
-#include "TranAnime.h"
+#include "tim.h"
+#include "modules/ShowFrames.h"
 #include "common/app_handles.h"
 
-void Game(void);
+void Show_Flashlight(void);
 
 #endif

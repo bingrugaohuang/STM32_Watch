@@ -6,7 +6,7 @@
 #include "OLED_Data.h"
 #include "FreeRTOS.h"
 #include "Key.h"
-#include "ShowFrames.h"
+#include "modules/ShowFrames.h"
 #include "common/app_handles.h"
 
 #define ANIME_SPEED 6//动画速度，数值越大动画越快
