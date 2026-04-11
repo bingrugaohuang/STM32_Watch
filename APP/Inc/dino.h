@@ -10,10 +10,7 @@
 #include "Timers.h"
 #include "stdlib.h"
 #include "ShowFrames.h"
-
-extern TaskHandle_t MenuTaskHandle;
-extern TaskHandle_t GameTaskHandle;
-extern TimerHandle_t DinoTimerHandle;//软件定时器句柄
+#include "common/app_handles.h"
 
 uint8_t Game_Dino(void);
 void Dino_Tick(TimerHandle_t xTimer);

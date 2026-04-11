@@ -10,14 +10,13 @@
 #include "MPU6050.h"
 #include "ShowFrames.h"
 #include "TranAnime.h"
-
-extern TaskHandle_t MPU6050TaskHandle;
+#include "common/app_handles.h"
 
 typedef struct{
 	float Roll;
 	float Pitch;
 	float Yaw;
-}Angle;//Å·À­½Ç½á¹¹Ìå
+}Angle;//Å·ï¿½ï¿½ï¿½Ç½á¹¹ï¿½ï¿½
 
 
 uint8_t MPU6050(void);

@@ -4,11 +4,9 @@
 #include "main.h"
 #include "FreeRtos.h"
 #include "usart.h"
-#include "menu.h"
 #include "stdio.h"
 #include "string.h"
-
-extern TaskHandle_t StackMonitorTaskHandle;
+#include "common/app_handles.h"
 
 void StackMonitor_Task(void *argument);
 

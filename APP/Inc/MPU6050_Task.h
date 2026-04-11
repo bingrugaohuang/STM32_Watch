@@ -12,9 +12,7 @@
 #include "ShowAngle.h"
 #include "Gradienter.h"
 #include "TranAnime.h"
-
-extern TaskHandle_t MenuTaskHandle;
-extern TaskHandle_t MPU6050TaskHandle;
+#include "common/app_handles.h"
 
 void Show_MPU6050(void);
 

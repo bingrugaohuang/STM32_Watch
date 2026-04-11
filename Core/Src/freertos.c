@@ -29,7 +29,9 @@
 #include "Key.h"
 #include "usart.h"
 #include "OLED.h"
-#include "menu.h"
+#include "tasks/task_entry.h"
+#include "StopWatch_APP.h"
+#include "dino.h"
 #include <timers.h>
 #include <stdio.h>
 #include <string.h>
@@ -190,4 +192,3 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 }
 
 /* USER CODE END Application */
-

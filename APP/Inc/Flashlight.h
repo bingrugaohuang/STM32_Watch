@@ -8,9 +8,7 @@
 #include "Key.h"
 #include "tim.h"
 #include "ShowFrames.h"
-
-extern TaskHandle_t MenuTaskHandle;
-extern TaskHandle_t FlashlightTaskHandle;
+#include "common/app_handles.h"
 
 void Show_Flashlight(void);
 

@@ -8,9 +8,9 @@
 #include "Key.h"
 #include "Timers.h"
 #include "ShowFrames.h"
-#include "menu.h"
 #include "StopWatch_APP.h"
 #include "AlarmUI.h"
+#include "common/app_handles.h"
 
 void TimeUI(void);
 

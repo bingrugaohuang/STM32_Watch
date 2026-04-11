@@ -9,9 +9,7 @@
 #include "dino.h"
 #include "ShowFrames.h"
 #include "TranAnime.h"
-
-extern TaskHandle_t MenuTaskHandle;
-extern TaskHandle_t GameTaskHandle;
+#include "common/app_handles.h"
 
 void Game(void);
 

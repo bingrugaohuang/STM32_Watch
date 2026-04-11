@@ -9,11 +9,7 @@
 #include "Key.h"
 #include "ShowFrames.h"
 #include "TranAnime.h"
-
-extern TaskHandle_t KeyTaskHandle;
-extern TaskHandle_t MenuTaskHandle;
-extern TaskHandle_t UITaskHandle;
-extern TaskHandle_t SetTaskHandle;//ÉèÖÃÈÎÎñ¾ä±ú
+#include "common/app_handles.h"
 
 
 void UI(void);

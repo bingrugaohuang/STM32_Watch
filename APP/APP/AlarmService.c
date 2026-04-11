@@ -466,7 +466,7 @@
  * */
 #include "AlarmService.h"
 #include "AlarmUI.h"
-#include "menu.h"
+#include "common/app_handles.h"
 #include "SleepManager.h"
 #include <string.h>
 

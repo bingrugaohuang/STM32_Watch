@@ -9,13 +9,10 @@
 #include "SetTime.h"
 #include "ShowFrames.h"
 #include "TranAnime.h"
-#include "menu.h"
 #include "Set_StackMonitor.h"
 #include "ScreenBright.h"
-
-extern TaskHandle_t StackMonitorTaskHandle;//栈监控任务句柄
+#include "common/app_handles.h"
 
 void Setting(void);
 	
 #endif
-
