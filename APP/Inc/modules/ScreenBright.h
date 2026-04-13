@@ -1,7 +1,7 @@
 #ifndef _SCREEN_BRIGHT_H
 #define _SCREEN_BRIGHT_H
 
-#include "tasks/Setting.h"
+#include "Setting.h"
 
 #define SCREEN_BRIGHTNESS_RAW_MIN		0x10U
 #define SCREEN_BRIGHTNESS_RAW_MAX		0xFFU

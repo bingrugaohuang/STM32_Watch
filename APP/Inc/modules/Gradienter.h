@@ -8,9 +8,9 @@
 #include "Key.h"
 #include <math.h>
 #include "MPU6050.h"
-#include "modules/ShowAngle.h"
-#include "modules/ShowFrames.h"
-#include "modules/TranAnime.h"
+#include "ShowAngle.h"
+#include "ShowFrames.h"
+#include "TranAnime.h"
 
 uint8_t Gradienter(void);
 #endif

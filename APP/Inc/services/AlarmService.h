@@ -5,8 +5,8 @@
 #include "rtc.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "common/app_handles.h"
-#include "common/app_types.h"
+#include "app_handles.h"
+#include "app_types.h"
 
 void Alarm_ServiceInit(void);
 void Alarm_ServiceGetConfig(AlarmConfig_t *cfg);

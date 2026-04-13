@@ -1,7 +1,7 @@
 #ifndef _APP_HANDLES_H_
 #define _APP_HANDLES_H_
 
-#include "common/app_common.h"
+#include "app_common.h"
 
 extern TaskHandle_t KeyTaskHandle;
 extern TaskHandle_t MenuTaskHandle;

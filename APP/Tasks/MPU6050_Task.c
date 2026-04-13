@@ -1,4 +1,4 @@
-#include "tasks/MPU6050_Task.h"
+#include "MPU6050_Task.h"
 
 static void ShowUI_MPU6050(void)
 {

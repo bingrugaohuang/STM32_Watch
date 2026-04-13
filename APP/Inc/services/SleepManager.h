@@ -7,7 +7,8 @@
 //#include "Key.h"
 #include "task.h"
 #include "MPU6050.h"
-#include "common/app_handles.h"
+#include "app_handles.h"
+#include "AlarmService.h"
 
 #define SLEEP_TASK_BIT_UI         (1U << 0)
 #define SLEEP_TASK_BIT_MENU       (1U << 1)

@@ -1,5 +1,4 @@
-#include "services/SleepManager.h"
-#include "services/AlarmService.h"
+#include "SleepManager.h"
 
 extern void SystemClock_Config(void);
 
@@ -13,6 +12,7 @@ static TickType_t gStopTimeoutTicks = 0; // 从Sleep升级到Stop的超时时间
 
 static volatile uint8_t gWakeupPending = 0; // 是否有待处理的唤醒事件，避免重复处理同一事件
 static volatile uint8_t gDiscardWakeKey = 0; // 睡眠期间用于唤醒的按键是否需要丢弃
+static volatile TickType_t gWakeupIgnoreKeyUntil = 0; // 免疫按键事件的截止Tick时间，避免刚醒来就被按键抖动立刻拉回睡眠
 
 static uint32_t gSuspendedTaskMask = 0U;// 记录进入睡眠前被本任务挂起的前台任务，唤醒时只恢复这批任务，避免固定恢复UI导致场景丢失
 static uint8_t gMotionWakeArmed = 0U; // 记录是否已经配置了MPU6050运动唤醒
@@ -180,7 +180,7 @@ void SleepManager_Task(void *argument)
 {
   (void)argument;//避免编译器警告，表示该参数未被使用
   TickType_t now = 0;
-    SleepMgr_Init(pdMS_TO_TICKS(30000), pdMS_TO_TICKS(30000)); 
+    SleepMgr_Init(pdMS_TO_TICKS(10000), pdMS_TO_TICKS(10000)); 
     
   while(1)
   {
@@ -305,7 +305,7 @@ void SleepMgr_ReportActivity(void)
  */
 void SleepMgr_ReportWakeupFromISR(uint16_t GPIO_Pin)
 {
-    gLastActiveTick = xTaskGetTickCount(); // 更新最后活跃时间
+    gLastActiveTick = xTaskGetTickCountFromISR(); // 更新最后活跃时间
 
     if((GPIO_Pin == KEY_CONFIRM_Pin) || (GPIO_Pin == KEY_NEXT_Pin) || (GPIO_Pin == KEY_LAST_Pin))
     {
@@ -313,7 +313,9 @@ void SleepMgr_ReportWakeupFromISR(uint16_t GPIO_Pin)
            (gSleepState == SLEEP_STATE_PREPARE_STOP) ||
            (gSleepState == SLEEP_STATE_STOP))
         {
-            gDiscardWakeKey = 1U;
+            // 记录下一次允许接受按键事件的Tick时间，由于是从睡眠醒来，可能是按住按钮很久
+            // 我们至少屏蔽300ms的按键，避免因抖动导致触发菜单按键
+            gWakeupIgnoreKeyUntil = gLastActiveTick + pdMS_TO_TICKS(400); 
         }
     }
     gWakeupPending = 1U; // 设置有待处理的唤醒事件标志
@@ -322,11 +324,14 @@ void SleepMgr_ReportWakeupFromISR(uint16_t GPIO_Pin)
 /*
  * 函数功能：从中断服务程序中消费唤醒按键丢弃标志
  * 入口参数：无
- * 返回值  ：丢弃标志状态
+ * 返回值  ：状态判断，1=丢弃当前按键事件，0=接受
  */
 uint8_t SleepMgr_ConsumeWakeKeyDiscardFlagFromISR(void)
 {
-    uint8_t discard = gDiscardWakeKey;
-    gDiscardWakeKey = 0U;
-    return discard;
+    // 如果当前时间还未超过我们设定的免疫窗口
+    if (xTaskGetTickCountFromISR() < gWakeupIgnoreKeyUntil)
+    {
+        return 1U;
+    }
+    return 0U;
 }

@@ -154,7 +154,6 @@ void StartDefaultTask(void *argument)
   xTaskCreate(StackMonitor_Task, "StackMon_Task", 192, NULL, osPriorityNormal, &StackMonitorTaskHandle);
   xTaskCreate(Alarm_Task, "Alarm_Task", 256, NULL, osPriorityAboveNormal, &AlarmTaskHandle);
 
-  Alarm_ServiceInit();//初始化闹钟配置并下发RTC闹钟
 
   StopWatchTimerHandle = 
     xTimerCreate( "StopWatch_Timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, StopWatch_Tick);
@@ -171,6 +170,9 @@ void StartDefaultTask(void *argument)
   vTaskSuspend(GameTaskHandle);
 	
   vTaskSuspend(StackMonitorTaskHandle);
+
+  Alarm_ServiceInit();//初始化闹钟配置并下发RTC闹钟
+
 
 	vTaskDelete(NULL);
   (void)argument;
