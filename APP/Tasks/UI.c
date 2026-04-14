@@ -1,9 +1,12 @@
-#include "ui/UI.h"
-
+#include "UI.h"
 
 RTC_DateTypeDef RTC_Date;
 RTC_TimeTypeDef RTC_Time;
 
+static const TaskMgrSwitchPlan_t gUI_SwitchPlan[] = {
+	{TASKMGR_TASK_MENU, TASKMGR_TASK_UI},
+	{TASKMGR_TASK_SET, TASKMGR_TASK_UI}
+};
 
 //显示首页时钟
 void ShowClock(void)
@@ -35,12 +38,11 @@ void UI(void)
 			case KEY_CONFIRM:
 				if(Cursor == 0){
 					OLED_Clear();
-					vTaskResume(MenuTaskHandle);//恢复菜单任务
+					TaskMgr_ApplySwitchPlan(&gUI_SwitchPlan[0]);//恢复菜单任务，挂起UI任务
 				}else if(Cursor == 1){
 					TranAnime(TRAN_DIR_LEFT);//进入设置界面，左移
-					vTaskResume(SetTaskHandle);//恢复设置任务
+					TaskMgr_ApplySwitchPlan(&gUI_SwitchPlan[1]);//恢复设置任务，挂起UI任务
 				}
-				vTaskSuspend(NULL);//挂起UI任务
 				break;
 			case KEY_NEXT:
 				Cursor++;

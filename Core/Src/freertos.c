@@ -29,15 +29,15 @@
 #include "Key.h"
 #include "usart.h"
 #include "OLED.h"
-#include "tasks/task_entry.h"
-#include "modules/StopWatch_APP.h"
-#include "modules/dino.h"
+#include "task_entry.h"
+#include "StopWatch_APP.h"
+#include "dino.h"
 #include <timers.h>
 #include <stdio.h>
 #include <string.h>
-#include "services/SleepManager.h"
-#include "tasks/StackMonitor_Task.h"
-#include "services/AlarmService.h"
+#include "SleepManager.h"
+#include "StackMonitor_Task.h"
+#include "AlarmService.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -152,9 +152,10 @@ void StartDefaultTask(void *argument)
   xTaskCreate(Game_Task, "Game_Task", 128, NULL, osPriorityNormal, &GameTaskHandle);
   xTaskCreate(SleepManager_Task, "SleepManager_Task", 128, NULL, osPriorityNormal, &SleepManagerTaskHandle);
   xTaskCreate(StackMonitor_Task, "StackMon_Task", 192, NULL, osPriorityNormal, &StackMonitorTaskHandle);
-  xTaskCreate(Alarm_Task, "Alarm_Task", 256, NULL, osPriorityAboveNormal, &AlarmTaskHandle);
 
   Alarm_ServiceInit();//初始化闹钟配置并下发RTC闹钟
+  xTaskCreate(Alarm_Task, "Alarm_Task", 256, NULL, osPriorityAboveNormal, &AlarmTaskHandle);
+
 
   StopWatchTimerHandle = 
     xTimerCreate( "StopWatch_Timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, StopWatch_Tick);
@@ -171,6 +172,7 @@ void StartDefaultTask(void *argument)
   vTaskSuspend(GameTaskHandle);
 	
   vTaskSuspend(StackMonitorTaskHandle);
+
 
 	vTaskDelete(NULL);
   (void)argument;

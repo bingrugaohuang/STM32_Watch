@@ -6,7 +6,7 @@
 #include "usart.h"
 #include <stdio.h>
 #include <string.h>
-#include "common/app_handles.h"
+#include "app_handles.h"
 
 void StackMonitor_Task(void *argument);
 

@@ -8,11 +8,11 @@
 #include "Key.h"
 #include <math.h>
 #include "MPU6050.h"
-#include "modules/ShowFrames.h"
-#include "modules/ShowAngle.h"
-#include "modules/Gradienter.h"
-#include "modules/TranAnime.h"
-#include "common/app_handles.h"
+#include "ShowFrames.h"
+#include "ShowAngle.h"
+#include "Gradienter.h"
+#include "TranAnime.h"
+#include "TaskMgr.h"
 
 void Show_MPU6050(void);
 

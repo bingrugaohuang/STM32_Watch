@@ -7,8 +7,8 @@
 #include "rtc.h"
 #include "FreeRTOS.h"
 #include "Key.h"
-#include "modules/ShowFrames.h"
-#include "modules/TranAnime.h"
+#include "ShowFrames.h"
+#include "TranAnime.h"
 
 
 //三级菜单——设置界面

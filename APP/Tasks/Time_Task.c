@@ -1,4 +1,8 @@
-#include "tasks/Time_Task.h"
+#include "Time_Task.h"
+
+static const TaskMgrSwitchPlan_t gTimeSwitchPlan = {
+	TASKMGR_TASK_MENU, TASKMGR_TASK_TIME
+};
 
 void ShowTimeUI(void)
 {
@@ -36,8 +40,7 @@ void TimeUI(void)
 		{
 			case KEY_CONFIRM:
 				if(Cursor == 0){
-					vTaskResume(MenuTaskHandle);//恢复菜单任务
-					vTaskSuspend(NULL);//挂起时间任务
+					TaskMgr_ApplySwitchPlan(&gTimeSwitchPlan);//恢复菜单任务，挂起时间任务
 				}
 				else if(Cursor == 1){
 					Show_StopWatch();

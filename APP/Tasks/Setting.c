@@ -1,4 +1,8 @@
-#include "tasks/Setting.h"
+#include "Setting.h"
+
+static const TaskMgrSwitchPlan_t gSettingSwitchPlan = {
+	TASKMGR_TASK_UI, TASKMGR_TASK_SET
+};
 
 //显示设置界面
 static void ShowUI_Setting(void)
@@ -9,7 +13,6 @@ static void ShowUI_Setting(void)
 	OLED_ShowString(0, 48, "3.设置屏幕亮度", OLED_8X16);
 
 }
-
 
 static void DrawSettingPage(int8_t Cursor)
 {
@@ -33,11 +36,8 @@ static void DrawSettingPage(int8_t Cursor)
 		default:
 			break;
 	}
-
 	ShowFrames();
 }
-
-
 
 //设置界面调度
 void Setting(void)
@@ -52,8 +52,7 @@ void Setting(void)
 			case KEY_CONFIRM:
 				if(Cursor == 0){
 					TranAnime(TRAN_DIR_RIGHT);//退出设置，右移
-					vTaskResume(UITaskHandle);//恢复UI任务
-					vTaskSuspend(NULL);//挂起设置任务
+					TaskMgr_ApplySwitchPlan(&gSettingSwitchPlan);//恢复UI任务，挂起设置任务
 				}else if(Cursor == 1){
 					TranAnime(TRAN_DIR_LEFT);//进入应用，左移
 					Menu_Third_SetTime();//进入设置时间界面

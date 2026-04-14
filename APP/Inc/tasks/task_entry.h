@@ -1,7 +1,7 @@
 #ifndef _TASK_ENTRY_H_
 #define _TASK_ENTRY_H_
 
-#include "common/app_common.h"
+#include "app_common.h"
 
 void Key_Task(void *argument);
 void UI_Task(void *argument);

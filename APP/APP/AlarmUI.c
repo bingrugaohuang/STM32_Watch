@@ -1,4 +1,4 @@
-#include "ui/AlarmUI.h"
+#include "AlarmUI.h"
 
 /*
  * 函数功能：显示闹钟设置页的静态文本

@@ -6,12 +6,12 @@
 #include "OLED_Data.h"
 #include "FreeRTOS.h"
 #include "Key.h"
-#include "modules/SetTime.h"
-#include "modules/ShowFrames.h"
-#include "modules/TranAnime.h"
-#include "modules/Set_StackMonitor.h"
-#include "modules/ScreenBright.h"
-#include "common/app_handles.h"
+#include "SetTime.h"
+#include "ShowFrames.h"
+#include "TranAnime.h"
+#include "Set_StackMonitor.h"
+#include "ScreenBright.h"
+#include "TaskMgr.h"
 
 void Setting(void);
 	

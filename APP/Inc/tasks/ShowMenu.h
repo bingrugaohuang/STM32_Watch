@@ -6,11 +6,11 @@
 #include "OLED_Data.h"
 #include "FreeRTOS.h"
 #include "Key.h"
-#include "modules/ShowFrames.h"
-#include "common/app_handles.h"
+#include "ShowFrames.h"
+#include "TaskMgr.h"
 
-#define ANIME_SPEED 6//动画速度，数值越大动画越快
-
+#define ANIME_SPEED 8//动画速度，数值越大动画越快
+#define ANIME_NUM 5  //动画图标数量
 
 void ShowMenu(void);
 

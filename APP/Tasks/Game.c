@@ -1,5 +1,8 @@
-#include "tasks/Game.h"
+#include "Game.h"
 
+static const TaskMgrSwitchPlan_t gGameSwitchPlan = {
+	TASKMGR_TASK_MENU, TASKMGR_TASK_GAME
+};
 
 void Game(void)
 {
@@ -12,8 +15,7 @@ void Game(void)
 		{
 			case KEY_CONFIRM:
 				if(Cursor == 0){
-					vTaskResume(MenuTaskHandle);//恢复UI任务
-					vTaskSuspend(NULL);//挂起设置任务
+					TaskMgr_ApplySwitchPlan(&gGameSwitchPlan);//恢复菜单任务，挂起游戏任务
 				}else if(Cursor == 1){
 					TranAnime(TRAN_DIR_LEFT);//进入小恐龙游戏，左移
 					Game_Dino();//进入小恐龙游戏

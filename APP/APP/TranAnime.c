@@ -1,4 +1,4 @@
-#include "modules/TranAnime.h"
+#include "TranAnime.h"
 
 //转场动画
 void TranAnime(uint8_t dir)

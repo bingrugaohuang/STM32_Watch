@@ -1,32 +1,41 @@
-#include "tasks/ShowMenu.h"
+#include "ShowMenu.h"
 
+static uint8_t Pre_Select = 0;//上一个中心图标
+static uint8_t Target_Select = 0;//目标中心图标
+static uint8_t Direction = 0;//动画方向
+static uint8_t Moving = 0;//动画进行标志
+static int8_t x_pre = 48;//动画过程中中心图标的x坐标
+static uint8_t anime_speed = ANIME_SPEED;//动画速度
 
-uint8_t Pre_Select = 0;//上一个中心图标
-uint8_t Target_Select = 0;//目标中心图标
-uint8_t Direction = 0;//动画方向
-uint8_t Moving = 0;//动画进行标志
-int8_t x_pre = 48;//动画过程中中心图标的x坐标
-uint8_t anime_speed = ANIME_SPEED;//动画速度
+// 菜单索引与任务切换策略映射: 业务层不再直接操作任务句柄
+static const TaskMgrSwitchPlan_t gMenuSwitchPlan[ANIME_NUM] =
+{
+	{TASKMGR_TASK_UI,         TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_TIME,       TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_FLASHLIGHT, TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_MPU6050,    TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_GAME,       TASKMGR_TASK_MENU}
+};
 
 //显示动画的一帧	
-void ShowAnimeFrame(void)
+static void ShowAnimeFrame(void)
 {
 	OLED_Clear();
 	OLED_ShowNum(64, 0, Pre_Select, 1, OLED_6X8);//显示光标位置
 	OLED_ShowImage(42, 10, 44, 44, Frame);//显示选择框
 
-	OLED_ShowImage(x_pre - 96, 16, 32, 32, Menu_Graph[(Pre_Select - 2 + 6) % 6]);//显示左侧-1图标
-	OLED_ShowImage(x_pre - 48, 16, 32, 32, Menu_Graph[(Pre_Select - 1 + 6) % 6]);//显示左侧图标
+	OLED_ShowImage(x_pre - 96, 16, 32, 32, Menu_Graph[(Pre_Select - 2 + ANIME_NUM) % ANIME_NUM]);//显示左侧-1图标
+	OLED_ShowImage(x_pre - 48, 16, 32, 32, Menu_Graph[(Pre_Select - 1 + ANIME_NUM) % ANIME_NUM]);//显示左侧图标
 	OLED_ShowImage(x_pre, 16, 32, 32, Menu_Graph[Pre_Select]);//显示原中心图标
-	OLED_ShowImage(x_pre + 48, 16, 32, 32, Menu_Graph[(Pre_Select + 1) % 6]);//显示右侧图标
-	OLED_ShowImage(x_pre + 96, 16, 32, 32, Menu_Graph[(Pre_Select + 2) % 6]);//显示右侧+1图标
+	OLED_ShowImage(x_pre + 48, 16, 32, 32, Menu_Graph[(Pre_Select + 1) % ANIME_NUM]);//显示右侧图标
+	OLED_ShowImage(x_pre + 96, 16, 32, 32, Menu_Graph[(Pre_Select + 2) % ANIME_NUM]);//显示右侧+1图标
 
 	ShowFrames();
 	OLED_Update();
 }
 
 //显示动画
-void ShowAnime(void)
+static void ShowAnime(void)
 {
 	if(Direction == KEY_LAST)  // 向左滑动，图标右移
 	{
@@ -54,35 +63,11 @@ void ShowAnime(void)
 }
 
 //调度函数，根据中心图标进入对应任务
-void Dispatch(void)
+static void Dispatch(void)
 {
-	switch (Pre_Select)
+	if(Pre_Select < ANIME_NUM)
 	{
-	case 0:
-		vTaskResume(UITaskHandle);//恢复UI任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 1:
-		vTaskResume(TimeTaskHandle);//恢复时间任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 2:
-		vTaskResume(FlashlightTaskHandle);//恢复手电筒任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 3:
-		vTaskResume(MPU6050TaskHandle);//恢复MPU6050任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 4:
-		vTaskResume(GameTaskHandle);//恢复小恐龙游戏任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 5:
-	
-		break;
-	default:
-		break;
+		(void)TaskMgr_ApplySwitchPlan(&gMenuSwitchPlan[Pre_Select]);
 	}
 }
 
@@ -133,21 +118,26 @@ void ShowMenu(void)
 			{
 				Confirm_flag = 0;
 				Dispatch();
-				ShowAnimeFrame(); // 从其他任务恢复后，立刻刷新一次画面
 			}
 			if(KeyCnt < 0)
 			{
 				KeyCnt++;
-				Target_Select = (Pre_Select - 1 + 6) % 6;//向左滑动
+				Target_Select = (Pre_Select - 1 + ANIME_NUM) % ANIME_NUM;//向左滑动
 				Direction = KEY_LAST;
 				Moving = 1;
 			}
 			else if(KeyCnt > 0)
 			{
 				KeyCnt--;
-				Target_Select = (Pre_Select + 1) % 6;//向右滑动
+				Target_Select = (Pre_Select + 1) % ANIME_NUM;//向右滑动
 				Direction = KEY_NEXT;
 				Moving = 1;
+			}
+			
+			// 对于不移动的静止状态，也要循环刷新显示，否则睡眠唤醒后（屏幕内容在睡眠前被清空）将是一片黑屏
+			if(!Moving && KeyNum == 0)
+			{
+			    ShowAnimeFrame();
 			}
 		}
 		else
@@ -155,7 +145,8 @@ void ShowMenu(void)
 			ShowAnime();
 		}
 		
-		vTaskDelay(pdMS_TO_TICKS(5));//让出cpu，同时时间尽量短以保证动画流畅和按键响应及时
+		if (!Moving) vTaskDelay(pdMS_TO_TICKS(50));
+		else vTaskDelay(pdMS_TO_TICKS(5));
 	}
   
 }

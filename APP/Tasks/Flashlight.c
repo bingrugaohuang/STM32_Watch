@@ -1,5 +1,4 @@
-#include "tasks/Flashlight.h"
-
+#include "Flashlight.h"
 
 static uint16_t CCR = 0;//PWM占空比值
 static uint16_t CCR_Speed = 50;//PWM占空比调整速度
@@ -144,6 +143,11 @@ void CCR_Set(void)
 	}
 }
 
+
+static const TaskMgrSwitchPlan_t gFlashlightSwitchPlan = {
+	TASKMGR_TASK_MENU, TASKMGR_TASK_FLASHLIGHT
+};
+
 //显示手电筒界面并处理按键
 void Show_Flashlight(void)
 {
@@ -157,8 +161,7 @@ void Show_Flashlight(void)
 			switch(Cursor)
 			{
 				case 0:
-					vTaskResume(MenuTaskHandle);//恢复UI任务
-					vTaskSuspend(NULL);//挂起手电筒任务
+					TaskMgr_ApplySwitchPlan(&gFlashlightSwitchPlan);
 					return;
 				case 1:
 					CCR_Set();

@@ -7,8 +7,8 @@
 #include "FreeRTOS.h"
 #include "Key.h"
 #include "tim.h"
-#include "modules/ShowFrames.h"
-#include "common/app_handles.h"
+#include "ShowFrames.h"
+#include "TaskMgr.h"
 
 void Show_Flashlight(void);
 

@@ -7,10 +7,10 @@
 #include "FreeRTOS.h"
 #include "Key.h"
 #include "timers.h"
-#include "modules/ShowFrames.h"
-#include "modules/StopWatch_APP.h"
-#include "ui/AlarmUI.h"
-#include "common/app_handles.h"
+#include "ShowFrames.h"
+#include "StopWatch_APP.h"
+#include "AlarmUI.h"
+#include "TaskMgr.h"
 
 void TimeUI(void);
 

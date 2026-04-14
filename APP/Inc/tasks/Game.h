@@ -6,10 +6,10 @@
 #include "OLED_Data.h"
 #include "FreeRTOS.h"
 #include "Key.h"
-#include "modules/dino.h"
-#include "modules/ShowFrames.h"
-#include "modules/TranAnime.h"
-#include "common/app_handles.h"
+#include "dino.h"
+#include "ShowFrames.h"
+#include "TranAnime.h"
+#include "TaskMgr.h"
 
 void Game(void);
 
