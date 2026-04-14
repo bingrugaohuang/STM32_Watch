@@ -10,6 +10,8 @@ static AlarmConfig_t gAlarmCfg = {0U, 0U, 0U, 1U, ALARM_REPEAT_DAILY};
 static volatile uint8_t gAlarmPendingIRQ = 0U;
 static volatile uint8_t gSnoozeArmed = 0U;
 static volatile uint8_t gAlarmRinging = 0U;
+static uint32_t mark = 0U;
+
 
 /*
  * 函数功能：约束配置项到合法范围
@@ -196,6 +198,16 @@ void Alarm_ServiceDebugForceWake(void)
 }
 
 /*
+ * 函数功能：在外部修改mark值
+ * 入口参数：marktemp
+ * 返回值  ：无
+ */
+void Alarm_SetMark(uint32_t marktemp)
+{
+	mark = marktemp;
+}
+
+/*
  *函数功能：闹钟任务，等待中断通知后拉起最小提醒页
  *入口参数：argument 任务参数（未使用）
  *返回值  ：无
@@ -215,7 +227,8 @@ void Alarm_ServiceTask(void *argument)
 		SleepMgr_ReportActivity();
 
 		gAlarmRinging = 1U;
-		uint32_t mark = SuspendForegroundTasks();
+		
+		mark = SuspendForegroundTasks();
 		AlarmAction_t action = AlarmUI_ShowRingingPage(&gAlarmCfg);
 		Alarm_ApplyAction(action);
 		ResumeForegroundTasks(mark);

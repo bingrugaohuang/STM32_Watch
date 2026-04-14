@@ -4,7 +4,7 @@
 typedef struct {
     TaskMgrTaskId_t TaskId;
     TaskHandle_t* HandleRef;
-    uint32_t ForefroundMark;
+    uint32_t ForegroundMark;
 }TaskMgrMap_t;
 
 static const TaskMgrMap_t gTaskMap[] = {
@@ -104,14 +104,14 @@ uint32_t SuspendForegroundTasks(void)
     MPU6050_I2C_Lock(); // 挂起前先锁住MPU6050，避免在挂起过程中被MPU6050任务打断导致死锁
     for(uint8_t i = 0U; i < sizeof(gTaskMap) / sizeof(gTaskMap[0]); i++)
     {
-        if(gTaskMap[i].ForefroundMark == 0U)
+        if(gTaskMap[i].ForegroundMark == 0U)
         {
             continue;
         }
 
         if(SuspendIfNeeded(*(gTaskMap[i].HandleRef)))
         {
-            mark |= gTaskMap[i].ForefroundMark;
+            mark |= gTaskMap[i].ForegroundMark;
         }
     }
     MPU6050_I2C_Unlock(); // 解锁MPU6050
@@ -137,11 +137,11 @@ void ResumeForegroundTasks(uint32_t mark)
 
     for(uint8_t i = 0U; i < sizeof(gTaskMap) / sizeof(gTaskMap[0]); i++)
     {
-        if(gTaskMap[i].ForefroundMark == 0U)
+        if(gTaskMap[i].ForegroundMark == 0U)
         {
             continue;
         }
-        if(mark & gTaskMap[i].ForefroundMark)
+        if(mark & gTaskMap[i].ForegroundMark)
         {
             ResumeIfNeeded(*(gTaskMap[i].HandleRef));
         }

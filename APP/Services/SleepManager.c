@@ -174,6 +174,7 @@ void SleepManager_Task(void *argument)
             if(Alarm_ServiceIsRinging() != 0U)
             {
                 gSleepState = SLEEP_STATE_ACTIVE;
+                Alarm_SetMark(mark);
                 break;
             }
 
