@@ -11,7 +11,7 @@
 #include "TranAnime.h"
 #include "Set_StackMonitor.h"
 #include "ScreenBright.h"
-#include "app_handles.h"
+#include "TaskMgr.h"
 
 void Setting(void);
 	

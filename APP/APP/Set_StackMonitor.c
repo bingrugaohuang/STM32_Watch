@@ -1,17 +1,22 @@
 #include "Set_StackMonitor.h"
 
+static const TaskMgrSwitchPlan_t gStackMonitorSwitchPlan[] = {
+    {TASKMGR_TASK_NULL, TASKMGR_TASK_STACK_MONITOR},
+    {TASKMGR_TASK_STACK_MONITOR, TASKMGR_TASK_NULL}
+};
+
 //根据Cursor判断是挂起还是恢复栈监控任务
 static void JugdeStackMonitorState(int8_t Cursor)
 {
     if(Cursor == 0){
         if(StackMonitorTaskHandle != NULL && eTaskGetState(StackMonitorTaskHandle) != eSuspended)
         {
-            vTaskSuspend(StackMonitorTaskHandle);//挂起栈监控任务，退出显示栈高水位界面
+           TaskMgr_ApplySwitchPlan(&gStackMonitorSwitchPlan[0]);//挂起栈监控任务，退出显示栈高水位界面
         }
     }else if(Cursor == 1){
         if(StackMonitorTaskHandle != NULL && eTaskGetState(StackMonitorTaskHandle) == eSuspended)
         {
-            vTaskResume(StackMonitorTaskHandle);//恢复栈监控任务，退出显示栈高水位界面
+           TaskMgr_ApplySwitchPlan(&gStackMonitorSwitchPlan[1]);//恢复栈监控任务，退出显示栈高水位界面
         }
     }
 }

@@ -1046,11 +1046,6 @@
               <FilePath>..\APP/Tasks\Game.c</FilePath>
             </File>
             <File>
-              <FileName>StackMonitor_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\Tasks\StackMonitor_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>Time_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\Tasks\Time_Task.c</FilePath>
@@ -1125,6 +1120,16 @@
               <FileType>1</FileType>
               <FilePath>..\APP\Services\SleepManager.c</FilePath>
             </File>
+            <File>
+              <FileName>TaskMgr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Services\TaskMgr.c</FilePath>
+            </File>
+            <File>
+              <FileName>StackMonitor_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Services\StackMonitor_Task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1171,11 +1176,6 @@
               <FilePath>..\APP\Inc\tasks\ShowMenu.h</FilePath>
             </File>
             <File>
-              <FileName>StackMonitor_Task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\APP\Inc\tasks\StackMonitor_Task.h</FilePath>
-            </File>
-            <File>
               <FileName>task_entry.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\APP\Inc\tasks\task_entry.h</FilePath>
@@ -1199,6 +1199,16 @@
               <FileName>SleepManager.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\APP\Inc\services\SleepManager.h</FilePath>
+            </File>
+            <File>
+              <FileName>TaskMgr.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\APP\Inc\Services\TaskMgr.h</FilePath>
+            </File>
+            <File>
+              <FileName>StackMonitor_Task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\APP\Inc\services\StackMonitor_Task.h</FilePath>
             </File>
           </Files>
         </Group>

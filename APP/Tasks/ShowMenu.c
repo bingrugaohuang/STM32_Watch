@@ -7,6 +7,16 @@ static uint8_t Moving = 0;//动画进行标志
 static int8_t x_pre = 48;//动画过程中中心图标的x坐标
 static uint8_t anime_speed = ANIME_SPEED;//动画速度
 
+// 菜单索引与任务切换策略映射: 业务层不再直接操作任务句柄
+static const TaskMgrSwitchPlan_t gMenuSwitchPlan[ANIME_NUM] =
+{
+	{TASKMGR_TASK_UI,         TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_TIME,       TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_FLASHLIGHT, TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_MPU6050,    TASKMGR_TASK_MENU},
+	{TASKMGR_TASK_GAME,       TASKMGR_TASK_MENU}
+};
+
 //显示动画的一帧	
 static void ShowAnimeFrame(void)
 {
@@ -55,33 +65,9 @@ static void ShowAnime(void)
 //调度函数，根据中心图标进入对应任务
 static void Dispatch(void)
 {
-	switch (Pre_Select)
+	if(Pre_Select < ANIME_NUM)
 	{
-	case 0:
-		vTaskResume(UITaskHandle);//恢复UI任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 1:
-		vTaskResume(TimeTaskHandle);//恢复时间任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 2:
-		vTaskResume(FlashlightTaskHandle);//恢复手电筒任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 3:
-		vTaskResume(MPU6050TaskHandle);//恢复MPU6050任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	case 4:
-		vTaskResume(GameTaskHandle);//恢复小恐龙游戏任务
-		vTaskSuspend(MenuTaskHandle);//挂起菜单任务
-		break;
-	// case 5:
-	
-	// 	break;
-	default:
-		break;
+		(void)TaskMgr_ApplySwitchPlan(&gMenuSwitchPlan[Pre_Select]);
 	}
 }
 
@@ -160,7 +146,7 @@ void ShowMenu(void)
 		}
 		
 		if (!Moving) vTaskDelay(pdMS_TO_TICKS(50));
-		else vTaskDelay(pdMS_TO_TICKS(10));
+		else vTaskDelay(pdMS_TO_TICKS(5));
 	}
   
 }

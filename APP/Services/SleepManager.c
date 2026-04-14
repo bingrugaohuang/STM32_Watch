@@ -12,9 +12,8 @@ static TickType_t gStopTimeoutTicks = 0; // 从Sleep升级到Stop的超时时间
 
 static volatile uint8_t gWakeupPending = 0; // 是否有待处理的唤醒事件，避免重复处理同一事件
 static volatile uint8_t gDiscardWakeKey = 0; // 睡眠期间用于唤醒的按键是否需要丢弃
-//static volatile TickType_t gWakeupIgnoreKeyUntil = 0; // 免疫按键事件的截止Tick时间，避免刚醒来就被按键抖动立刻拉回睡眠
 
-static uint32_t gSuspendedTaskMask = 0U;// 记录进入睡眠前被本任务挂起的前台任务，唤醒时只恢复这批任务，避免固定恢复UI导致场景丢失
+static uint32_t mark = 0U; // 记录进入睡眠前被本任务挂起的前台任务，唤醒时只恢复这批任务，避免固定恢复UI导致场景丢失
 static uint8_t gMotionWakeArmed = 0U; // 记录是否已经配置了MPU6050运动唤醒
 static uint8_t gStopContext = 0U; // 记录本次唤醒是否来自Stop返回
 
@@ -33,84 +32,6 @@ static void SleepMgr_ClearWakeIrqPending(void)
 
     __HAL_RTC_ALARM_EXTI_CLEAR_FLAG();
     HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
-}
-
-
-// 恢复任务，如果任务句柄有效且当前处于挂起状态
-static void ResumeIfNeeded(TaskHandle_t taskHandle)
-{
-    if(taskHandle != NULL && eTaskGetState(taskHandle) == eSuspended)
-    {
-        vTaskResume(taskHandle);
-    }
-}
-
-// 挂起任务并记录该任务在睡眠前是运行态，唤醒时只恢复这批任务
-static void SuspendAndRecord(TaskHandle_t taskHandle, uint32_t taskBit)
-{
-    if(taskHandle != NULL && eTaskGetState(taskHandle) != eSuspended)
-    {
-        vTaskSuspend(taskHandle);
-        gSuspendedTaskMask |= taskBit;
-    }
-}
-
-// 挂起所有前台任务，准备进入睡眠状态
-static void SuspendForegroundTasks(void)
-{
-    gSuspendedTaskMask = 0U;
-    SuspendAndRecord(UITaskHandle, SLEEP_TASK_BIT_UI);
-    SuspendAndRecord(MenuTaskHandle, SLEEP_TASK_BIT_MENU);
-    SuspendAndRecord(TimeTaskHandle, SLEEP_TASK_BIT_STOPWATCH);
-    SuspendAndRecord(FlashlightTaskHandle, SLEEP_TASK_BIT_FLASHLIGHT);
-    SuspendAndRecord(MPU6050TaskHandle, SLEEP_TASK_BIT_MPU6050);
-    SuspendAndRecord(GameTaskHandle, SLEEP_TASK_BIT_GAME);
-    SuspendAndRecord(SetTaskHandle, SLEEP_TASK_BIT_SET);
-}
-
-// 唤醒时恢复睡眠前被本任务挂起的前台任务，避免固定恢复UI导致场景丢失
-static uint8_t ResumeForegroundTasks(void)
-{
-    uint8_t resumedCount = 0U;
-
-    if((gSuspendedTaskMask & SLEEP_TASK_BIT_UI) != 0U)
-    {
-        ResumeIfNeeded(UITaskHandle);
-        resumedCount++;
-    }
-    if((gSuspendedTaskMask & SLEEP_TASK_BIT_MENU) != 0U)
-    {
-        ResumeIfNeeded(MenuTaskHandle);
-        resumedCount++;
-    }
-    if((gSuspendedTaskMask & SLEEP_TASK_BIT_STOPWATCH) != 0U)
-    {
-        ResumeIfNeeded(TimeTaskHandle);
-        resumedCount++;
-    }
-    if((gSuspendedTaskMask & SLEEP_TASK_BIT_FLASHLIGHT) != 0U)
-    {
-        ResumeIfNeeded(FlashlightTaskHandle);
-        resumedCount++;
-    }
-    if((gSuspendedTaskMask & SLEEP_TASK_BIT_MPU6050) != 0U)
-    {
-        ResumeIfNeeded(MPU6050TaskHandle);
-        resumedCount++;
-    }
-    if((gSuspendedTaskMask & SLEEP_TASK_BIT_GAME) != 0U)
-    {
-        ResumeIfNeeded(GameTaskHandle);
-        resumedCount++;
-    }
-    if((gSuspendedTaskMask & SLEEP_TASK_BIT_SET) != 0U)
-    {
-        ResumeIfNeeded(SetTaskHandle);
-        resumedCount++;
-    }
-
-    gSuspendedTaskMask = 0U;
-    return resumedCount;
 }
 
 // 配置MPU6050运动唤醒，用于Sleep和Stop期间的抬腕唤醒
@@ -138,7 +59,6 @@ static void SleepMgr_DisarmMotionWakeup(void)
     }
 }
 
-
 // 初始化睡眠管理器，设置进入睡眠状态的超时时间
 static void SleepMgr_Init(TickType_t SleepTimeoutTicks, TickType_t StopTimeoutTicks)
 {
@@ -146,7 +66,7 @@ static void SleepMgr_Init(TickType_t SleepTimeoutTicks, TickType_t StopTimeoutTi
     gLastActiveTick = xTaskGetTickCount();
     gSleepTimeoutTicks = SleepTimeoutTicks;
     gStopTimeoutTicks = StopTimeoutTicks;
-    gSuspendedTaskMask = 0U;
+    // gSuspendedTaskMask = 0U;
     gWakeupPending = 0U;
     gMotionWakeArmed = 0U;
     gStopContext = 0U;
@@ -194,17 +114,10 @@ void SleepManager_Task(void *argument)
             }
             break;
         case SLEEP_STATE_PREPARE_SLEEP:
-            OLED_I2C_Lock();
-            MPU6050_I2C_Lock();
-
-            SuspendForegroundTasks(); // 在确保I2C空闲后挂起任务，避免在I2C发送间隙把任务卡死死锁
-
-            MPU6050_I2C_Unlock(); // 已经挂起前台任务，MPU6050肯定空闲了
+            mark = SuspendForegroundTasks();
 
             OLED_Clear();
             OLED_Update();
-
-            OLED_I2C_Unlock(); // 解锁OLED
 
             SleepMgr_ArmMotionWakeup(); // Sleep阶段也保持抬腕唤醒能力
             taskENTER_CRITICAL();
@@ -265,10 +178,7 @@ void SleepManager_Task(void *argument)
             }
 
             // 恢复睡眠前实际运行的任务，确保被挂起在显示/I2C路径中的任务可以继续收尾
-            if(ResumeForegroundTasks() == 0U)
-            {
-                ResumeIfNeeded(UITaskHandle);
-            }
+            ResumeForegroundTasks(mark); // 恢复被挂起的前台任务，恢复后才切换回活跃
             gSleepState = SLEEP_STATE_ACTIVE; // 切换回活跃状态
             break;
     }

@@ -28,7 +28,8 @@
                 "d:\\Desk\\stm32\\STM32HAL\\STM32_Watch\\APP\\Src",
                 "d:\\Desk\\stm32\\STM32HAL\\STM32_Watch\\APP\\Tasks",
                 "d:\\Desk\\stm32\\STM32HAL\\STM32_Watch\\APP\\APP",
-                "d:\\Desk\\stm32\\STM32HAL\\STM32_Watch\\APP\\Services"
+                "d:\\Desk\\stm32\\STM32HAL\\STM32_Watch\\APP\\Services",
+                "d:\\Desk\\stm32\\STM32HAL\\STM32_Watch\\APP\\Inc\\Services"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

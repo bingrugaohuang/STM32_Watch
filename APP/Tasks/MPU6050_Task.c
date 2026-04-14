@@ -1,5 +1,9 @@
 #include "MPU6050_Task.h"
 
+static const TaskMgrSwitchPlan_t gMPU6050SwitchPlan = {
+	TASKMGR_TASK_MENU, TASKMGR_TASK_MPU6050
+};
+
 static void ShowUI_MPU6050(void)
 {
 	OLED_ShowImage(0, 0, 16, 16, Return);
@@ -20,8 +24,7 @@ void Show_MPU6050(void)
 			switch (Cursor)
 			{
 				case 0:
-					vTaskResume(MenuTaskHandle);//恢复菜单任务，进入菜单界面
-					vTaskSuspend(NULL);//挂起当前任务，等待下次进入MPU6050界面时再恢复
+					TaskMgr_ApplySwitchPlan(&gMPU6050SwitchPlan);//恢复菜单任务，挂起MPU6050任务
 					break;
 				case 1:
 					TranAnime(TRAN_DIR_LEFT);//进入MPU6050角度界面，左移

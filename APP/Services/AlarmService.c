@@ -6,7 +6,6 @@ extern void SleepMgr_ReportActivity(void);
 extern AlarmAction_t AlarmUI_ShowRingingPage(const AlarmConfig_t *cfg);
 
 static AlarmConfig_t gAlarmCfg = {0U, 0U, 0U, 1U, ALARM_REPEAT_DAILY};
-//static AlarmConfig_t gAlarmSnzCfg = {0U};
 
 static volatile uint8_t gAlarmPendingIRQ = 0U;
 static volatile uint8_t gSnoozeArmed = 0U;
@@ -27,76 +26,6 @@ static void Alarm_ClampConfig(AlarmConfig_t *cfg)
 	if(cfg->SnoozeMin > 30U) cfg->SnoozeMin = 30U;
 	cfg->Enabled = (cfg->Enabled != 0U) ? 1U : 0U;
 	cfg->Repeat = (cfg->Repeat == ALARM_REPEAT_DAILY) ? ALARM_REPEAT_DAILY : ALARM_REPEAT_ONCE;
-}
-
-
-/*
- * 函数功能：如果任务句柄有效且未挂起，则挂起任务
- * 入口参数：xTaskHandle 任务句柄
- * 返回值  ：1U 已挂起，0U 无需挂起
- */
-static uint8_t SuspendIfNeeded(TaskHandle_t xTaskHandle)
-{
-	if(xTaskHandle != NULL && eTaskGetState(xTaskHandle) != eSuspended)
-	{
-		OLED_I2C_Lock(); // 先拿OLED递归锁，避免挂起时持有锁导致死锁
-		vTaskSuspend(xTaskHandle);
-		OLED_I2C_Unlock();
-		return 1U;
-	}
-	return 0U;
-}
-
-/*
- * 函数功能：如果任务句柄有效且处于挂起状态，则恢复任务
- * 入口参数：xTaskHandle 任务句柄
- * 返回值  ：无
- */
-static void ResumeIfNeeded(TaskHandle_t xTaskHandle)
-{
-	if(xTaskHandle != NULL && eTaskGetState(xTaskHandle) == eSuspended)
-	{
-		vTaskResume(xTaskHandle);
-	}
-}
-
-/*
- * 函数功能：挂起前台任务
- * 入口参数：无
- * 返回值  ：挂起任务的掩码
- */
-static uint32_t Alarm_SuspendForegroundTasks(void)
-{
-	uint32_t mark = 0U;
-
-	if(SuspendIfNeeded(UITaskHandle))           mark |= (1U << 0);
-	if(SuspendIfNeeded(MenuTaskHandle))  	    mark |= (1U << 1);
-	if(SuspendIfNeeded(SetTaskHandle))          mark |= (1U << 2);
-	if(SuspendIfNeeded(TimeTaskHandle))         mark |= (1U << 3);
-	if(SuspendIfNeeded(FlashlightTaskHandle))   mark |= (1U << 4);
-	if(SuspendIfNeeded(MPU6050TaskHandle))      mark |= (1U << 5);
-	if(SuspendIfNeeded(GameTaskHandle))         mark |= (1U << 6);
-	if(SuspendIfNeeded(StackMonitorTaskHandle)) mark |= (1U << 7);
-	return mark;
-}
-
-/*
- * 函数功能：按掩码恢复前台任务
- * 入口参数：mask 挂起掩码
- * 返回值  ：无
- */
-static void Alarm_ResumeForegroundTasks(uint32_t mark)
-{
-	if(mark & (1U << 0)) ResumeIfNeeded(UITaskHandle);
-	if(mark & (1U << 1)) ResumeIfNeeded(MenuTaskHandle);
-	if(mark & (1U << 2)) ResumeIfNeeded(SetTaskHandle);
-	if(mark & (1U << 3)) ResumeIfNeeded(TimeTaskHandle);
-	if(mark & (1U << 4)) ResumeIfNeeded(FlashlightTaskHandle);
-	if(mark & (1U << 5)) ResumeIfNeeded(MPU6050TaskHandle);
-	if(mark & (1U << 6)) ResumeIfNeeded(GameTaskHandle);
-	if(mark & (1U << 7)) ResumeIfNeeded(StackMonitorTaskHandle);
-
-	if(mark == 0U)       ResumeIfNeeded(UITaskHandle);
 }
 
 /*
@@ -286,10 +215,10 @@ void Alarm_ServiceTask(void *argument)
 		SleepMgr_ReportActivity();
 
 		gAlarmRinging = 1U;
-		uint32_t mark = Alarm_SuspendForegroundTasks();
+		uint32_t mark = SuspendForegroundTasks();
 		AlarmAction_t action = AlarmUI_ShowRingingPage(&gAlarmCfg);
 		Alarm_ApplyAction(action);
-		Alarm_ResumeForegroundTasks(mark);
+		ResumeForegroundTasks(mark);
 		gAlarmRinging = 0U;
 	}
 }
