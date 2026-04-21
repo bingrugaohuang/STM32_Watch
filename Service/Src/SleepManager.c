@@ -3,7 +3,7 @@
 
 extern void SystemClock_Config(void);
 
-static SleepState_t gSleepState = SLEEP_STATE_ACTIVE; // 全局睡眠状态变量，初始为活跃状态
+static volatile SleepState_t gSleepState = SLEEP_STATE_ACTIVE; // 全局睡眠状态变量，初始为活跃状态；在任务与ISR上下文间共享
 
 static TickType_t gLastActiveTick = 0; // 上次活跃的系统时钟计数，用于判断是否进入睡眠状态
 static TickType_t gSleepEnterTick = 0; // 实际进入睡眠状态的系统时钟计数，用于计算睡眠持续时间
