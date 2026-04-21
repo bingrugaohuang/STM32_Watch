@@ -53,10 +53,10 @@ TickType_t OSAL_GetTickCountFromISR(void)
     return xTaskGetTickCountFromISR();
 }
 
-void OSAL_Delay(TickType_t ticks)
+void OSAL_Delay(uint32_t delayMs)
 {
-    configASSERT(ticks > 0U);
-    vTaskDelay(ticks);
+    configASSERT(delayMs > 0U);
+    vTaskDelay(pdMS_TO_TICKS(delayMs));
 }
 
 void OSAL_DelayUntil(TickType_t *const previousWakeTime, TickType_t timeIncrement)

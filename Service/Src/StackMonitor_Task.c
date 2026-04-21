@@ -107,6 +107,6 @@ void StackMonitor_Task(void *argument)
   while(1)
   {
     StackMonitor_PrintAll();
-    OSAL_Delay(pdMS_TO_TICKS(5000));
+    OSAL_Delay(5000U);
   }
 }

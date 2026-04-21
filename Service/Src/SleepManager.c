@@ -187,11 +187,11 @@ void SleepManager_Task(void *argument)
 
     if(gSleepState == SLEEP_STATE_SLEEPING)
     {
-        OSAL_Delay(pdMS_TO_TICKS(1));
+        OSAL_Delay(1U);
     }
     else
     {
-        OSAL_Delay(pdMS_TO_TICKS(10));
+        OSAL_Delay(10U);
     }
   }
 }

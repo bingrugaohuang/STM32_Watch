@@ -15,7 +15,7 @@ BaseType_t OSAL_TaskResumeIfSuspended(TaskHandle_t task);
 BaseType_t OSAL_TaskSuspendIfRunning(TaskHandle_t task);
 TickType_t OSAL_GetTickCount(void);
 TickType_t OSAL_GetTickCountFromISR(void);
-void OSAL_Delay(TickType_t ticks);
+void OSAL_Delay(uint32_t delayMs);
 void OSAL_DelayUntil(TickType_t *const previousWakeTime, TickType_t timeIncrement);
 
 #endif

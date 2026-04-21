@@ -1145,6 +1145,11 @@
               <FileType>1</FileType>
               <FilePath>..\Service\Src\StackMonitor_Task.c</FilePath>
             </File>
+            <File>
+              <FileName>Log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Service\Src\Log.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1224,6 +1229,11 @@
               <FileName>StackMonitor_Task.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Service\Inc\StackMonitor_Task.h</FilePath>
+            </File>
+            <File>
+              <FileName>Log.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Service\Inc\Log.h</FilePath>
             </File>
           </Files>
         </Group>
