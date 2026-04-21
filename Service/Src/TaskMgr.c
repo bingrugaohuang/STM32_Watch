@@ -1,4 +1,5 @@
 #include "TaskMgr.h"
+#include "osal.h"
 
 // 任务映射表: 用任务ID统一管理句柄和前台挂起掩码
 typedef struct {
@@ -19,6 +20,16 @@ static const TaskMgrMap_t gTaskMap[] = {
     {TASKMGR_TASK_SLEEP_MANAGER, &SleepManagerTaskHandle,          0U},
     {TASKMGR_TASK_ALARM,         &AlarmTaskHandle,                 0U}
 };
+
+static uint32_t TaskMgr_GetForegroundMask(void)
+{
+    uint32_t mask = 0U;
+    for(uint8_t i = 0U; i < sizeof(gTaskMap) / sizeof(gTaskMap[0]); i++)
+    {
+        mask |= gTaskMap[i].ForegroundMark;
+    }
+    return mask;
+}
 
 /*
  * 函数功能：根据任务ID获取任务句柄
@@ -44,10 +55,9 @@ static TaskHandle_t TaskMgr_GetHandle(TaskMgrTaskId_t taskId)
  */
 static BaseType_t ResumeIfNeeded(TaskHandle_t taskHandle)
 {
-    if(taskHandle != NULL && eTaskGetState(taskHandle) == eSuspended)
+    if(taskHandle != NULL)
     {
-        vTaskResume(taskHandle);
-        return pdTRUE;
+        return OSAL_TaskResumeIfSuspended(taskHandle);
     }
     return pdFALSE;
 }
@@ -59,10 +69,9 @@ static BaseType_t ResumeIfNeeded(TaskHandle_t taskHandle)
  */
 static BaseType_t SuspendIfNeeded(TaskHandle_t taskHandle)
 {
-    if(taskHandle != NULL && eTaskGetState(taskHandle) != eSuspended)
+    if(taskHandle != NULL)
     {
-        vTaskSuspend(taskHandle);
-        return pdTRUE;
+        return OSAL_TaskSuspendIfRunning(taskHandle);
     }
     return pdFALSE;
 }
@@ -74,10 +83,9 @@ static BaseType_t SuspendIfNeeded(TaskHandle_t taskHandle)
  */
 BaseType_t TaskMgr_ApplySwitchPlan(const TaskMgrSwitchPlan_t* plan)
 {
-    if(plan == NULL)
-    {
-        return pdFALSE;
-    }
+    configASSERT(plan != NULL);
+    configASSERT(plan->ResumeTaskId < TASKMGR_TASK_COUNT);
+    configASSERT(plan->SuspendTaskId < TASKMGR_TASK_COUNT);
 
     TaskHandle_t resumeTaskHandle = TaskMgr_GetHandle(plan->ResumeTaskId);
     TaskHandle_t suspendTaskHandle = TaskMgr_GetHandle(plan->SuspendTaskId);
@@ -127,6 +135,9 @@ uint32_t SuspendForegroundTasks(void)
  */
 void ResumeForegroundTasks(uint32_t mark)
 {
+    uint32_t validMask = TaskMgr_GetForegroundMask();
+
+    configASSERT((mark & ~validMask) == 0U || mark == 0U);
     if(mark == 0U)
     {
         // 如果没有指定恢复哪个任务，默认恢复UI任务，避免场景丢失

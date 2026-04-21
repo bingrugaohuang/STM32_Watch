@@ -159,9 +159,9 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\APP\Services\SleepManager.c</Filename>
+          <Filename>..\Service\Src\SleepManager.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Watch\../APP/Services/SleepManager.c\313</Expression>
+          <Expression>\\STM32_Watch\../Service/Src/SleepManager.c\313</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
@@ -175,9 +175,9 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\APP\Services\SleepManager.c</Filename>
+          <Filename>..\Service\Src\SleepManager.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Watch\../APP/Services/SleepManager.c\312</Expression>
+          <Expression>\\STM32_Watch\../Service/Src/SleepManager.c\312</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -789,7 +789,7 @@
   </Group>
 
   <Group>
-    <GroupName>HardWare</GroupName>
+    <GroupName>BSP</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -801,8 +801,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\oled.c</PathWithFileName>
-      <FilenameWithoutPath>oled.c</FilenameWithoutPath>
+      <PathWithFileName>..\BSP\OLED.c</PathWithFileName>
+      <FilenameWithoutPath>OLED.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -813,8 +813,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\oled.h</PathWithFileName>
-      <FilenameWithoutPath>oled.h</FilenameWithoutPath>
+      <PathWithFileName>..\BSP\OLED.h</PathWithFileName>
+      <FilenameWithoutPath>OLED.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -825,7 +825,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\OLED_Data.c</PathWithFileName>
+      <PathWithFileName>..\BSP\OLED_Data.c</PathWithFileName>
       <FilenameWithoutPath>OLED_Data.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -837,7 +837,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\OLED_Data.h</PathWithFileName>
+      <PathWithFileName>..\BSP\OLED_Data.h</PathWithFileName>
       <FilenameWithoutPath>OLED_Data.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -849,7 +849,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\Key.c</PathWithFileName>
+      <PathWithFileName>..\BSP\Key.c</PathWithFileName>
       <FilenameWithoutPath>Key.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -861,7 +861,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\Key.h</PathWithFileName>
+      <PathWithFileName>..\BSP\Key.h</PathWithFileName>
       <FilenameWithoutPath>Key.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -873,7 +873,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\MPU6050.c</PathWithFileName>
+      <PathWithFileName>..\BSP\MPU6050.c</PathWithFileName>
       <FilenameWithoutPath>MPU6050.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -885,7 +885,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\MPU6050.h</PathWithFileName>
+      <PathWithFileName>..\BSP\MPU6050.h</PathWithFileName>
       <FilenameWithoutPath>MPU6050.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -897,7 +897,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardWare\MPU6050_Reg.h</PathWithFileName>
+      <PathWithFileName>..\BSP\MPU6050_Reg.h</PathWithFileName>
       <FilenameWithoutPath>MPU6050_Reg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1145,7 +1145,7 @@
   </Group>
 
   <Group>
-    <GroupName>APP/Services</GroupName>
+    <GroupName>Service/Src</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1157,7 +1157,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Services\AlarmService.c</PathWithFileName>
+      <PathWithFileName>..\Service\Src\AlarmService.c</PathWithFileName>
       <FilenameWithoutPath>AlarmService.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1169,7 +1169,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Services\SleepManager.c</PathWithFileName>
+      <PathWithFileName>..\Service\Src\SleepManager.c</PathWithFileName>
       <FilenameWithoutPath>SleepManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1181,7 +1181,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Services\TaskMgr.c</PathWithFileName>
+      <PathWithFileName>..\Service\Src\TaskMgr.c</PathWithFileName>
       <FilenameWithoutPath>TaskMgr.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1193,8 +1193,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Services\StackMonitor_Task.c</PathWithFileName>
+      <PathWithFileName>..\Service\Src\StackMonitor_Task.c</PathWithFileName>
       <FilenameWithoutPath>StackMonitor_Task.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>100</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Service\Src\Log.c</PathWithFileName>
+      <FilenameWithoutPath>Log.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1325,7 +1337,7 @@
   </Group>
 
   <Group>
-    <GroupName>APP/Inc/services</GroupName>
+    <GroupName>Service/Inc</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1337,7 +1349,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Inc\services\AlarmService.h</PathWithFileName>
+      <PathWithFileName>..\Service\Inc\AlarmService.h</PathWithFileName>
       <FilenameWithoutPath>AlarmService.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1349,7 +1361,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Inc\services\SleepManager.h</PathWithFileName>
+      <PathWithFileName>..\Service\Inc\SleepManager.h</PathWithFileName>
       <FilenameWithoutPath>SleepManager.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1361,7 +1373,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Inc\Services\TaskMgr.h</PathWithFileName>
+      <PathWithFileName>..\Service\Inc\TaskMgr.h</PathWithFileName>
       <FilenameWithoutPath>TaskMgr.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1373,8 +1385,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\APP\Inc\services\StackMonitor_Task.h</PathWithFileName>
+      <PathWithFileName>..\Service\Inc\StackMonitor_Task.h</PathWithFileName>
       <FilenameWithoutPath>StackMonitor_Task.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>101</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Service\Inc\Log.h</PathWithFileName>
+      <FilenameWithoutPath>Log.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1547,6 +1571,38 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\APP\Inc\common\app_types.h</PathWithFileName>
       <FilenameWithoutPath>app_types.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>OSAL</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>98</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\OSAL\Src\osal.c</PathWithFileName>
+      <FilenameWithoutPath>osal.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>99</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\OSAL\Inc\osal.h</PathWithFileName>
+      <FilenameWithoutPath>osal.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

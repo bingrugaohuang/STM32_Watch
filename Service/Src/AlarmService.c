@@ -141,7 +141,7 @@ static void Alarm_ApplyAction(AlarmAction_t action)
  */
 void Alarm_ServiceSetConfig(const AlarmConfig_t *cfg)
 {
-	if(cfg == NULL) return;
+	configASSERT(cfg != NULL);
 	gAlarmCfg = *cfg;
 	Alarm_ClampConfig(&gAlarmCfg);
 	//配置变更后重置贪睡状态，确保新配置生效时不受旧贪睡状态影响
@@ -169,7 +169,7 @@ void Alarm_ServiceInit(void)
  */
 void Alarm_ServiceGetConfig(AlarmConfig_t *cfg)
 {
-	if(cfg == NULL) return;
+	configASSERT(cfg != NULL);
 	*cfg = gAlarmCfg;
 }
 

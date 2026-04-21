@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../HardWare;../APP/Inc;..\APP\Inc\ui;..\APP\Inc\tasks;..\APP\Inc\services;..\APP\Inc\modules;..\APP\Inc\common</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../BSP;../OSAL/Inc;../Service/Inc;../APP/Inc;../APP/Inc/ui;../APP/Inc/tasks;../APP/Inc/modules;../APP/Inc/common</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -953,52 +953,67 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>HardWare</GroupName>
+          <GroupName>OSAL</GroupName>
           <Files>
             <File>
-              <FileName>oled.c</FileName>
+              <FileName>osal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardWare\oled.c</FilePath>
+              <FilePath>..\OSAL\Src\osal.c</FilePath>
             </File>
             <File>
-              <FileName>oled.h</FileName>
+              <FileName>osal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\HardWare\oled.h</FilePath>
+              <FilePath>..\OSAL\Inc\osal.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>BSP</GroupName>
+          <Files>
+            <File>
+              <FileName>OLED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\OLED.c</FilePath>
+            </File>
+            <File>
+              <FileName>OLED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\BSP\OLED.h</FilePath>
             </File>
             <File>
               <FileName>OLED_Data.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardWare\OLED_Data.c</FilePath>
+              <FilePath>..\BSP\OLED_Data.c</FilePath>
             </File>
             <File>
               <FileName>OLED_Data.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\HardWare\OLED_Data.h</FilePath>
+              <FilePath>..\BSP\OLED_Data.h</FilePath>
             </File>
             <File>
               <FileName>Key.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardWare\Key.c</FilePath>
+              <FilePath>..\BSP\Key.c</FilePath>
             </File>
             <File>
               <FileName>Key.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\HardWare\Key.h</FilePath>
+              <FilePath>..\BSP\Key.h</FilePath>
             </File>
             <File>
               <FileName>MPU6050.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardWare\MPU6050.c</FilePath>
+              <FilePath>..\BSP\MPU6050.c</FilePath>
             </File>
             <File>
               <FileName>MPU6050.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\HardWare\MPU6050.h</FilePath>
+              <FilePath>..\BSP\MPU6050.h</FilePath>
             </File>
             <File>
               <FileName>MPU6050_Reg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\HardWare\MPU6050_Reg.h</FilePath>
+              <FilePath>..\BSP\MPU6050_Reg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1108,27 +1123,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>APP/Services</GroupName>
+          <GroupName>Service/Src</GroupName>
           <Files>
             <File>
               <FileName>AlarmService.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\Services\AlarmService.c</FilePath>
+              <FilePath>..\Service\Src\AlarmService.c</FilePath>
             </File>
             <File>
               <FileName>SleepManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\Services\SleepManager.c</FilePath>
+              <FilePath>..\Service\Src\SleepManager.c</FilePath>
             </File>
             <File>
               <FileName>TaskMgr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\Services\TaskMgr.c</FilePath>
+              <FilePath>..\Service\Src\TaskMgr.c</FilePath>
             </File>
             <File>
               <FileName>StackMonitor_Task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\Services\StackMonitor_Task.c</FilePath>
+              <FilePath>..\Service\Src\StackMonitor_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>Log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Service\Src\Log.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1188,27 +1208,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>APP/Inc/services</GroupName>
+          <GroupName>Service/Inc</GroupName>
           <Files>
             <File>
               <FileName>AlarmService.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\APP\Inc\services\AlarmService.h</FilePath>
+              <FilePath>..\Service\Inc\AlarmService.h</FilePath>
             </File>
             <File>
               <FileName>SleepManager.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\APP\Inc\services\SleepManager.h</FilePath>
+              <FilePath>..\Service\Inc\SleepManager.h</FilePath>
             </File>
             <File>
               <FileName>TaskMgr.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\APP\Inc\Services\TaskMgr.h</FilePath>
+              <FilePath>..\Service\Inc\TaskMgr.h</FilePath>
             </File>
             <File>
               <FileName>StackMonitor_Task.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\APP\Inc\services\StackMonitor_Task.h</FilePath>
+              <FilePath>..\Service\Inc\StackMonitor_Task.h</FilePath>
+            </File>
+            <File>
+              <FileName>Log.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Service\Inc\Log.h</FilePath>
             </File>
           </Files>
         </Group>
