@@ -1,4 +1,5 @@
 #include "StackMonitor_Task.h"
+#include "osal.h"
 
 #define STACK_REPORT_BUF_SIZE 640
 
@@ -106,6 +107,6 @@ void StackMonitor_Task(void *argument)
   while(1)
   {
     StackMonitor_PrintAll();
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    OSAL_Delay(pdMS_TO_TICKS(5000));
   }
 }
