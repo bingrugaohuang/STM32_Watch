@@ -30,6 +30,7 @@
 /* USER CODE BEGIN Includes */
 #include "OLED.h"
 #include "MPU6050.h"
+#include "Log.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,9 +102,13 @@ int main(void)
   MX_TIM2_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+	Log_Init();
+  Log_SetLevel(LOG_LEVEL_INFO); // Set to LOG_LEVEL_DEBUG to observe verbose learning logs.
+	LOG_I("BOOT", "System boot start");
 	OLED_Init();
   MPU6050_Init();
 	OLED_Clear();
+	LOG_I("BOOT", "Peripherals ready, starting scheduler");
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -207,6 +212,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  LOG_E("BOOT", "Error_Handler entered");
   __disable_irq();
   while (1)
   {

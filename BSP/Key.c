@@ -1,4 +1,5 @@
 #include "Key.h"
+#include "Log.h"
 
 #define KEY_LONGPRESS_TICKS 100U  // 长按判定阈值：10ms * 100 = 1s
 
@@ -47,6 +48,7 @@ uint8_t Key_GetNum(void)
   uint8_t Key_Num = 0;
   if(xQueueReceive(xKeyQueue, &Key_Num, 0) == pdPASS){
 	SleepMgr_ReportActivity(); // 上报用户活动，刷新休眠计时
+	LOG_D("KEY", "Key event=%u", Key_Num);
     return Key_Num;
   }else
     return 0;
@@ -59,6 +61,7 @@ static void LongPressed_Init(uint8_t Key)
 	Key_Cnt = 0;
 	Key_LongSent = 0;
 	xTimerStart(KeyTimerHandle, 0);
+	LOG_D("KEY", "LongPress start key=%u", Key);
 }
 
 // 退出长按检测并停止扫描定时器
@@ -75,6 +78,13 @@ void Key(void)
 {
 	uint32_t KeyVal = 0;
 	xKeyQueue = xQueueCreate(10, sizeof(uint8_t)); // 创建按键事件队列：长度10，元素类型uint8_t
+	if(xKeyQueue == NULL)
+	{
+		LOG_E("KEY", "xKeyQueue create failed");
+		vTaskDelete(NULL);
+		return;
+	}
+	LOG_I("KEY", "Key queue created len=10");
 	while(1)
 	{
 		xTaskNotifyWait(0x07, 0x07, &KeyVal, portMAX_DELAY); // 等待EXTI通知，按位记录到KeyVal
@@ -129,11 +139,13 @@ void Key_Tick(TimerHandle_t xTimer)
 			KeyNum = Key_IsLongPressed(Key_Active_Copy);
 			xQueueSend(xKeyQueue, &KeyNum, 0);
 			Key_LongSent = 1U;
+			LOG_D("KEY", "LongPress send key=%u", KeyNum);
 		}
 	}else{
 		if(Key_LongSent == 0U){ // 未触发长按时，补发一次短按事件
 		KeyNum = Key_Active_Copy;
 		xQueueSend(xKeyQueue, &KeyNum, 0);
+		LOG_D("KEY", "ShortPress send key=%u", KeyNum);
 		}
 		LongPressed_Exit(xTimer);
 	}

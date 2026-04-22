@@ -86,7 +86,9 @@ void Log_RegisterBackend(LogBackend backend)
  */
 void Log_Print(LogLevel level, const char *tag, const char *fmt, ...)
 {
-    if(level > sLogLevel || level >= LOG_LEVEL_OFF)
+    //if(level > sLogLevel || level >= LOG_LEVEL_OFF)
+    if(sLogLevel == LOG_LEVEL_OFF 
+        || level > sLogLevel || level >= LOG_LEVEL_OFF)
     {
         return;
     }

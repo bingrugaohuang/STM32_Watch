@@ -1,4 +1,5 @@
 #include "AlarmService.h"
+#include "Log.h"
 
 extern void OLED_I2C_Lock(void);
 extern void OLED_I2C_Unlock(void);
@@ -12,6 +13,16 @@ static volatile uint8_t gSnoozeArmed = 0U;
 static volatile uint8_t gAlarmRinging = 0U;
 static uint32_t mark = 0U;
 
+static const char *Alarm_RepeatName(AlarmRepeat_t repeat)
+{
+	return (repeat == ALARM_REPEAT_DAILY) ? "DAILY" : "ONCE";
+}
+
+static const char *Alarm_ActionName(AlarmAction_t action)
+{
+	return (action == ALARM_ACTION_SNOOZE) ? "SNOOZE" : "STOP";
+}
+
 
 /*
  * 函数功能：约束配置项到合法范围
@@ -20,7 +31,10 @@ static uint32_t mark = 0U;
  */
 static void Alarm_ClampConfig(AlarmConfig_t *cfg)
 {
+	AlarmConfig_t rawCfg;
+
 	if(cfg == NULL) return;
+	rawCfg = *cfg;
 
 	if(cfg->Hour > 23U) cfg->Hour = 23U;
 	if(cfg->Min > 59U) cfg->Min = 59U;
@@ -28,6 +42,20 @@ static void Alarm_ClampConfig(AlarmConfig_t *cfg)
 	if(cfg->SnoozeMin > 30U) cfg->SnoozeMin = 30U;
 	cfg->Enabled = (cfg->Enabled != 0U) ? 1U : 0U;
 	cfg->Repeat = (cfg->Repeat == ALARM_REPEAT_DAILY) ? ALARM_REPEAT_DAILY : ALARM_REPEAT_ONCE;
+
+	if((rawCfg.Hour != cfg->Hour) ||
+	   (rawCfg.Min != cfg->Min) ||
+	   (rawCfg.SnoozeMin != cfg->SnoozeMin) ||
+	   (rawCfg.Enabled != cfg->Enabled) ||
+	   (rawCfg.Repeat != cfg->Repeat))
+	{
+		LOG_W("ALARM", "Config clamped en=%u %02u:%02u snooze=%u repeat=%s",
+		      cfg->Enabled,
+		      cfg->Hour,
+		      cfg->Min,
+		      cfg->SnoozeMin,
+		      Alarm_RepeatName(cfg->Repeat));
+	}
 }
 
 /*
@@ -48,8 +76,10 @@ static void Alarm_SetHardwareAlarm(uint8_t hour, uint8_t minute)
 	HAL_RTC_DeactivateAlarm(&hrtc, RTC_ALARM_A);
 	if(HAL_RTC_SetAlarm_IT(&hrtc, &alarm, RTC_FORMAT_BIN) != HAL_OK)
 	{
+		LOG_E("ALARM", "Set hardware alarm failed %02u:%02u", hour, minute);
 		Error_Handler();
 	}
+	LOG_I("ALARM", "Hardware alarm scheduled %02u:%02u", hour, minute);
 }
 
 /*
@@ -87,6 +117,7 @@ static void Alarm_NextTrigger(void)
 	if(gAlarmCfg.Enabled == 0U)
 	{
 		HAL_RTC_DeactivateAlarm(&hrtc, RTC_ALARM_A);
+		LOG_W("ALARM", "Alarm disabled, hardware alarm deactivated");
 		return;
 	}
 	else if(gAlarmCfg.Enabled == 1U)
@@ -97,10 +128,15 @@ static void Alarm_NextTrigger(void)
 			gSnoozeArmed = 0U;
 			Alarm_NextTriggerCaculation(gAlarmCfg.SnoozeMin, &targetHour, &targetMinute);
 			Alarm_SetHardwareAlarm(targetHour, targetMinute);
+			LOG_I("ALARM", "Snooze re-scheduled to %02u:%02u", targetHour, targetMinute);
 			return;
 		}
 		//Repeat模式下，按下stop直接配置下一次触发时间，无需计算
 		Alarm_SetHardwareAlarm(gAlarmCfg.Hour, gAlarmCfg.Min);
+		LOG_I("ALARM", "Next trigger from cfg %02u:%02u repeat=%s",
+		      gAlarmCfg.Hour,
+		      gAlarmCfg.Min,
+		      Alarm_RepeatName(gAlarmCfg.Repeat));
 	}
 }
 
@@ -112,6 +148,8 @@ static void Alarm_NextTrigger(void)
  */
 static void Alarm_ApplyAction(AlarmAction_t action)
 {
+	LOG_I("ALARM", "Apply action %s", Alarm_ActionName(action));
+
 	if(action == ALARM_ACTION_SNOOZE)
 	{
 		//贪睡可叠加
@@ -147,6 +185,12 @@ void Alarm_ServiceSetConfig(const AlarmConfig_t *cfg)
 	//配置变更后重置贪睡状态，确保新配置生效时不受旧贪睡状态影响
 	gSnoozeArmed = 0U;
 	Alarm_SetHardwareAlarm(gAlarmCfg.Hour, gAlarmCfg.Min);
+	LOG_I("ALARM", "Config updated en=%u %02u:%02u snooze=%u repeat=%s",
+	      gAlarmCfg.Enabled,
+	      gAlarmCfg.Hour,
+	      gAlarmCfg.Min,
+	      gAlarmCfg.SnoozeMin,
+	      Alarm_RepeatName(gAlarmCfg.Repeat));
 }
 
 /*
@@ -160,6 +204,12 @@ void Alarm_ServiceInit(void)
 	gAlarmRinging = 0U;
 	gSnoozeArmed = 0U;
 	Alarm_NextTrigger();
+	LOG_I("ALARM", "Service init en=%u %02u:%02u snooze=%u repeat=%s",
+	      gAlarmCfg.Enabled,
+	      gAlarmCfg.Hour,
+	      gAlarmCfg.Min,
+	      gAlarmCfg.SnoozeMin,
+	      Alarm_RepeatName(gAlarmCfg.Repeat));
 }
 
 /*
@@ -191,6 +241,7 @@ uint8_t Alarm_ServiceIsRinging(void)
 void Alarm_ServiceDebugForceWake(void)
 {
 	gAlarmPendingIRQ = 1U;
+	LOG_W("ALARM", "Debug force wake requested");
 	if(AlarmTaskHandle != NULL)
 	{
 		xTaskNotify(AlarmTaskHandle, 1U, eSetBits);
@@ -216,6 +267,7 @@ void Alarm_ServiceTask(void *argument)
 {
 	(void)argument;
 	uint32_t notifyValue = 0U;
+	LOG_I("ALARM", "Alarm task started");
 	while(1)
 	{
 		xTaskNotifyWait(0xFFFFFFFFU, 0xFFFFFFFFU, &notifyValue, portMAX_DELAY);
@@ -223,6 +275,7 @@ void Alarm_ServiceTask(void *argument)
 		gAlarmPendingIRQ = 0U;
 
 		if(gAlarmCfg.Enabled == 0U) continue;
+		LOG_I("ALARM", "Alarm IRQ consumed notify=0x%08lX", (unsigned long)notifyValue);
 
 		SleepMgr_ReportActivity();
 
@@ -232,6 +285,7 @@ void Alarm_ServiceTask(void *argument)
 		AlarmAction_t action = AlarmUI_ShowRingingPage(&gAlarmCfg);
 		Alarm_ApplyAction(action);
 		ResumeForegroundTasks(mark);
+		LOG_I("ALARM", "Ringing page done action=%s", Alarm_ActionName(action));
 		gAlarmRinging = 0U;
 	}
 }

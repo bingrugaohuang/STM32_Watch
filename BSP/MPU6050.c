@@ -1,5 +1,6 @@
 #include "MPU6050.h"
 #include "osal.h"
+#include "Log.h"
 // MPU6050 I2C访问的互斥锁，确保多任务环境下对MPU6050的I2C访问是线程安全的
 static OSAL_MutexHandle MPU6050_MutexHandle = NULL;
 
@@ -28,6 +29,7 @@ void MPU6050_I2C_Unlock(void)
 void MPU6050_EnableMotionWakeup(uint8_t mot_thr, uint8_t mot_dur, uint8_t wake_freq)
 {
   configASSERT(wake_freq <= 3U);
+  LOG_D("MPU6050", "Enable motion wake thr=%u dur=%u freq=%u", mot_thr, mot_dur, wake_freq);
   // 1. 先关中断并清状态，避免旧中断被锁存后影响本次入睡
   MPU6050_WriteReg(MPU6050_INT_ENABLE, 0x00);
   MPU6050_ReadReg(MPU6050_INT_STATUS);
@@ -72,6 +74,7 @@ void MPU6050_EnableMotionWakeup(uint8_t mot_thr, uint8_t mot_dur, uint8_t wake_f
  */
 void MPU6050_DisableMotionWakeup(void)
 {
+  LOG_D("MPU6050", "Disable motion wake");
     // 1. 禁用运动中断
     MPU6050_WriteReg(MPU6050_INT_ENABLE, 0x00);
     
@@ -115,16 +118,22 @@ void MPU6050_ClearIntStatus(void)
   */
 void MPU6050_WriteReg(uint8_t RegAddress, uint8_t Data)
 {
+  HAL_StatusTypeDef status;
+
 	configASSERT(MPU6050_MutexHandle != NULL);
 	MPU6050_I2C_Lock();
-	HAL_I2C_Mem_Write(&hi2c2,
-					  MPU6050_ADDRESS,
-					  RegAddress,
-					  I2C_MEMADD_SIZE_8BIT,
-					  &Data,
-					  1,
-					  MPU6050_I2C_TIMEOUT);
+  status = HAL_I2C_Mem_Write(&hi2c2,
+               MPU6050_ADDRESS,
+               RegAddress,
+               I2C_MEMADD_SIZE_8BIT,
+               &Data,
+               1,
+               MPU6050_I2C_TIMEOUT);
 	MPU6050_I2C_Unlock();
+  if(status != HAL_OK)
+  {
+    LOG_E("MPU6050", "WriteReg fail reg=0x%02X data=0x%02X st=%d", RegAddress, Data, (int)status);
+  }
 }
 
 /**
@@ -134,18 +143,23 @@ void MPU6050_WriteReg(uint8_t RegAddress, uint8_t Data)
   */
 uint8_t MPU6050_ReadReg(uint8_t RegAddress)
 {
-	uint8_t Data;
+  uint8_t Data = 0U;
+  HAL_StatusTypeDef status;
 
 	configASSERT(MPU6050_MutexHandle != NULL);
 	MPU6050_I2C_Lock();
-	HAL_I2C_Mem_Read(&hi2c2,
-					 MPU6050_ADDRESS,
-					 RegAddress,
-					 I2C_MEMADD_SIZE_8BIT,
-					 &Data,
-					 1,
-					 MPU6050_I2C_TIMEOUT);
+  status = HAL_I2C_Mem_Read(&hi2c2,
+              MPU6050_ADDRESS,
+              RegAddress,
+              I2C_MEMADD_SIZE_8BIT,
+              &Data,
+              1,
+              MPU6050_I2C_TIMEOUT);
 	MPU6050_I2C_Unlock();
+  if(status != HAL_OK)
+  {
+    LOG_E("MPU6050", "ReadReg fail reg=0x%02X st=%d", RegAddress, (int)status);
+  }
 	
 	return Data;
 }
@@ -157,6 +171,9 @@ uint8_t MPU6050_ReadReg(uint8_t RegAddress)
   */
 void MPU6050_Init(void)
 {
+  uint8_t id = 0U;
+
+  LOG_I("MPU6050", "Init start");
 	MPU6050_MutexHandle = OSAL_MutexCreateRecursive();
 	
 	MX_I2C2_Init();									//初始化硬件I2C2
@@ -168,6 +185,16 @@ void MPU6050_Init(void)
 	MPU6050_WriteReg(MPU6050_CONFIG, 0x06);			//配置寄存器，配置DLPF
 	MPU6050_WriteReg(MPU6050_GYRO_CONFIG, 0x18);	//陀螺仪配置寄存器，选择满量程为±2000°/s
 	MPU6050_WriteReg(MPU6050_ACCEL_CONFIG, 0x18);	//加速度计配置寄存器，选择满量程为±16g
+
+  id = MPU6050_GetID();
+  if(id == 0x68U || id == 0x69U)
+  {
+    LOG_I("MPU6050", "Init done WHO_AM_I=0x%02X", id);
+  }
+  else
+  {
+    LOG_E("MPU6050", "Unexpected WHO_AM_I=0x%02X", id);
+  }
 }
 
 /**

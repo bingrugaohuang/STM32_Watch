@@ -38,6 +38,7 @@
 #include "SleepManager.h"
 #include "StackMonitor_Task.h"
 #include "AlarmService.h"
+#include "Log.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -85,6 +86,44 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+
+static BaseType_t CreateTaskWithLog(TaskFunction_t taskFunc,
+                                    const char *name,
+                                    uint16_t stackWords,
+                                    UBaseType_t priority,
+                                    TaskHandle_t *handle)
+{
+  BaseType_t ret = xTaskCreate(taskFunc, name, stackWords, NULL, priority, handle);
+  if(ret == pdPASS)
+  {
+    LOG_I("TASK", "Create %s ok stack=%u prio=%lu", name, stackWords, (unsigned long)priority);
+  }
+  else
+  {
+    LOG_E("TASK", "Create %s failed stack=%u prio=%lu", name, stackWords, (unsigned long)priority);
+  }
+  return ret;
+}
+
+static TimerHandle_t CreateTimerWithLog(const char *name,
+                                        uint32_t periodMs,
+                                        TimerCallbackFunction_t callback)
+{
+  TimerHandle_t timer = xTimerCreate(name,
+                                     pdMS_TO_TICKS(periodMs),
+                                     pdTRUE,
+                                     NULL,
+                                     callback);
+  if(timer != NULL)
+  {
+    LOG_I("TIMER", "Create %s ok period=%lums", name, (unsigned long)periodMs);
+  }
+  else
+  {
+    LOG_E("TIMER", "Create %s failed period=%lums", name, (unsigned long)periodMs);
+  }
+  return timer;
+}
 
 /* USER CODE END FunctionPrototypes */
 
@@ -142,27 +181,26 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-	xTaskCreate(Key_Task, "Key_Task", 128, NULL, osPriorityHigh, &KeyTaskHandle);
-  xTaskCreate(UI_Task, "UI_Task", 192, NULL, osPriorityNormal, &UITaskHandle);
-  xTaskCreate(Set_Task, "Set_Task", 192, NULL, osPriorityNormal, &SetTaskHandle);
-  xTaskCreate(Menu_Task, "Menu_Task", 128, NULL, osPriorityNormal, &MenuTaskHandle);
-  xTaskCreate(Time_Task, "Time_Task", 192, NULL, osPriorityNormal, &TimeTaskHandle);
-  xTaskCreate(Flashlight_Task, "Flashlight_Task", 128, NULL, osPriorityNormal, &FlashlightTaskHandle);
-  xTaskCreate(MPU6050_Task, "MPU6050_Task", 256, NULL, osPriorityNormal, &MPU6050TaskHandle);
-  xTaskCreate(Game_Task, "Game_Task", 128, NULL, osPriorityNormal, &GameTaskHandle);
-  xTaskCreate(SleepManager_Task, "SleepManager_Task", 128, NULL, osPriorityNormal, &SleepManagerTaskHandle);
-  xTaskCreate(StackMonitor_Task, "StackMon_Task", 192, NULL, osPriorityNormal, &StackMonitorTaskHandle);
+	LOG_I("TASK", "StartDefaultTask begin");
+	CreateTaskWithLog(Key_Task, "Key_Task", 128, osPriorityHigh, &KeyTaskHandle);
+  CreateTaskWithLog(UI_Task, "UI_Task", 192, osPriorityNormal, &UITaskHandle);
+  CreateTaskWithLog(Set_Task, "Set_Task", 192, osPriorityNormal, &SetTaskHandle);
+  CreateTaskWithLog(Menu_Task, "Menu_Task", 128, osPriorityNormal, &MenuTaskHandle);
+  CreateTaskWithLog(Time_Task, "Time_Task", 192, osPriorityNormal, &TimeTaskHandle);
+  CreateTaskWithLog(Flashlight_Task, "Flashlight_Task", 128, osPriorityNormal, &FlashlightTaskHandle);
+  CreateTaskWithLog(MPU6050_Task, "MPU6050_Task", 256, osPriorityNormal, &MPU6050TaskHandle);
+  CreateTaskWithLog(Game_Task, "Game_Task", 128, osPriorityNormal, &GameTaskHandle);
+  CreateTaskWithLog(SleepManager_Task, "SleepManager_Task", 128, osPriorityNormal, &SleepManagerTaskHandle);
+  CreateTaskWithLog(StackMonitor_Task, "StackMon_Task", 192, osPriorityNormal, &StackMonitorTaskHandle);
 
   Alarm_ServiceInit();//初始化闹钟配置并下发RTC闹钟
-  xTaskCreate(Alarm_Task, "Alarm_Task", 256, NULL, osPriorityAboveNormal, &AlarmTaskHandle);
+  LOG_I("ALARM", "Alarm service initialized");
+  CreateTaskWithLog(Alarm_Task, "Alarm_Task", 256, osPriorityAboveNormal, &AlarmTaskHandle);
 
 
-  StopWatchTimerHandle = 
-    xTimerCreate( "StopWatch_Timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, StopWatch_Tick);
-  KeyTimerHandle = 
-    xTimerCreate( "Key_Timer", pdMS_TO_TICKS(10), pdTRUE, NULL, Key_Tick);
-  DinoTimerHandle =
-    xTimerCreate( "Dino_Timer", pdMS_TO_TICKS(10), pdTRUE, NULL, Dino_Tick);
+  StopWatchTimerHandle = CreateTimerWithLog("StopWatch_Timer", 1000U, StopWatch_Tick);
+  KeyTimerHandle = CreateTimerWithLog("Key_Timer", 10U, Key_Tick);
+  DinoTimerHandle = CreateTimerWithLog("Dino_Timer", 10U, Dino_Tick);
 
   vTaskSuspend(MenuTaskHandle);
   vTaskSuspend(SetTaskHandle);
@@ -172,6 +210,8 @@ void StartDefaultTask(void *argument)
   vTaskSuspend(GameTaskHandle);
 	
   vTaskSuspend(StackMonitorTaskHandle);
+
+  LOG_I("TASK", "Foreground tasks suspended for startup scene");
 
 
 	vTaskDelete(NULL);

@@ -13,7 +13,8 @@ typedef enum {
     LOG_LEVEL_OFF
 } LogLevel;
 
-typedef void (*LogBackend)(LogLevel level, const char *tag, const char *fmt, va_list args);
+typedef void (*LogBackend)(LogLevel level, 
+    const char *tag, const char *fmt, va_list args);
 
 /*
  * 函数功能：初始化日志模块，设置默认日志等级与后端

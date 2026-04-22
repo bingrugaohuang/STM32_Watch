@@ -1,5 +1,6 @@
 #include "TaskMgr.h"
 #include "osal.h"
+#include "Log.h"
 
 // 任务映射表: 用任务ID统一管理句柄和前台挂起掩码
 typedef struct {
@@ -20,6 +21,24 @@ static const TaskMgrMap_t gTaskMap[] = {
     {TASKMGR_TASK_SLEEP_MANAGER, &SleepManagerTaskHandle,          0U},
     {TASKMGR_TASK_ALARM,         &AlarmTaskHandle,                 0U}
 };
+
+static const char *TaskMgr_TaskName(TaskMgrTaskId_t taskId)
+{
+    switch(taskId)
+    {
+        case TASKMGR_TASK_UI:            return "UI";
+        case TASKMGR_TASK_MENU:          return "MENU";
+        case TASKMGR_TASK_SET:           return "SET";
+        case TASKMGR_TASK_TIME:          return "TIME";
+        case TASKMGR_TASK_FLASHLIGHT:    return "FLASHLIGHT";
+        case TASKMGR_TASK_MPU6050:       return "MPU6050";
+        case TASKMGR_TASK_GAME:          return "GAME";
+        case TASKMGR_TASK_STACK_MONITOR: return "STACK_MON";
+        case TASKMGR_TASK_SLEEP_MANAGER: return "SLEEP_MGR";
+        case TASKMGR_TASK_ALARM:         return "ALARM";
+        default:                         return "UNKNOWN";
+    }
+}
 
 static uint32_t TaskMgr_GetForegroundMask(void)
 {
@@ -96,6 +115,20 @@ BaseType_t TaskMgr_ApplySwitchPlan(const TaskMgrSwitchPlan_t* plan)
     {
         if(SuspendIfNeeded(suspendTaskHandle)) ret = pdTRUE;
     }
+
+    if(ret == pdTRUE)
+    {
+        LOG_D("TASKMGR", "Switch resume=%s suspend=%s",
+              TaskMgr_TaskName(plan->ResumeTaskId),
+              TaskMgr_TaskName(plan->SuspendTaskId));
+    }
+    else
+    {
+        LOG_W("TASKMGR", "Switch skipped resume=%s suspend=%s",
+              TaskMgr_TaskName(plan->ResumeTaskId),
+              TaskMgr_TaskName(plan->SuspendTaskId));
+    }
+
     return ret;
 }
 
@@ -125,6 +158,8 @@ uint32_t SuspendForegroundTasks(void)
     MPU6050_I2C_Unlock(); // 解锁MPU6050
     OLED_I2C_Unlock(); // 解锁OLED
 
+    LOG_I("TASKMGR", "Suspend foreground mark=0x%08lX", (unsigned long)mark);
+
     return mark;
 }
 
@@ -143,6 +178,7 @@ void ResumeForegroundTasks(uint32_t mark)
         // 如果没有指定恢复哪个任务，默认恢复UI任务，避免场景丢失
         TaskHandle_t uiHandle = TaskMgr_GetHandle(TASKMGR_TASK_UI);
         ResumeIfNeeded(uiHandle);
+        LOG_W("TASKMGR", "Resume mask empty, fallback to UI");
         return;
     }
 
@@ -157,4 +193,6 @@ void ResumeForegroundTasks(uint32_t mark)
             ResumeIfNeeded(*(gTaskMap[i].HandleRef));
         }
     }
+
+    LOG_I("TASKMGR", "Resume foreground mark=0x%08lX", (unsigned long)mark);
 }
