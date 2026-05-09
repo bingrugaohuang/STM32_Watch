@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 #include "dma.h"
 #include "i2c.h"
 #include "rtc.h"
@@ -28,9 +27,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "OLED.h"
-#include "MPU6050.h"
-#include "Log.h"
+#include "osal.h"           /* 包含 OSAL 抽象层 */
+#include "log.h"            /* 包含日志模块 */
+#include "serial.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,9 +55,8 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
-
+extern void APP_Init(void);   /* 应用初始化函数，定义在 APP 层 */
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -97,28 +95,19 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C1_Init();
-  MX_USART1_UART_Init();
+  MX_I2C2_Init();
   MX_RTC_Init();
   MX_TIM2_Init();
-  MX_I2C2_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-	Log_Init();
-  Log_SetLevel(LOG_LEVEL_INFO); // Set to LOG_LEVEL_DEBUG to observe verbose learning logs.
-	LOG_I("BOOT", "System boot start");
-	OLED_Init();
-  MPU6050_Init();
-	OLED_Clear();
-	LOG_I("BOOT", "Peripherals ready, starting scheduler");
+  serial_init();           // Driver 层（创建串口锁）
+  log_init();              // Service 层（创建日志锁、队列，设置后端）
+  LOG_I("MAIN", "System boot...");
+  
+  APP_Init(); /* 调用应用初始化函数，创建任务等 */
+  /* 正常情况下 APP_Init 不会返回，若返回说明调度器启动失败 */
+  Error_Handler();
   /* USER CODE END 2 */
-
-  /* Init scheduler */
-  osKernelInitialize();  /* Call init function for freertos objects (in cmsis_os2.c) */
-  MX_FREERTOS_Init();
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -212,11 +201,21 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  LOG_E("BOOT", "Error_Handler entered");
-  __disable_irq();
-  while (1)
-  {
-  }
+   // 1. 首先，禁止中断（避免进一步的混乱）
+    __disable_irq();
+
+    // 2. 使用轮询方式直接操作UART发送寄存器（不依赖中断）
+    //    伪代码示例：
+    //    while ((USART->SR & USART_SR_TXE) == 0);
+    //    USART->DR = 'E';
+    //    或者调用一个你自己写的阻塞式串口输出函数
+    serial_send_blocking("ERROR: System halted!\r\n", 25);
+    // 3. 最后死循环
+    while(1) {
+        #ifdef __CC_ARM  // 如果使用调试器，可触发BKPT
+        __BKPT(0);
+        #endif
+    }
   /* USER CODE END Error_Handler_Debug */
 }
 #ifdef USE_FULL_ASSERT

@@ -57,18 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MPU_INT_Pin GPIO_PIN_0
-#define MPU_INT_GPIO_Port GPIOA
-#define MPU_INT_EXTI_IRQn EXTI0_IRQn
-#define KEY_CONFIRM_Pin GPIO_PIN_4
-#define KEY_CONFIRM_GPIO_Port GPIOA
-#define KEY_CONFIRM_EXTI_IRQn EXTI4_IRQn
-#define KEY_NEXT_Pin GPIO_PIN_6
-#define KEY_NEXT_GPIO_Port GPIOA
-#define KEY_NEXT_EXTI_IRQn EXTI9_5_IRQn
-#define KEY_LAST_Pin GPIO_PIN_1
-#define KEY_LAST_GPIO_Port GPIOB
-#define KEY_LAST_EXTI_IRQn EXTI1_IRQn
 
 /* USER CODE BEGIN Private defines */
 

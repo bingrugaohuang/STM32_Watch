@@ -41,7 +41,6 @@ extern RTC_HandleTypeDef hrtc;
 void MX_RTC_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void RTC_SaveDateToBackup(const RTC_DateTypeDef *date);
 
 /* USER CODE END Prototypes */
 
