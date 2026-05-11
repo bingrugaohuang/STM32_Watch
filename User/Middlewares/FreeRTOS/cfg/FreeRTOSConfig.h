@@ -3,6 +3,7 @@
  
 /* м╥нд╪Ч */
 #include "stm32f1xx.h"
+#include "main.h"  
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -114,8 +115,8 @@ extern uint32_t FreeRTOSRunTimeTicks;
  
  
 /* ╤оят */
-#define vAssertCalled(char, int) printf("Error: %s, %d\r\n", char, int)
-#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
+#define vAssertCalled(file, line) do{printf("Error: %s, %d\r\n", file, line);Error_Handler();}while(0)
+#define configASSERT( x ) do{if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ );}while(0)
  
  
 #endif /* FREERTOS_CONFIG_H */

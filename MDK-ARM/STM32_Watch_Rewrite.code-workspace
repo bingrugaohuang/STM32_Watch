@@ -5,6 +5,9 @@
         },
         {
             "path": ".."
+        },
+        {
+            "path": "../../STM32_Watch"
         }
     ],
     "settings": {},

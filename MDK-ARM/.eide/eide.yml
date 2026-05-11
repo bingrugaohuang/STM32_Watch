@@ -76,6 +76,11 @@ virtualFolder:
                 - path: ../User/Middlewares/FreeRTOS/portable/RVDS/ARM_CM3/port.c
                 - path: ../User/Middlewares/FreeRTOS/portable/MemMang/heap_4.c
               folders: []
+        - name: Button
+          files:
+            - path: ../User/Middlewares/Button/button.c
+            - path: ../User/Middlewares/Button/button.h
+          folders: []
     - name: APP
       files: []
       folders:
@@ -83,9 +88,6 @@ virtualFolder:
           files:
             - path: ../User/APP/SYS/task_main.c
           folders: []
-    - name: ::CMSIS
-      files: []
-      folders: []
     - name: OSAL
       files:
         - path: ../User/OSAL/osal.c
@@ -95,11 +97,22 @@ virtualFolder:
       files:
         - path: ../User/Services/log.c
         - path: ../User/Services/log.h
+        - path: ../User/Services/button_service.c
+        - path: ../User/Services/button_service.h
       folders: []
     - name: MyDrivers
       files:
         - path: ../User/Drivers/serial.c
         - path: ../User/Drivers/serial.h
+      folders: []
+    - name: BSP
+      files:
+        - path: ../User/BSP/bsp_button.c
+        - path: ../User/BSP/bsp_button.h
+      folders: []
+    - name: Common
+      files:
+        - path: ../User/Common/common_macro.h
       folders: []
 dependenceList: []
 outDir: build
@@ -125,14 +138,21 @@ targets:
         - ../User/Drivers
         - ../User/OSAL
         - ../User/Services
+        - ../User/Middlewares/Button
+        - ../User/BSP
+        - ../User/Common
       libList:
         - ../User/Drivers
         - ../User/OSAL
         - ../User/Services
         - ../User
+        - ../User/Middlewares/Button
+        - ../User/BSP
+        - ../User/Common
     excludeList:
       - <virtual_root>/::CMSIS
       - <virtual_root>/OSAL/Service
+      - <virtual_root>/MyDrivers/button.c
     settings:
       debugger: cortex-debug
     toolchain: AC5

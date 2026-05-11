@@ -1,5 +1,5 @@
-#ifndef _OSAL_H
-#define _OSAL_H
+#ifndef OSAL_H
+#define OSAL_H
 
 #include <stdint.h>/* 包含标准整数类型定义 */
 

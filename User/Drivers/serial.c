@@ -3,6 +3,7 @@
 #include "osal.h"
 #include "main.h"           /* Error_Handler */
 #include <string.h>
+#include "common_macro.h"
 
 /* ---------- 发送任务栈与优先级 ---------- */
 #define SERIAL_TX_TASK_STACK_SIZE   256
@@ -78,12 +79,12 @@ void serial_init(void)
 int serial_send_async(const uint8_t *pData, size_t size)
 {
     if (pData == NULL || size == 0 || size > SERIAL_BUF_SIZE) {
-        return -1;
+        return COMMON_ERR_PARAM;
     }
 
     uint8_t *buf = serial_buf_alloc_from_task();
     if (buf == NULL) {
-        return -2;
+        return COMMON_ERR_MEM;
     }
     memcpy(buf, pData, size);
 
@@ -93,9 +94,9 @@ int serial_send_async(const uint8_t *pData, size_t size)
 
     if (osal_queue_send(s_tx_queue, &msg, OSAL_NO_WAIT) != OSAL_OK) {
         serial_buf_free_from_task(buf);
-        return -3;
+        return COMMON_ERR_QUEUE_FULL;
     }
-    return 0;
+    return COMMON_ERR_OK;
 }
 
 /**
@@ -105,12 +106,12 @@ int serial_send_async_from_isr(const uint8_t *pData, size_t size,
                                BaseType_t *pxHigherPriorityTaskWoken)
 {
     if (pData == NULL || size == 0 || size > SERIAL_BUF_SIZE) {
-        return -1;
+        return COMMON_ERR_PARAM;
     }
 
     uint8_t *buf = serial_buf_alloc_from_isr(pxHigherPriorityTaskWoken);
     if (buf == NULL) {
-        return -2;
+        return COMMON_ERR_MEM;
     }
     memcpy(buf, pData, size);
 
@@ -120,9 +121,9 @@ int serial_send_async_from_isr(const uint8_t *pData, size_t size,
 
     if (osal_queue_send_from_isr(s_tx_queue, &msg, pxHigherPriorityTaskWoken) != OSAL_OK) {
         serial_buf_free_from_isr(buf, pxHigherPriorityTaskWoken);
-        return -3;
+        return COMMON_ERR_QUEUE_FULL;
     }
-    return 0;
+    return COMMON_ERR_OK;
 }
 
 /**
