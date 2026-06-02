@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug (ST-Link/OpenOCD)",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/STM32_Watch_Rewrite/STM32_Watch_Rewrite.axf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "servertype": "openocd",
+            "serverpath": "C:\\Users\\lihua\\.eide\\tools\\openocd_7a1adfbec_mingw32\\bin\\openocd.exe",
+            "searchDir": [
+                "C:\\Users\\lihua\\.eide\\tools\\openocd_7a1adfbec_mingw32\\share\\openocd\\scripts"
+            ],
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f1x.cfg"
+            ],
+            "openOCDPreConfigLaunchCommands": [
+                "adapter speed 4000"
+            ],
+            "gdbPath": "C:\\Users\\lihua\\.eide\\tools\\gcc_arm\\bin\\arm-none-eabi-gdb.exe",
+            "svdFile": "${workspaceFolder}/.vscode/STM32F103xx.svd",
+            "showDevDebugOutput": "raw"
+        }
+    ]
+}

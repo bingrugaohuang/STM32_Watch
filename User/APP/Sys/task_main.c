@@ -3,17 +3,40 @@
  * FreeRTOS 应用入口文件
  * 负责创建初始任务、IPC 对象并启动调度器
  */
-#include "osal.h"
-#include "log.h"
-//#include "app_tasks.h"   /* 用户自定义的应用任务头文件 */
+#include "osal.h"           /* 包含 OSAL 抽象层 */
+#include "log.h"            /* 包含日志模块 */
+#include "serial.h"
+#include "button_service.h" /* 包含按钮服务模块 */
+#include "hardfault_debug.h"
 
-/* ---------- 可能用到的全局对象句柄（若需要跨文件可声明 extern） ---------- */
-static osal_queue_handle_t  g_xxx_queue;    /* 示例队列 */
-static osal_mutex_handle_t  g_xxx_mutex;    /* 示例递归锁 */
+//测试
+#include "i2c_test.h"
 
 /* ---------- 私有函数声明 ---------- */
 static void prvCreateObjects(void);   /* 创建 IPC 对象 */
 static void prvCreateTasks(void);     /* 创建系统任务 */
+
+/**
+  * 函    数：系统底层总初始化函数
+  * 参    数：无
+  * 返 回 值：无
+  * 说    明：在 APP_Init 中被调用，负责完成所有底层初始化工作。
+  *           包括但不限于：
+  *             - OSAL 层初始化（如 osal_init()）
+  *             - 硬件外设初始化（如 I2C、OLED、传感器等）
+  *             - 驱动层初始化（如串口、按键等）
+  *           注意：此函数应在创建 IPC 对象和任务之前调用，以确保底层资源准备就绪。
+  */
+static void total_init(void)
+{
+  check_crash_log_on_startup();  /* 最先检查上次 HardFault 是否有 FLASH 崩溃日志 */
+  serial_init();           // Driver 层（创建串口锁）
+  log_init();              // Service 层（创建日志锁、队列，设置后端）
+  button_service_init();   // Service 层（创建按键事件队列，配置按键控制块）
+  I2C_Init();              // Driver 层（初始化 I2C 硬件或软件实现）
+  hardfault_debug_init();  // MiddleWares/Debug（配置相关寄存器，准备 HardFault 调试）
+  LOG_I("MAIN", "System boot...");
+}
 
 /**
   * 函    数：应用初始化入口
@@ -27,8 +50,9 @@ static void prvCreateTasks(void);     /* 创建系统任务 */
   */
 void APP_Init(void)
 {
-    /* 步骤1：OSAL 初始化（目前可省） */
-    osal_init();
+    /* 步骤1：驱动等底层初始化 */
+    //osal_init();
+    total_init(); /* 包含 osal_init 和其他底层初始化，如 I2C、OLED、传感器等 */
 
     /* 步骤2：创建系统所需的 IPC 对象 */
     prvCreateObjects();
@@ -78,4 +102,23 @@ static void prvCreateTasks(void)
     // osal_task_create( "Sensor", vTask_Sensor, 256, NULL, 2 );
     // ...
 
+}
+
+/**
+ * 函   数： FreeRTOS 栈溢出钩子函数
+ * 参   数： 发生溢出的任务句柄
+ *           发生溢出的任务名称
+ */
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+    /* 1. 打印是哪个任务炸了栈（非常关键的信息！） */
+    printf("FATAL ERROR: Stack Overflow in task: %s\r\n", pcTaskName);
+
+    /* 2. 既然已经栈溢出了，系统状态已经不可控，直接死循环 */
+    /* 配合你之前写的硬错误处理，这里也可以触发一个断言或者直接禁用中断 */
+    __disable_irq(); 
+    while (1) 
+    {
+        // 停在这里，你可以用调试器查看 pcTaskName 的值
+    }
 }

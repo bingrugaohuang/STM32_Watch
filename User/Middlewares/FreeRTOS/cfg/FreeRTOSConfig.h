@@ -1,7 +1,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
  
-/* Í·ÎÄ¼þ */
+/* Í·ï¿½Ä¼ï¿½ */
 #include "stm32f1xx.h"
 #include "main.h"  
 #include <stdint.h>
@@ -10,111 +10,111 @@
  
 extern uint32_t SystemCoreClock;
  
-/* »ù´¡ÅäÖÃÏî */
-#define configUSE_PREEMPTION                            1                       /* 1: ÇÀÕ¼Ê½µ÷¶ÈÆ÷, 0: Ð­³ÌÊ½µ÷¶ÈÆ÷, ÎÞÄ¬ÈÏÐè¶¨Òå */
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION         1                       /* 1: Ê¹ÓÃÓ²¼þ¼ÆËãÏÂÒ»¸öÒªÔËÐÐµÄÈÎÎñ, 0: Ê¹ÓÃÈí¼þËã·¨¼ÆËãÏÂÒ»¸öÒªÔËÐÐµÄÈÎÎñ, Ä¬ÈÏ: 0 */
-#define configUSE_TICKLESS_IDLE                         0                       /* 1: Ê¹ÄÜticklessµÍ¹¦ºÄÄ£Ê½, Ä¬ÈÏ: 0 */
-#define configCPU_CLOCK_HZ                              SystemCoreClock         /* ¶¨ÒåCPUÖ÷Æµ, µ¥Î»: Hz, ÎÞÄ¬ÈÏÐè¶¨Òå */
-//#define configSYSTICK_CLOCK_HZ                          (configCPU_CLOCK_HZ / 8)/* ¶¨ÒåSysTickÊ±ÖÓÆµÂÊ£¬µ±SysTickÊ±ÖÓÆµÂÊÓëÄÚºËÊ±ÖÓÆµÂÊ²»Í¬Ê±²Å¿ÉÒÔ¶¨Òå, µ¥Î»: Hz, Ä¬ÈÏ: ²»¶¨Òå */
-#define configTICK_RATE_HZ                              1000                    /* ¶¨ÒåÏµÍ³Ê±ÖÓ½ÚÅÄÆµÂÊ, µ¥Î»: Hz, ÎÞÄ¬ÈÏÐè¶¨Òå */
-#define configMAX_PRIORITIES                            10                      /* ¶¨Òå×î´óÓÅÏÈ¼¶Êý, ×î´óÓÅÏÈ¼¶=configMAX_PRIORITIES-1, ÎÞÄ¬ÈÏÐè¶¨Òå */
-#define configMINIMAL_STACK_SIZE                        128                     /* ¶¨Òå¿ÕÏÐÈÎÎñµÄÕ»¿Õ¼ä´óÐ¡, µ¥Î»: Word, ÎÞÄ¬ÈÏÐè¶¨Òå */
-#define configMAX_TASK_NAME_LEN                         16                      /* ¶¨ÒåÈÎÎñÃû×î´ó×Ö·ûÊý, Ä¬ÈÏ: 16 */
-#define configUSE_16_BIT_TICKS                          0                       /* 1: ¶¨ÒåÏµÍ³Ê±ÖÓ½ÚÅÄ¼ÆÊýÆ÷µÄÊý¾ÝÀàÐÍÎª16Î»ÎÞ·ûºÅÊý, ÎÞÄ¬ÈÏÐè¶¨Òå */
-#define configIDLE_SHOULD_YIELD                         1                       /* 1: Ê¹ÄÜÔÚÇÀÕ¼Ê½µ÷¶ÈÏÂ,Í¬ÓÅÏÈ¼¶µÄÈÎÎñÄÜÇÀÕ¼¿ÕÏÐÈÎÎñ, Ä¬ÈÏ: 1 */
-#define configUSE_TASK_NOTIFICATIONS                    1                       /* 1: Ê¹ÄÜÈÎÎñ¼äÖ±½ÓµÄÏûÏ¢´«µÝ,°üÀ¨ÐÅºÅÁ¿¡¢ÊÂ¼þ±êÖ¾×éºÍÏûÏ¢ÓÊÏä, Ä¬ÈÏ: 1 */
-#define configTASK_NOTIFICATION_ARRAY_ENTRIES           1                       /* ¶¨ÒåÈÎÎñÍ¨ÖªÊý×éµÄ´óÐ¡, Ä¬ÈÏ: 1 */
-#define configUSE_MUTEXES                               1                       /* 1: Ê¹ÄÜ»¥³âÐÅºÅÁ¿, Ä¬ÈÏ: 0 */
-#define configUSE_RECURSIVE_MUTEXES                     1                       /* 1: Ê¹ÄÜµÝ¹é»¥³âÐÅºÅÁ¿, Ä¬ÈÏ: 0 */
-#define configUSE_COUNTING_SEMAPHORES                   1                       /* 1: Ê¹ÄÜ¼ÆÊýÐÅºÅÁ¿, Ä¬ÈÏ: 0 */
-#define configUSE_ALTERNATIVE_API                       0                       /* ÒÑÆúÓÃ!!! */
-#define configQUEUE_REGISTRY_SIZE                       8                       /* ¶¨Òå¿ÉÒÔ×¢²áµÄÐÅºÅÁ¿ºÍÏûÏ¢¶ÓÁÐµÄ¸öÊý, Ä¬ÈÏ: 0 */
-#define configUSE_QUEUE_SETS                            1                       /* 1: Ê¹ÄÜ¶ÓÁÐ¼¯, Ä¬ÈÏ: 0 */
-#define configUSE_TIME_SLICING                          1                       /* 1: Ê¹ÄÜÊ±¼äÆ¬µ÷¶È, Ä¬ÈÏ: 1 */
-#define configUSE_NEWLIB_REENTRANT                      0                       /* 1: ÈÎÎñ´´½¨Ê±·ÖÅäNewlibµÄÖØÈë½á¹¹Ìå, Ä¬ÈÏ: 0 */  
-#define configENABLE_BACKWARD_COMPATIBILITY             0                       /* 1: Ê¹ÄÜ¼æÈÝÀÏ°æ±¾, Ä¬ÈÏ: 1 */
-#define configNUM_THREAD_LOCAL_STORAGE_POINTERS         0                       /* ¶¨ÒåÏß³Ì±¾µØ´æ´¢Ö¸ÕëµÄ¸öÊý, Ä¬ÈÏ: 0 */
-#define configSTACK_DEPTH_TYPE                          uint16_t                /* ¶¨ÒåÈÎÎñ¶ÑÕ»Éî¶ÈµÄÊý¾ÝÀàÐÍ, Ä¬ÈÏ: uint16_t */
-#define configMESSAGE_BUFFER_LENGTH_TYPE                size_t                  /* ¶¨ÒåÏûÏ¢»º³åÇøÖÐÏûÏ¢³¤¶ÈµÄÊý¾ÝÀàÐÍ, Ä¬ÈÏ: size_t */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define configUSE_PREEMPTION                            1                       /* 1: ï¿½ï¿½Õ¼Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, 0: Ð­ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION         1                       /* 1: Ê¹ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Òªï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½, 0: Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Òªï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_TICKLESS_IDLE                         0                       /* 1: Ê¹ï¿½ï¿½ticklessï¿½Í¹ï¿½ï¿½ï¿½Ä£Ê½, Ä¬ï¿½ï¿½: 0 */
+#define configCPU_CLOCK_HZ                              SystemCoreClock         /* ï¿½ï¿½ï¿½ï¿½CPUï¿½ï¿½Æµ, ï¿½ï¿½Î»: Hz, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+//#define configSYSTICK_CLOCK_HZ                          (configCPU_CLOCK_HZ / 8)/* ï¿½ï¿½ï¿½ï¿½SysTickÊ±ï¿½ï¿½Æµï¿½Ê£ï¿½ï¿½ï¿½SysTickÊ±ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½Ê±ï¿½ï¿½Æµï¿½Ê²ï¿½Í¬Ê±ï¿½Å¿ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½, ï¿½ï¿½Î»: Hz, Ä¬ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define configTICK_RATE_HZ                              1000                    /* ï¿½ï¿½ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó½ï¿½ï¿½ï¿½Æµï¿½ï¿½, ï¿½ï¿½Î»: Hz, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+#define configMAX_PRIORITIES                            10                      /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½=configMAX_PRIORITIES-1, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+#define configMINIMAL_STACK_SIZE                        128                     /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ»ï¿½Õ¼ï¿½ï¿½Ð¡, ï¿½ï¿½Î»: Word, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+#define configMAX_TASK_NAME_LEN                         16                      /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 16 */
+#define configUSE_16_BIT_TICKS                          0                       /* 1: ï¿½ï¿½ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª16Î»ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+#define configIDLE_SHOULD_YIELD                         1                       /* 1: Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Í¬ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 1 */
+#define configUSE_TASK_NOTIFICATIONS                    1                       /* 1: Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Óµï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 1 */
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES           1                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨Öªï¿½ï¿½ï¿½ï¿½Ä´ï¿½Ð¡, Ä¬ï¿½ï¿½: 1 */
+#define configUSE_MUTEXES                               1                       /* 1: Ê¹ï¿½Ü»ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_RECURSIVE_MUTEXES                     1                       /* 1: Ê¹ï¿½ÜµÝ¹é»¥ï¿½ï¿½ï¿½Åºï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_COUNTING_SEMAPHORES                   1                       /* 1: Ê¹ï¿½Ü¼ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_ALTERNATIVE_API                       0                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!!! */
+#define configQUEUE_REGISTRY_SIZE                       8                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ÐµÄ¸ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_QUEUE_SETS                            1                       /* 1: Ê¹ï¿½Ü¶ï¿½ï¿½Ð¼ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_TIME_SLICING                          1                       /* 1: Ê¹ï¿½ï¿½Ê±ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 1 */
+#define configUSE_NEWLIB_REENTRANT                      0                       /* 1: ï¿½ï¿½ï¿½ñ´´½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Newlibï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */  
+#define configENABLE_BACKWARD_COMPATIBILITY             0                       /* 1: Ê¹ï¿½Ü¼ï¿½ï¿½ï¿½ï¿½Ï°æ±¾, Ä¬ï¿½ï¿½: 1 */
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS         0                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì±ï¿½ï¿½Ø´æ´¢Ö¸ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configSTACK_DEPTH_TYPE                          uint16_t                /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½Èµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: uint16_t */
+#define configMESSAGE_BUFFER_LENGTH_TYPE                size_t                  /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Èµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: size_t */
  
-/* ÄÚ´æ·ÖÅäÏà¹Ø¶¨Òå */
-#define configSUPPORT_STATIC_ALLOCATION                 0                       /* 1: Ö§³Ö¾²Ì¬ÉêÇëÄÚ´æ, Ä¬ÈÏ: 0 */
-#define configSUPPORT_DYNAMIC_ALLOCATION                1                       /* 1: Ö§³Ö¶¯Ì¬ÉêÇëÄÚ´æ, Ä¬ÈÏ: 1 */
-#define configTOTAL_HEAP_SIZE                           ((size_t)(10 * 1024))   /* FreeRTOS¶ÑÖÐ¿ÉÓÃµÄRAM×ÜÁ¿, µ¥Î»: Byte, ÎÞÄ¬ÈÏÐè¶¨Òå */
-#define configAPPLICATION_ALLOCATED_HEAP                0                       /* 1: ÓÃ»§ÊÖ¶¯·ÖÅäFreeRTOSÄÚ´æ¶Ñ(ucHeap), Ä¬ÈÏ: 0 */
-#define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP       0                       /* 1: ÓÃ»§×ÔÐÐÊµÏÖÈÎÎñ´´½¨Ê±Ê¹ÓÃµÄÄÚ´æÉêÇëÓëÊÍ·Åº¯Êý, Ä¬ÈÏ: 0 */
+/* ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ */
+#define configSUPPORT_STATIC_ALLOCATION                 0                       /* 1: Ö§ï¿½Ö¾ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configSUPPORT_DYNAMIC_ALLOCATION                1                       /* 1: Ö§ï¿½Ö¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½, Ä¬ï¿½ï¿½: 1 */
+#define configTOTAL_HEAP_SIZE                           ((size_t)(10 * 1024))   /* FreeRTOSï¿½ï¿½ï¿½Ð¿ï¿½ï¿½Ãµï¿½RAMï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Î»: Byte, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+#define configAPPLICATION_ALLOCATED_HEAP                0                       /* 1: ï¿½Ã»ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½FreeRTOSï¿½Ú´ï¿½ï¿½(ucHeap), Ä¬ï¿½ï¿½: 0 */
+#define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP       0                       /* 1: ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ñ´´½ï¿½Ê±Ê¹ï¿½Ãµï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·Åºï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
  
-/* ¹³×Óº¯ÊýÏà¹Ø¶¨Òå */
-#define configUSE_IDLE_HOOK                             0                       /* 1: Ê¹ÄÜ¿ÕÏÐÈÎÎñ¹³×Óº¯Êý, ÎÞÄ¬ÈÏÐè¶¨Òå  */
-#define configUSE_TICK_HOOK                             0                       /* 1: Ê¹ÄÜÏµÍ³Ê±ÖÓ½ÚÅÄÖÐ¶Ï¹³×Óº¯Êý, ÎÞÄ¬ÈÏÐè¶¨Òå */
-#define configCHECK_FOR_STACK_OVERFLOW                  0                       /* 1: Ê¹ÄÜÕ»Òç³ö¼ì²â·½·¨1, 2: Ê¹ÄÜÕ»Òç³ö¼ì²â·½·¨2, Ä¬ÈÏ: 0 */
-#define configUSE_MALLOC_FAILED_HOOK                    0                       /* 1: Ê¹ÄÜ¶¯Ì¬ÄÚ´æÉêÇëÊ§°Ü¹³×Óº¯Êý, Ä¬ÈÏ: 0 */
-#define configUSE_DAEMON_TASK_STARTUP_HOOK              0                       /* 1: Ê¹ÄÜ¶¨Ê±Æ÷·þÎñÈÎÎñÊ×´ÎÖ´ÐÐÇ°µÄ¹³×Óº¯Êý, Ä¬ÈÏ: 0 */
+/* ï¿½ï¿½ï¿½Óºï¿½ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ */
+#define configUSE_IDLE_HOOK                             0                       /* 1: Ê¹ï¿½Ü¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óºï¿½ï¿½ï¿½, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½  */
+#define configUSE_TICK_HOOK                             0                       /* 1: Ê¹ï¿½ï¿½ÏµÍ³Ê±ï¿½Ó½ï¿½ï¿½ï¿½ï¿½Ð¶Ï¹ï¿½ï¿½Óºï¿½ï¿½ï¿½, ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ */
+#define configCHECK_FOR_STACK_OVERFLOW                  2                       /* 1: Ê¹ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½ï¿½â·½ï¿½ï¿½1, 2: Ê¹ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½ï¿½â·½ï¿½ï¿½2, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_MALLOC_FAILED_HOOK                    0                       /* 1: Ê¹ï¿½Ü¶ï¿½Ì¬ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü¹ï¿½ï¿½Óºï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_DAEMON_TASK_STARTUP_HOOK              0                       /* 1: Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´ï¿½Ö´ï¿½ï¿½Ç°ï¿½Ä¹ï¿½ï¿½Óºï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
  
-/* ÔËÐÐÊ±¼äºÍÈÎÎñ×´Ì¬Í³¼ÆÏà¹Ø¶¨Òå */
-#define configGENERATE_RUN_TIME_STATS                   0                       /* 1: Ê¹ÄÜÈÎÎñÔËÐÐÊ±¼äÍ³¼Æ¹¦ÄÜ, Ä¬ÈÏ: 0 */
+/* ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬Í³ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ */
+#define configGENERATE_RUN_TIME_STATS                   0                       /* 1: Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Í³ï¿½Æ¹ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
 #if configGENERATE_RUN_TIME_STATS
 #include "./BSP/TIMER/btim.h"
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()        ConfigureTimeForRunTimeStats()
 extern uint32_t FreeRTOSRunTimeTicks;
 #define portGET_RUN_TIME_COUNTER_VALUE()                FreeRTOSRunTimeTicks
 #endif
-#define configUSE_TRACE_FACILITY                        1                       /* 1: Ê¹ÄÜ¿ÉÊÓ»¯¸ú×Ùµ÷ÊÔ, Ä¬ÈÏ: 0 */
-#define configUSE_STATS_FORMATTING_FUNCTIONS            1                       /* 1: configUSE_TRACE_FACILITYÎª1Ê±£¬»á±àÒëvTaskList()ºÍvTaskGetRunTimeStats()º¯Êý, Ä¬ÈÏ: 0 */
+#define configUSE_TRACE_FACILITY                        1                       /* 1: Ê¹ï¿½Ü¿ï¿½ï¿½Ó»ï¿½ï¿½ï¿½ï¿½Ùµï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configUSE_STATS_FORMATTING_FUNCTIONS            1                       /* 1: configUSE_TRACE_FACILITYÎª1Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vTaskList()ï¿½ï¿½vTaskGetRunTimeStats()ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
  
-/* Ð­³ÌÏà¹Ø¶¨Òå */
-#define configUSE_CO_ROUTINES                           0                       /* 1: ÆôÓÃÐ­³Ì, Ä¬ÈÏ: 0 */
-#define configMAX_CO_ROUTINE_PRIORITIES                 2                       /* ¶¨ÒåÐ­³ÌµÄ×î´óÓÅÏÈ¼¶, ×î´óÓÅÏÈ¼¶=configMAX_CO_ROUTINE_PRIORITIES-1, ÎÞÄ¬ÈÏconfigUSE_CO_ROUTINESÎª1Ê±Ðè¶¨Òå */
+/* Ð­ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ */
+#define configUSE_CO_ROUTINES                           0                       /* 1: ï¿½ï¿½ï¿½ï¿½Ð­ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configMAX_CO_ROUTINE_PRIORITIES                 2                       /* ï¿½ï¿½ï¿½ï¿½Ð­ï¿½Ìµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½=configMAX_CO_ROUTINE_PRIORITIES-1, ï¿½ï¿½Ä¬ï¿½ï¿½configUSE_CO_ROUTINESÎª1Ê±ï¿½è¶¨ï¿½ï¿½ */
  
-/* Èí¼þ¶¨Ê±Æ÷Ïà¹Ø¶¨Òå */
-#define configUSE_TIMERS                                1                               /* 1: Ê¹ÄÜÈí¼þ¶¨Ê±Æ÷, Ä¬ÈÏ: 0 */
-#define configTIMER_TASK_PRIORITY                       ( configMAX_PRIORITIES - 1 )    /* ¶¨ÒåÈí¼þ¶¨Ê±Æ÷ÈÎÎñµÄÓÅÏÈ¼¶, ÎÞÄ¬ÈÏconfigUSE_TIMERSÎª1Ê±Ðè¶¨Òå */
-#define configTIMER_QUEUE_LENGTH                        5                               /* ¶¨ÒåÈí¼þ¶¨Ê±Æ÷ÃüÁî¶ÓÁÐµÄ³¤¶È, ÎÞÄ¬ÈÏconfigUSE_TIMERSÎª1Ê±Ðè¶¨Òå */
-#define configTIMER_TASK_STACK_DEPTH                    ( configMINIMAL_STACK_SIZE * 2) /* ¶¨ÒåÈí¼þ¶¨Ê±Æ÷ÈÎÎñµÄÕ»¿Õ¼ä´óÐ¡, ÎÞÄ¬ÈÏconfigUSE_TIMERSÎª1Ê±Ðè¶¨Òå */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ */
+#define configUSE_TIMERS                                1                               /* 1: Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½, Ä¬ï¿½ï¿½: 0 */
+#define configTIMER_TASK_PRIORITY                       ( configMAX_PRIORITIES - 1 )    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½, ï¿½ï¿½Ä¬ï¿½ï¿½configUSE_TIMERSÎª1Ê±ï¿½è¶¨ï¿½ï¿½ */
+#define configTIMER_QUEUE_LENGTH                        5                               /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ³ï¿½ï¿½ï¿½, ï¿½ï¿½Ä¬ï¿½ï¿½configUSE_TIMERSÎª1Ê±ï¿½è¶¨ï¿½ï¿½ */
+#define configTIMER_TASK_STACK_DEPTH                    ( configMINIMAL_STACK_SIZE * 2) /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ»ï¿½Õ¼ï¿½ï¿½Ð¡, ï¿½ï¿½Ä¬ï¿½ï¿½configUSE_TIMERSÎª1Ê±ï¿½è¶¨ï¿½ï¿½ */
  
-/* ¿ÉÑ¡º¯Êý, 1: Ê¹ÄÜ */
-#define INCLUDE_vTaskPrioritySet                        1                       /* ÉèÖÃÈÎÎñÓÅÏÈ¼¶ */
-#define INCLUDE_uxTaskPriorityGet                       1                       /* »ñÈ¡ÈÎÎñÓÅÏÈ¼¶ */
-#define INCLUDE_vTaskDelete                             1                       /* É¾³ýÈÎÎñ */
-#define INCLUDE_vTaskSuspend                            1                       /* ¹ÒÆðÈÎÎñ */
-#define INCLUDE_xResumeFromISR                          1                       /* »Ö¸´ÔÚÖÐ¶ÏÖÐ¹ÒÆðµÄÈÎÎñ */
-#define INCLUDE_vTaskDelayUntil                         1                       /* ÈÎÎñ¾ø¶ÔÑÓÊ± */
-#define INCLUDE_vTaskDelay                              1                       /* ÈÎÎñÑÓÊ± */
-#define INCLUDE_xTaskGetSchedulerState                  1                       /* »ñÈ¡ÈÎÎñµ÷¶ÈÆ÷×´Ì¬ */
-#define INCLUDE_xTaskGetCurrentTaskHandle               1                       /* »ñÈ¡µ±Ç°ÈÎÎñµÄÈÎÎñ¾ä±ú */
-#define INCLUDE_uxTaskGetStackHighWaterMark             1                       /* »ñÈ¡ÈÎÎñ¶ÑÕ»ÀúÊ·Ê£Óà×îÐ¡Öµ */
-#define INCLUDE_xTaskGetIdleTaskHandle                  1                       /* »ñÈ¡¿ÕÏÐÈÎÎñµÄÈÎÎñ¾ä±ú */
-#define INCLUDE_eTaskGetState                           1                       /* »ñÈ¡ÈÎÎñ×´Ì¬ */
-#define INCLUDE_xEventGroupSetBitFromISR                1                       /* ÔÚÖÐ¶ÏÖÐÉèÖÃÊÂ¼þ±êÖ¾Î» */
-#define INCLUDE_xTimerPendFunctionCall                  1                       /* ½«º¯ÊýµÄÖ´ÐÐ¹Òµ½¶¨Ê±Æ÷·þÎñÈÎÎñ */
-#define INCLUDE_xTaskAbortDelay                         1                       /* ÖÐ¶ÏÈÎÎñÑÓÊ± */
-#define INCLUDE_xTaskGetHandle                          1                       /* Í¨¹ýÈÎÎñÃû»ñÈ¡ÈÎÎñ¾ä±ú */
-#define INCLUDE_xTaskResumeFromISR                      1                       /* »Ö¸´ÔÚÖÐ¶ÏÖÐ¹ÒÆðµÄÈÎÎñ */
+/* ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½, 1: Ê¹ï¿½ï¿½ */
+#define INCLUDE_vTaskPrioritySet                        1                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ */
+#define INCLUDE_uxTaskPriorityGet                       1                       /* ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ */
+#define INCLUDE_vTaskDelete                             1                       /* É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define INCLUDE_vTaskSuspend                            1                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define INCLUDE_xResumeFromISR                          1                       /* ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ð¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define INCLUDE_vTaskDelayUntil                         1                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê± */
+#define INCLUDE_vTaskDelay                              1                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê± */
+#define INCLUDE_xTaskGetSchedulerState                  1                       /* ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ */
+#define INCLUDE_xTaskGetCurrentTaskHandle               1                       /* ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define INCLUDE_uxTaskGetStackHighWaterMark             1                       /* ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½Ê·Ê£ï¿½ï¿½ï¿½ï¿½Ð¡Öµ */
+#define INCLUDE_xTaskGetIdleTaskHandle                  1                       /* ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define INCLUDE_eTaskGetState                           1                       /* ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½×´Ì¬ */
+#define INCLUDE_xEventGroupSetBitFromISR                1                       /* ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ö¾Î» */
+#define INCLUDE_xTimerPendFunctionCall                  1                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ð¹Òµï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define INCLUDE_xTaskAbortDelay                         1                       /* ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê± */
+#define INCLUDE_xTaskGetHandle                          1                       /* Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define INCLUDE_xTaskResumeFromISR                      1                       /* ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ð¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
  
-/* ÖÐ¶ÏÇ¶Ì×ÐÐÎªÅäÖÃ */
+/* ï¿½Ð¶ï¿½Ç¶ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ */
 #ifdef __NVIC_PRIO_BITS
-    /* ×¢Òâ£º´Ë´¦µÄ configPRIO_BITS ²»ÄÜÖ±½ÓµÈÓÚ __NVIC_PRIO_BITS¡£
-       ÒòÎª STM32 HAL ¿âÖÐ£¬__NVIC_PRIO_BITS »á±»¶¨ÒåÎª 4U¡£
-       ARMCC5 µÄÄÚÁª»ã±àÆ÷ÎÞ·¨Ê¶±ð´øÓÐ 'U' ºó×ºµÄ²Ù×÷Êý£¬Õâ»áµ¼ÖÂ port.c »ã±à±¨´í£¡
-       Òò´ËÕâÀïÐ´ËÀÎª 4 »òÕßÈ¥µô U ºó×º¡£ */
+    /* ×¢ï¿½â£ºï¿½Ë´ï¿½ï¿½ï¿½ configPRIO_BITS ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Óµï¿½ï¿½ï¿½ __NVIC_PRIO_BITSï¿½ï¿½
+       ï¿½ï¿½Îª STM32 HAL ï¿½ï¿½ï¿½Ð£ï¿½__NVIC_PRIO_BITS ï¿½á±»ï¿½ï¿½ï¿½ï¿½Îª 4Uï¿½ï¿½
+       ARMCC5 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ï¿½ 'U' ï¿½ï¿½×ºï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½áµ¼ï¿½ï¿½ port.c ï¿½ï¿½à±¨ï¿½ï¿½ï¿½ï¿½
+       ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Îª 4 ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ U ï¿½ï¿½×ºï¿½ï¿½ */
     #define configPRIO_BITS 4
 #else
     #define configPRIO_BITS 4
 #endif
  
-#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY         15                  /* ÖÐ¶Ï×îµÍÓÅÏÈ¼¶ */
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY    5                   /* FreeRTOS¿É¹ÜÀíµÄ×î¸ßÖÐ¶ÏÓÅÏÈ¼¶ */
-#define configKERNEL_INTERRUPT_PRIORITY                 ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY            ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
+#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY         15                  /* ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ */
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY    5                   /* FreeRTOSï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½È¼ï¿½ */
+#define configKERNEL_INTERRUPT_PRIORITY                 0xF0   /* 15 << (8 - 4) = 240. Literal required for ARMCC5 inline asm compatibility. */
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY            0x50   /* 5 << (8 - 4) = 80. Literal required for ARMCC5 inline asm compatibility (port.c:424). */
 #define configMAX_API_CALL_INTERRUPT_PRIORITY           configMAX_SYSCALL_INTERRUPT_PRIORITY
  
-/* FreeRTOSÖÐ¶Ï·þÎñº¯ÊýÏà¹Ø¶¨Òå */
+/* FreeRTOSï¿½Ð¶Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ */
 #define xPortPendSVHandler PendSV_Handler
 #define vPortSVCHandler SVC_Handler
 #define xPortSysTickHandler SysTick_Handler
  
  
-/* ¶ÏÑÔ */
+/* ï¿½ï¿½ï¿½ï¿½ */
 #define vAssertCalled(file, line) do{printf("Error: %s, %d\r\n", file, line);Error_Handler();}while(0)
 #define configASSERT( x ) do{if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ );}while(0)
  

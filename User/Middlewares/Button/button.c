@@ -8,11 +8,11 @@
 #define ButtonASSERT( x )    do { if (!(x)) { /* 可选：添加错误处理或日志输出 */Error_Handler();/* return;*/ } } while (0)
 
 /* 
- * 函数名称：button_init
- * 功能描述：初始化按键控制块，绑定 GPIO 读取函数与有效电平
- *           - 将所有成员置零
- *           - 设置 active_level
- *           - 保存 read_pin 函数指针
+ * 函数：button_init
+ * 功能：初始化按键控制块，绑定 GPIO 读取函数与有效电平
+ *       - 将所有成员置零
+ *       - 设置 active_level
+ *       - 保存 read_pin 函数指针
  **/
 void button_init(Button *btn,
                  uint8_t (*read_pin)(void),
@@ -28,8 +28,8 @@ void button_init(Button *btn,
 }
 
 /* 
- * 函数名称：button_attach_short
- * 功能描述：注册短按回调函数及对应的用户数据
+ * 函数：button_attach_short
+ * 功能：注册短按回调函数及对应的用户数据
  **/
 void button_attach_short(Button *btn,
                          ButtonCallback cb,
@@ -43,8 +43,8 @@ void button_attach_short(Button *btn,
 }
 
 /* 
- * 函数名称：button_attach_long
- * 功能描述：注册长按回调函数及对应的用户数据
+ * 函数：button_attach_long
+ * 功能：注册长按回调函数及对应的用户数据
  **/
 void button_attach_long(Button *btn,
                         ButtonCallback cb,
@@ -58,9 +58,9 @@ void button_attach_long(Button *btn,
 }
 
 /* 
- * 函数名称：button_ticks
- * 功能描述：按键状态机核心处理，需周期性调用（例如每 10ms）
- *           主要完成：消抖、状态跳转、事件回调
+ * 函数：button_ticks
+ * 功能：按键状态机核心处理，需周期性调用（例如每 10ms）
+ *       主要完成：消抖、状态跳转、事件回调
  **/
 void button_ticks(Button *btn)
 {

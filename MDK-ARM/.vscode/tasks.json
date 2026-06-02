@@ -35,6 +35,83 @@
             "command": "${command:eide.project.clean}",
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "Keil: Build",
+            "type": "shell",
+            "command": "d:/keil/UV4/UV4.exe",
+            "args": [
+                "-b",
+                "STM32_Watch_Rewrite.uvprojx",
+                "-j0",
+                "-o",
+                "${workspaceFolder}/build_output.txt"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Keil: Rebuild",
+            "type": "shell",
+            "command": "d:/keil/UV4/UV4.exe",
+            "args": [
+                "-b",
+                "STM32_Watch_Rewrite.uvprojx",
+                "-j0",
+                "-o",
+                "${workspaceFolder}/build_output.txt",
+                "-r"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Keil: Download",
+            "type": "shell",
+            "command": "d:/keil/UV4/UV4.exe",
+            "args": [
+                "-f",
+                "STM32_Watch_Rewrite.uvprojx",
+                "-j0"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Keil: Build & Download",
+            "type": "shell",
+            "dependsOn": ["Keil: Build"],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
         }
     ]
 }

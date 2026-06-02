@@ -1,0 +1,208 @@
+- generic [ref=e4]:
+  - generic [ref=e5] [cursor=pointer]:
+    - img [ref=e7]
+    - generic [ref=e19]:
+      - generic [ref=e21]: 来自分享的对话
+      - generic [ref=e22]:
+        - img [ref=e24]
+        - generic [ref=e26]: 专家模式
+  - generic [ref=e30]:
+    - generic [ref=e31]:
+      - img [ref=e34]
+      - generic [ref=e38]: 该对话来自分享，由 AI 生成，请仔细甄别。
+    - generic [ref=e39]:
+      - generic [ref=e41]: "# Keil MDK 工具链集成 ## 概述 此 skill 让 Claude Code 能够直接调用 Keil MDK 的命令行工具 `UV4.exe`，完成 ARM 嵌入式项目的**编译、下载、调试和编译信息分析**，无需依赖 EIDE 或 Keil IDE 图形界面。 适用芯片：STM32F1/F4/... 全系列（Cortex-M 架构），Keil MDK v5。 ## 前置条件 1. Keil MDK v5 已安装，许可证有效 2. 项目包含有效的 `.uvprojx` 工程文件 3. 所有源文件和包含路径已在 `.uvprojx` 中正确配置 ## 第一步：定位 UV4.exe 不同机器的 Keil 安装路径可能不同。通过以下方式查找： ```bash # Windows — 搜索常见路径 cmd.exe /c \"dir /s /b C:\\*UV4.exe 2>nul\" cmd.exe /c \"dir /s /b D:\\*UV4.exe 2>nul\" ``` 常见路径： - `C:\\Keil_v5\\UV4\\UV4.exe` - `D:\\keil\\UV4\\UV4.exe` - `C:\\Program Files\\Keil\\UV4\\UV4.exe` 找到后，记录路径供后续使用（假设为 `<KEIL_UV4>`）。 ## 第二步：关键命令行参数 ```bash # 编译（增量构建） <KEIL_UV4> -b <project>.uvprojx -j0 -o build_output.txt # 全量重编译 <KEIL_UV4> -b <project>.uvprojx -j0 -o build_output.txt -r # 下载固件到芯片 <KEIL_UV4> -f <project>.uvprojx -j0 # 启动调试会话 <KEIL_UV4> -d <project>.uvprojx ``` 参数说明： - `-b`：batch build（命令行编译模式） - `-r`：rebuild all（全量重编译，否则增量编译） - `-f`：flash download（下载固件） - `-d`：debug（启动调试会话） - `-j0`：无窗口模式，不依赖 Windows GUI - `-o <file>`：将编译输出重定向到文件（**关键**：Claude Code 无法看到终端历史，必须通过文件读取） ## 第三步：退出码含义 | 退出码 | 含义 | |--------|------| | 0 | 成功（无错误） | | 1 | 有警告，无错误 | | 2 | 有编译错误 | | 3 | 致命错误 | 退出码 0 或 1 均表示链接成功，`.axf` 和 `.hex` 已生成。 ## 第四步：配置 .vscode/tasks.json 在项目的 `.vscode/tasks.json` 中添加以下任务模板（将 `<KEIL_UV4>` 替换为实际路径）： ```json { \"version\": \"2.0.0\", \"tasks\": [ { \"label\": \"Keil: Build\", \"type\": \"shell\", \"command\": \"<KEIL_UV4>\", \"args\": [ \"-b\", \"<project>.uvprojx\", \"-j0\", \"-o\", \"${workspaceFolder}/build_output.txt\" ], \"group\": \"build\", \"options\": { \"cwd\": \"${workspaceFolder}\" }, \"problemMatcher\": [], \"presentation\": { \"reveal\": \"always\", \"panel\": \"shared\" } }, { \"label\": \"Keil: Rebuild\", \"type\": \"shell\", \"command\": \"<KEIL_UV4>\", \"args\": [ \"-b\", \"<project>.uvprojx\", \"-j0\", \"-o\", \"${workspaceFolder}/build_output.txt\", \"-r\" ], \"group\": \"build\", \"options\": { \"cwd\": \"${workspaceFolder}\" }, \"problemMatcher\": [], \"presentation\": { \"reveal\": \"always\", \"panel\": \"shared\" } }, { \"label\": \"Keil: Download\", \"type\": \"shell\", \"command\": \"<KEIL_UV4>\", \"args\": [\"-f\", \"<project>.uvprojx\", \"-j0\"], \"group\": \"build\", \"options\": { \"cwd\": \"${workspaceFolder}\" }, \"problemMatcher\": [], \"presentation\": { \"reveal\": \"always\", \"panel\": \"shared\" } }, { \"label\": \"Keil: Build & Download\", \"type\": \"shell\", \"dependsOn\": [\"Keil: Build\"], \"dependsOrder\": \"sequence\", \"group\": \"build\", \"options\": { \"cwd\": \"${workspaceFolder}\" }, \"problemMatcher\": [], \"presentation\": { \"reveal\": \"always\", \"panel\": \"shared\" } } ] } ``` ## 第五步：标准工作流 ### Claude Code 执行编译的标准流程： 1. **编译**：运行 `Keil: Build` 任务或直接用 Bash 执行 UV4 命令 2. **读取输出**：编译完成后，读取 `build_output.txt` 3. **分析错误**：解析输出中的错误行（格式：`文件路径(行号): error: #错误码: 描述`） 4. **修复代码**：根据错误信息修改源文件 5. **重新编译**：重复步骤 1-4 直到 0 错误 6. **下载**（可选）：编译成功后运行 `Keil: Download` ### 实际 Bash 命令示例： ```bash cd \"<项目目录>/MDK-ARM\" d:/keil/UV4/UV4.exe -b STM32_Watch_Rewrite.uvprojx -j0 -o build_output.txt # 检查退出码 # 读取 build_output.txt 分析结果 ``` ## 第六步：常见编译错误排查 ### 1. `cannot open source input file \"xxx.h\"` 原因：Keil 项目的 IncludePath 缺少对应目录。 解决：在 `.uvprojx` 文件的 `<Cads><VariousControls><IncludePath>` 中添加路径（分号分隔）。 ### 2. `Undefined symbol xxx` 原因：缺少源文件或库文件。 解决：在 `.uvprojx` 文件的 `<Groups>` 中添加对应的 `.c` 文件。 ### 3. UV4.exe 启动失败 - 检查路径是否存在 - 检查 Keil 许可证是否有效（在 Keil IDE 中查看） - 如路径含空格，需用引号包裹 ### 4. 与 EIDE 项目共存 - EIDE 的 `.eide/eide.yml` 管理 EIDE 构建 - Keil 的 `.uvprojx` 管理 Keil/UV4 构建 - 两者的源文件列表和包含路径需**分别维护** - 新增源文件时，两个配置文件都要更新 ## 第七步：调试配置 如果需要调试功能，需配合 `.vscode/launch.json` 使用 OpenOCD/ST-Link： ```json { \"version\": \"0.2.0\", \"configurations\": [ { \"name\": \"Cortex Debug (ST-Link/OpenOCD)\", \"cwd\": \"${workspaceFolder}\", \"executable\": \"${workspaceFolder}/build/<project>.axf\", \"request\": \"launch\", \"type\": \"cortex-debug\", \"runToEntryPoint\": \"main\", \"servertype\": \"openocd\", \"serverpath\": \"<openocd.exe路径>\", \"configFiles\": [\"interface/stlink.cfg\", \"target/stm32f1x.cfg\"], \"gdbPath\": \"<arm-none-eabi-gdb.exe路径>\", \"svdFile\": \"${workspaceFolder}/.vscode/<芯片>.svd\" } ] } ``` ## 第七步：下载固件到芯片 ### 方法 A：OpenOCD + ST-Link（推荐，有 verify） ```bash # 一步完成：擦除 → 烧录 → 校验 → 复位运行 openocd -s <scripts_dir> \\ -f interface/stlink.cfg \\ -c \"transport select hla_swd\" \\ -c \"adapter speed 4000\" \\ -f target/stm32f1x.cfg \\ -c \"init\" \\ -c \"reset halt\" \\ -c \"stm32f1x mass_erase 0\" \\ -c \"program <firmware>.hex verify\" \\ -c \"reset\" \\ -c \"exit\" ``` **实战示例**（STM32F103C8T6）： ```bash OPENOCD=\"C:/Users/lihua/.eide/tools/openocd_7a1adfbec_mingw32/bin/openocd.exe\" SCRIPTS=\"C:/Users/lihua/.eide/tools/openocd_7a1adfbec_mingw32/share/openocd/scripts\" HEX=\"d:/Desk/Watch/STM32HAL/STM32_Watch_Rewrite/MDK-ARM/STM32_Watch_Rewrite/STM32_Watch_Rewrite.hex\" \"$OPENOCD\" -s \"$SCRIPTS\" \\ -f interface/stlink.cfg \\ -c \"transport select hla_swd\" \\ -c \"adapter speed 4000\" \\ -f target/stm32f1x.cfg \\ -c \"init\" -c \"reset halt\" \\ -c \"stm32f1x mass_erase 0\" \\ -c \"program $HEX verify\" \\ -c \"reset\" -c \"exit\" ``` 关键注意事项： - `transport select hla_swd` **必不可少**，否则报 `session transport was not selected` - ST-Link 实际速度被限制在 1000kHz（硬件固件限制），设置 4000 也不会报错但会被自动降速 - `verify` 参数让 OpenOCD 在烧录后回读校验，确保写入正确 ### 方法 B：UV4.exe -f（Keil 原生，简单快速） ```bash cd <项目目录>/MDK-ARM <KEIL_UV4> -f <project>.uvprojx -j0 ``` **优点**：一行命令，自动找到对应的 flash algo。 **缺点**：无 verify 步骤，依赖 Keil 工程中的 flash 配置正确。 ## 第八步：GDB 命令行调试 ### 启动 OpenOCD GDB 服务器（后台运行） ```bash openocd -s <scripts_dir> \\ -f interface/stlink.cfg \\ -c \"transport select hla_swd\" \\ -c \"adapter speed 4000\" \\ -f target/stm32f1x.cfg \\ & ``` GDB 服务器监听在 `localhost:3333`。 ### GDB 连接并进行基本调试 ```bash # 非交互式 (batch) 调试操作 arm-none-eabi-gdb -batch \\ -ex \"target extended-remote localhost:3333\" \\ -ex \"monitor reset halt\" \\ -ex \"info reg pc sp lr\" \\ -ex \"x/8i \\$pc\" \\ -ex \"monitor reset run\" \\ -ex \"quit\" \\ <firmware>.axf ``` ### 常用 GDB 命令速查 | 命令 | 用途 | |------|------| | `monitor reset halt` | 复位并停在第一条指令 | | `monitor reset run` | 复位并全速运行 | | `info reg pc sp lr` | 查看关键寄存器 | | `x/8i $pc` | 反汇编当前地址 8 条指令 | | `b main` / `c` | 在 main 设断点后继续运行 | | `p variable` | 查看变量值 | | `bt` | 回溯调用栈 | | `load` | 通过 GDB 下载固件 | | `monitor reset init` | 复位并执行初始化脚本 | ### 实战示例 — 快速验证固件是否运行 ```bash GDB=\"C:/Users/lihua/.eide/tools/gcc_arm/bin/arm-none-eabi-gdb.exe\" AXF=\"d:/Desk/Watch/STM32HAL/STM32_Watch_Rewrite/MDK-ARM/STM32_Watch_Rewrite/STM32_Watch_Rewrite.axf\" \"$GDB\" -batch \\ -ex \"target extended-remote localhost:3333\" \\ -ex \"monitor reset halt\" \\ -ex \"info reg pc\" \\ -ex \"x/4i \\$pc\" \\ -ex \"monitor reset run\" \\ \"$AXF\" ``` **已知警告**（可安全忽略）： - `Loadable section \"RW_IRAM1\" outside of ELF segments` — Keil/ARMCC 生成的 .axf 格式与 GDB 预期有细微差异，不影响调试功能 ## 经验总结 1. **输出必须重定向到文件**：UV4.exe 的输出不会自动保存，`-o` 参数是关键 2. **Keil 和 EIDE 的路径配置是独立的**：确保两个系统都能找到所有头文件 3. **退出码 1 也是成功**：只有警告时退出码为 1，但编译和链接均已完成 4. **ARMCC (AC5)** 编译的警告 `#1-D: last line of file ends without a newline` 是纯风格问题，可安全忽略 5. **`-j0`** 参数在无桌面环境（SSH、CI）中必不可少，否则 UV4.exe 会尝试弹窗 6. **OpenOCD 烧录 > UV4.exe 下载**：OpenOCD 有 verify 保证写入正确，UV4.exe 没有 7. **`transport select hla_swd`** 是 OpenOCD + ST-Link 的必须配置，忘记会导致连接失败 8. **ST-Link 实际速度**：虽然设置 4000kHz，但固件实际限制在 1000kHz，属正常现象 9. **GDB 非交互模式**：使用 `-batch` 参数，适合 Claude Code 自动化调试检查 这个skill是claudecode写的，写得怎么样，如果没问题我就直接同意了"
+      - button [ref=e45] [cursor=pointer]:
+        - img [ref=e48]
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e54] [cursor=pointer]:
+            - img [ref=e56]
+            - generic [ref=e59]: 已思考（用时 10 秒）
+            - img [ref=e61]
+          - generic [ref=e67]:
+            - paragraph [ref=e68]: 看到用户发来一个 Claude Code 生成的 Skill，让我评估质量。我先快速扫一遍内容——这是关于 Keil MDK 工具链集成的 Skill，用于让 Claude Code 调用 UV4.exe 完成编译、下载、调试等。
+            - paragraph [ref=e69]: 整体看了一下，这个 Skill 写得真不错，结构清晰、内容全面。从定位 UV4.exe 路径开始，到命令行参数、退出码含义、tasks.json 配置、实际 Bash 命令示例，再到常见错误排查、OpenOCD 烧录、GDB 调试，覆盖了嵌入式开发的完整工作流。
+            - paragraph [ref=e70]:
+              - text: 最让我欣赏的是几个细节：强调了
+              - code [ref=e71]: "-o build_output.txt"
+              - text: 重定向输出的重要性（因为 Claude Code 看不到终端历史），说明了退出码 1 也算成功，还区分了 OpenOCD 和 UV4.exe 两种下载方式的优缺点。经验总结部分也很实用，比如 ST-Link 实际速度限制、ARMCC 警告可忽略等。
+            - paragraph [ref=e72]:
+              - text: 不过我也发现了一些可以优化的地方：有个"第七步"重复了，调试配置和下载固件都是第七步；路径都是用硬编码的 Windows 绝对路径，不够通用；OpenOCD 和 GDB 的路径直接写死了用户
+              - code [ref=e73]: lihua
+              - text: 的目录；调试部分相对简略，只给了非交互式命令。另外还缺少对
+              - code [ref=e74]: .uvprojx
+              - text: 是 XML 格式的说明（这个对 AI 修改工程配置很有用），以及和用户已有 EIDE 环境的协调建议。
+            - paragraph [ref=e75]: 用户问"如果没问题就同意"，我觉得这个 Skill 在当前状态下已经"可用"，核心功能齐全，能解决主要问题。但我应该诚实指出这些小问题，给出具体修改建议，让用户自己决定是现在就用还是先改一改。毕竟生成这个 Skill 的目的就是让 Claude Code 真正能用起来，路径硬编码这种问题如果不解决，换个环境就跑不起来了。
+        - generic [ref=e76]:
+          - paragraph [ref=e77]:
+            - text: 这份 Skill 整体写得
+            - strong [ref=e78]: 相当不错
+            - text: ，结构清晰、内容完整，而且有很多只有实际踩过坑才能总结出的经验。我可以直接告诉你结论：
+            - strong [ref=e79]: 可以同意，但有几个小地方值得顺手改一下，会让它更健壮。
+          - separator [ref=e80]
+          - heading "🎯 优点（写得好的地方）" [level=3] [ref=e81]
+          - table [ref=e83]:
+            - rowgroup [ref=e84]:
+              - row "亮点 说明" [ref=e85]:
+                - columnheader "亮点" [ref=e86]
+                - columnheader "说明" [ref=e87]
+            - rowgroup [ref=e88]:
+              - row "输出重定向的意识 明确写出 -o build_output.txt ，并解释了\"Claude Code 看不到终端历史\"——这是很多新手会忽略的关键点" [ref=e89]:
+                - cell "输出重定向的意识" [ref=e90]:
+                  - strong [ref=e91]: 输出重定向的意识
+                - cell "明确写出 -o build_output.txt ，并解释了\"Claude Code 看不到终端历史\"——这是很多新手会忽略的关键点" [ref=e92]:
+                  - text: 明确写出
+                  - code [ref=e93]: "-o build_output.txt"
+                  - text: ，并解释了"Claude Code 看不到终端历史"——这是很多新手会忽略的关键点
+              - row "退出码含义表 特别指出\"退出码 1 也是成功\"，避免 AI 误判警告为失败" [ref=e94]:
+                - cell "退出码含义表" [ref=e95]:
+                  - strong [ref=e96]: 退出码含义表
+                - cell "特别指出\"退出码 1 也是成功\"，避免 AI 误判警告为失败" [ref=e97]
+              - row "OpenOCD vs UV4 下载 对比了两者的优缺点（verify / 无verify），并给出了推荐方案" [ref=e98]:
+                - cell "OpenOCD vs UV4 下载" [ref=e99]:
+                  - strong [ref=e100]: OpenOCD vs UV4 下载
+                - cell "对比了两者的优缺点（verify / 无verify），并给出了推荐方案" [ref=e101]
+              - 'row "实战经验总结 transport select hla_swd 必须加、ST-Link 实际速度限制、ARMCC 的 #1-D 警告可忽略、GDB 的段警告可忽略——这些都是真刀真枪踩出来的坑" [ref=e102]':
+                - cell "实战经验总结" [ref=e103]:
+                  - strong [ref=e104]: 实战经验总结
+                - 'cell "transport select hla_swd 必须加、ST-Link 实际速度限制、ARMCC 的 #1-D 警告可忽略、GDB 的段警告可忽略——这些都是真刀真枪踩出来的坑" [ref=e105]':
+                  - code [ref=e106]: transport select hla_swd
+                  - text: 必须加、ST-Link 实际速度限制、ARMCC 的
+                  - code [ref=e107]: "#1-D"
+                  - text: 警告可忽略、GDB 的段警告可忽略——这些都是真刀真枪踩出来的坑
+              - row "EIDE 共存提醒 明确指出 Keil 和 EIDE 的路径配置需分别维护，这是双工具链用户最容易踩的坑" [ref=e108]:
+                - cell "EIDE 共存提醒" [ref=e109]:
+                  - strong [ref=e110]: EIDE 共存提醒
+                - cell "明确指出 Keil 和 EIDE 的路径配置需分别维护，这是双工具链用户最容易踩的坑" [ref=e111]:
+                  - text: 明确指出 Keil 和 EIDE 的路径配置需
+                  - strong [ref=e112]: 分别维护
+                  - text: ，这是双工具链用户最容易踩的坑
+          - separator [ref=e113]
+          - heading "🔧 建议顺手修改的地方" [level=3] [ref=e114]
+          - heading "1. 有两个\"第七步\"（编号错误）" [level=4] [ref=e115]
+          - paragraph [ref=e116]: 当前结构：
+          - generic [ref=e117]:
+            - generic [ref=e120]:
+              - generic [ref=e121]: text
+              - generic [ref=e123]:
+                - button "复制" [ref=e124] [cursor=pointer]:
+                  - img [ref=e126]
+                  - generic [ref=e128]: 复制
+                - button "下载" [ref=e129] [cursor=pointer]:
+                  - img [ref=e131]
+                  - generic [ref=e133]: 下载
+            - generic [ref=e134]: "## 第七步：调试配置 ## 第七步：下载固件到芯片 ## 第八步：GDB 命令行调试"
+            - img [ref=e135]
+            - img [ref=e137]
+          - paragraph [ref=e139]:
+            - text: 建议将"下载固件到芯片"改为
+            - strong [ref=e140]: 第七步（补充）
+            - text: 或
+            - strong [ref=e141]: 第六步（补充）
+            - text: ，或者把两个合并到同一个章节下，用子标题区分。
+          - heading "2. 路径模板化不够彻底" [level=4] [ref=e142]
+          - paragraph [ref=e143]:
+            - text: Skill 中有些地方用了占位符
+            - code [ref=e144]: <KEIL_UV4>
+            - text: ，但在"实战示例"中直接写死了
+            - code [ref=e145]: C:/Users/lihua/...
+            - text: 。建议在文件开头明确声明一个
+            - strong [ref=e146]: 变量区
+            - text: ：
+          - generic [ref=e147]:
+            - generic [ref=e150]:
+              - generic [ref=e151]: markdown
+              - generic [ref=e153]:
+                - button "复制" [ref=e154] [cursor=pointer]:
+                  - img [ref=e156]
+                  - generic [ref=e158]: 复制
+                - button "下载" [ref=e159] [cursor=pointer]:
+                  - img [ref=e161]
+                  - generic [ref=e163]: 下载
+            - generic [ref=e164]:
+              - text: "## 环境变量（需按实际替换）"
+              - text: "| 变量 | 当前值（示例） | 说明 | |:---|:---|:---| | `KEIL_UV4` | `D:/keil/UV4/UV4.exe` | Keil 命令行工具 | | `OPENOCD` | `C:/Users/lihua/.eide/tools/openocd_.../bin/openocd.exe` | OpenOCD 路径 | | `GDB` | `C:/Users/lihua/.eide/tools/gcc_arm/bin/arm-none-eabi-gdb.exe` | ARM GDB 路径 |"
+            - img [ref=e165]
+            - img [ref=e167]
+          - paragraph [ref=e169]: 然后在所有示例中统一使用这些变量名，这样 AI 在首次使用时就知道"这些路径需要先确认/替换"。
+          - heading "3. 调试配置（第一个第七步）相对简略" [level=4] [ref=e170]
+          - paragraph [ref=e171]:
+            - code [ref=e172]: launch.json
+            - text: 部分只给了模板，但缺少对
+            - code [ref=e173]: serverpath
+            - text: 和
+            - code [ref=e174]: gdbPath
+            - text: 的查找说明。可以像"定位 UV4.exe"那样，加一段查找 OpenOCD 和 ARM GDB 的命令：
+          - generic [ref=e175]:
+            - generic [ref=e178]:
+              - generic [ref=e179]: bash
+              - generic [ref=e181]:
+                - button "复制" [ref=e182] [cursor=pointer]:
+                  - img [ref=e184]
+                  - generic [ref=e186]: 复制
+                - button "下载" [ref=e187] [cursor=pointer]:
+                  - img [ref=e189]
+                  - generic [ref=e191]: 下载
+            - generic [ref=e192]: "# 在 EIDE 环境中通常在这里 dir C:\\Users\\<用户名>\\.eide\\tools\\openocd_*\\bin\\openocd.exe /s /b dir C:\\Users\\<用户名>\\.eide\\tools\\gcc_arm\\bin\\arm-none-eabi-gdb.exe /s /b"
+            - img [ref=e193]
+            - img [ref=e195]
+          - heading "4. 小遗漏： .uvprojx 是 XML 格式" [level=4] [ref=e197]:
+            - text: 4. 小遗漏：
+            - code [ref=e198]: .uvprojx
+            - text: 是 XML 格式
+          - paragraph [ref=e199]:
+            - text: Skill 在"常见错误排查"中提到要修改
+            - code [ref=e200]: .uvprojx
+            - text: 文件，但没有说明它是 XML 格式。可以在该节开头加一句：
+          - blockquote [ref=e201]:
+            - paragraph [ref=e202]:
+              - code [ref=e203]: .uvprojx
+              - text: 是 XML 格式文件，可直接用文本编辑器或 Claude Code 修改。
+              - code [ref=e204]: <IncludePath>
+              - text: 和
+              - code [ref=e205]: <Groups>
+              - text: 等节点都是纯文本，支持正则替换。
+          - paragraph [ref=e206]: 这样 AI 就不会犹豫"这个文件能不能直接改"。
+          - separator [ref=e207]
+          - heading "💎 总体评价" [level=3] [ref=e208]
+          - table [ref=e210]:
+            - rowgroup [ref=e211]:
+              - row "维度 评分 说明" [ref=e212]:
+                - columnheader "维度" [ref=e213]
+                - columnheader "评分" [ref=e214]
+                - columnheader "说明" [ref=e215]
+            - rowgroup [ref=e216]:
+              - row "完整性 ⭐⭐⭐⭐⭐ 覆盖了编译、下载、调试、错误分析全流程" [ref=e217]:
+                - cell "完整性" [ref=e218]
+                - cell "⭐⭐⭐⭐⭐" [ref=e219]
+                - cell "覆盖了编译、下载、调试、错误分析全流程" [ref=e220]
+              - row "准确性 ⭐⭐⭐⭐⭐ 所有命令和参数都正确，退出码、警告说明都准确" [ref=e221]:
+                - cell "准确性" [ref=e222]
+                - cell "⭐⭐⭐⭐⭐" [ref=e223]
+                - cell "所有命令和参数都正确，退出码、警告说明都准确" [ref=e224]
+              - row "实用性 ⭐⭐⭐⭐⭐ 实战经验丰富，可直接用于自动化工作流" [ref=e225]:
+                - cell "实用性" [ref=e226]
+                - cell "⭐⭐⭐⭐⭐" [ref=e227]
+                - cell "实战经验丰富，可直接用于自动化工作流" [ref=e228]
+              - row "可维护性 ⭐⭐⭐⭐☆ 大部分用了占位符，但有少量路径硬编码，改完就完美了" [ref=e229]:
+                - cell "可维护性" [ref=e230]
+                - cell "⭐⭐⭐⭐☆" [ref=e231]
+                - cell "大部分用了占位符，但有少量路径硬编码，改完就完美了" [ref=e232]
+          - separator [ref=e233]
+          - heading "✅ 我的建议" [level=3] [ref=e234]
+          - paragraph [ref=e235]:
+            - strong [ref=e236]: 直接同意，同时让 Claude Code 帮忙改一下上面的编号和路径问题
+            - text: 。你可以这样跟它说：
+          - blockquote [ref=e237]:
+            - paragraph [ref=e238]:
+              - text: "\"这个 Skill 我基本满意，请帮我做以下修改：1）修复重复的'第七步'编号；2）在文件开头建立一个环境变量声明区，把后面示例里硬编码的路径都替换为变量引用；3）在常见错误排查那里补充说明"
+              - code [ref=e239]: .uvprojx
+              - text: 是 XML 格式。改完后保存到同一个文件。"
+          - paragraph [ref=e240]: 这样你拿到手的 Skill 就是可以直接放心用的最终版本了。
+      - button [ref=e243] [cursor=pointer]:
+        - img [ref=e246]
+  - button "和 DeepSeek 继续聊" [ref=e250] [cursor=pointer]:
+    - generic [ref=e251]: 和 DeepSeek 继续聊
+    - img [ref=e253]

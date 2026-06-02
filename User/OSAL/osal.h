@@ -21,7 +21,7 @@ typedef BaseType_t            osal_status_t;           /**< 操作状态 */
 /* ---------- 通用返回值定义 ---------- */
 #define OSAL_OK                 pdPASS
 #define OSAL_FAIL               pdFAIL
-#define OSAL_WAIT_FOREVER        portMAX_DELAY
+#define OSAL_WAIT_FOREVER       portMAX_DELAY
 #define OSAL_NO_WAIT            0
 
 /* ---------- 任务通知动作定义 ---------- */
@@ -30,6 +30,10 @@ typedef BaseType_t            osal_status_t;           /**< 操作状态 */
 #define OSAL_NOTIFY_INCREMENT               2
 #define OSAL_NOTIFY_SET_VALUE_OVERWRITE     3
 #define OSAL_NOTIFY_SET_VALUE_NO_OVERWRITE  4
+
+/* ---------- 关键代码段保护 ---------- */
+#define OSAL_ENTER_CRITICAL()   taskENTER_CRITICAL()
+#define OSAL_EXIT_CRITICAL()    taskEXIT_CRITICAL()
 
 /* ======================== 函数声明 ======================== */
 

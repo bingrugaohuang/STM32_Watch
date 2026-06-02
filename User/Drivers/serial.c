@@ -50,6 +50,32 @@ static uint8_t *serial_buf_alloc_from_isr(BaseType_t *pxHigherPriorityTaskWoken)
 static void serial_buf_free_from_task(uint8_t *pBuf);
 static void serial_buf_free_from_isr(uint8_t *pBuf, BaseType_t *pxHigherPriorityTaskWoken);
 
+/* ========================== 半主机模式禁用与标准库重定向 ========================== */
+#if defined(__CC_ARM) || defined(__ARMCC_VERSION)
+#if (__ARMCC_VERSION >= 6000000)
+    __asm(".global __use_no_semihosting\n\t");
+#else
+    #pragma import(__use_no_semihosting)
+#endif
+
+#include <stdio.h>
+struct __FILE { int handle; };
+FILE __stdout;
+FILE __stdin;
+FILE __stderr;
+
+void _sys_exit(int x) { x = x; while(1); }
+void _ttywrch(int ch) { ch = ch; }
+char *_sys_command_string(char *cmd, int len) { return NULL; }
+int fputc(int ch, FILE *f) {
+    while (!(USART1->SR & USART_SR_TXE)); // 等待发送寄存器为空
+    USART1->DR = ch;                // 把字符丢给串口 1
+    return ch;
+}
+int fgetc(FILE *f) { return EOF; }
+int ferror(FILE *f) { return EOF; }
+#endif
+
 /* ========================== 公共函数 ========================== */
 
 /**

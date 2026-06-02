@@ -27,10 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "osal.h"           /* 包含 OSAL 抽象层 */
-#include "log.h"            /* 包含日志模块 */
 #include "serial.h"
-#include "button_service.h" /* 包含按钮服务模块 */
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -95,17 +92,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_I2C1_Init();
+  //MX_I2C1_Init(); //条件编译，由I2C驱动调用
   MX_I2C2_Init();
   MX_RTC_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  serial_init();           // Driver 层（创建串口锁）
-  log_init();              // Service 层（创建日志锁、队列，设置后端）
-  button_service_init();   // Service 层（创建按键事件队列，配置按键控制块）
-  LOG_I("MAIN", "System boot...");
-  
   APP_Init(); /* 调用应用初始化函数，创建任务等 */
   /* 正常情况下 APP_Init 不会返回，若返回说明调度器启动失败 */
   Error_Handler();

@@ -1,11 +1,18 @@
 {
-	"folders": [
+    "folders": [
+		{
+			"path": "MDK-ARM"
+		},
 		{
 			"path": "."
 		},
 		{
 			"path": "../STM32_Watch"
+		},
+		{
+			"path": "../../stm32智能手表标准库/1-7 ADC"
 		}
 	],
-	"settings": {}
+    "settings": {},
+    "extensions": {}
 }
