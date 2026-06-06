@@ -103,7 +103,7 @@ static const char *level_to_string(LogLevel level)
   */
 static void default_backend(LogLevel level, const char *tag, const char *fmt, va_list args)
 {
-    char buf[LOG_LINE_MAX_LEN];
+    static char buf[LOG_LINE_MAX_LEN];
     int len;
 
     /* 1. 拼装前缀 */

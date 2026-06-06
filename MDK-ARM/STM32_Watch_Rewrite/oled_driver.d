@@ -1,0 +1,12 @@
+stm32_watch_rewrite\oled_driver.o: ../User/Drivers/oled_driver.c
+stm32_watch_rewrite\oled_driver.o: ../User/Drivers/oled_driver.h
+stm32_watch_rewrite\oled_driver.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
+stm32_watch_rewrite\oled_driver.o: ../User/Drivers/oled_data.h
+stm32_watch_rewrite\oled_driver.o: ../User/Middlewares/I2C/i2c_interface.h
+stm32_watch_rewrite\oled_driver.o: ../User/BSP/bsp_i2c1_sw.h
+stm32_watch_rewrite\oled_driver.o: ../User/Drivers/oled_common.h
+stm32_watch_rewrite\oled_driver.o: ../User/Services/log.h
+stm32_watch_rewrite\oled_driver.o: D:\keil\ARM\ARMCC\Bin\..\include\stdarg.h
+stm32_watch_rewrite\oled_driver.o: D:\keil\ARM\ARMCC\Bin\..\include\string.h
+stm32_watch_rewrite\oled_driver.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
+stm32_watch_rewrite\oled_driver.o: D:\keil\ARM\ARMCC\Bin\..\include\stdio.h

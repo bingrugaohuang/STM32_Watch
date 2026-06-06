@@ -22,36 +22,72 @@ Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
 D:\Desk\Watch\STM32HAL\STM32_Watch_Rewrite\MDK-ARM\STM32_Watch_Rewrite.uvprojx
-Project File Date:  05/30/2026
+Project File Date:  06/04/2026
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\keil\ARM\ARMCC\Bin'
 Build target 'STM32_Watch_Rewrite'
-compiling button.c...
+assembling startup_stm32f103xb.s...
+compiling oled_driver.c...
+../User/Middlewares/I2C/i2c_interface.h(31): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C_INTERFACE_H */
+../User/BSP/bsp_i2c1_sw.h(38): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C1_SW_H */
+../User/Drivers/oled_common.h(8): warning:  #1-D: last line of file ends without a newline
+  #endif /* OLED_COMMON_H */
+../User/Services/log.h(73): warning:  #1-D: last line of file ends without a newline
+  #endif /* SERVICE_LOG_H */
+../User/Drivers/oled_driver.c: 4 warnings, 0 errors
+compiling bsp_i2c1_sw.c...
+../User/Middlewares/I2C/i2c_interface.h(31): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C_INTERFACE_H */
+../User/BSP/bsp_i2c1_sw.h(38): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C1_SW_H */
+../User/BSP/bsp_i2c1_sw.c(305): warning:  #1-D: last line of file ends without a newline
+  }
+../User/BSP/bsp_i2c1_sw.c: 3 warnings, 0 errors
+compiling task_main.c...
+../User/OSAL/osal.h(321): warning:  #1-D: last line of file ends without a newline
+  #endif /* _OSAL_H */
+../User/Services/log.h(73): warning:  #1-D: last line of file ends without a newline
+  #endif /* SERVICE_LOG_H */
+../User/Drivers/serial.h(47): warning:  #1-D: last line of file ends without a newline
+  #endif
 ../User/Middlewares/Button/button.h(92): warning:  #1-D: last line of file ends without a newline
   #endif /* BUTTON_H */
-../User/Middlewares/Button/button.c(21): warning:  #223-D: function "Error_Handler" declared implicitly
-      
-uttonASSERT(btn != NULL);
-../User/Middlewares/Button/button.c(22): warning:  #223-D: function "Error_Handler" declared implicitly
-      
-uttonASSERT(read_pin != NULL);
-../User/Middlewares/Button/button.c(38): warning:  #223-D: function "Error_Handler" declared implicitly
-      
-uttonASSERT(btn != NULL);
-../User/Middlewares/Button/button.c(53): warning:  #223-D: function "Error_Handler" declared implicitly
-      
-uttonASSERT(btn != NULL);
-../User/Middlewares/Button/button.c(67): warning:  #223-D: function "Error_Handler" declared implicitly
-      
-uttonASSERT(btn != NULL);
-../User/Middlewares/Button/button.c(123): warning:  #1-D: last line of file ends without a newline
+../User/Drivers/i2c_test.h(6): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C_TEST_H */
+..\User\APP\SYS\task_main.c(123): warning:  #1-D: last line of file ends without a newline
   }
-../User/Middlewares/Button/button.c: 7 warnings, 0 errors
+..\User\APP\SYS\task_main.c: 6 warnings, 0 errors
+compiling log.c...
+../User/Services/log.h(73): warning:  #1-D: last line of file ends without a newline
+  #endif /* SERVICE_LOG_H */
+../User/OSAL/osal.h(321): warning:  #1-D: last line of file ends without a newline
+  #endif /* _OSAL_H */
+../User/Drivers/serial.h(47): warning:  #1-D: last line of file ends without a newline
+  #endif
+../User/Services/log.c(134): warning:  #1-D: last line of file ends without a newline
+  }
+../User/Services/log.c: 4 warnings, 0 errors
+compiling i2c_test.c...
+../User/Middlewares/I2C/i2c_interface.h(31): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C_INTERFACE_H */
+../User/BSP/bsp_i2c1_sw.h(38): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C1_SW_H */
+../User/Drivers/oled_common.h(8): warning:  #1-D: last line of file ends without a newline
+  #endif /* OLED_COMMON_H */
+../User/OSAL/osal.h(321): warning:  #1-D: last line of file ends without a newline
+  #endif /* _OSAL_H */
+../User/Services/log.h(73): warning:  #1-D: last line of file ends without a newline
+  #endif /* SERVICE_LOG_H */
+../User/Drivers/i2c_test.h(6): warning:  #1-D: last line of file ends without a newline
+  #endif /* I2C_TEST_H */
+../User/Drivers/i2c_test.c: 6 warnings, 0 errors
 linking...
-Program Size: Code=32748 RO-data=884 RW-data=212 ZI-data=15900  
+Program Size: Code=38632 RO-data=7332 RW-data=216 ZI-data=17048  
 FromELF: creating hex file...
-"STM32_Watch_Rewrite\STM32_Watch_Rewrite.axf" - 0 Error(s), 7 Warning(s).
+"STM32_Watch_Rewrite\STM32_Watch_Rewrite.axf" - 0 Error(s), 23 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -74,7 +110,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.0.1
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

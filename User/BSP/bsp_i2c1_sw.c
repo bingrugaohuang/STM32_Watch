@@ -152,10 +152,10 @@ static void I2C_SendAck(uint8_t ack)
 {
     SCL_LOW();
     if(ack){
-        SDA_LOW(); // 发送 ACK（0）
+        SDA_HIGH(); // 发送 NACK（1）
     }
     else{
-        SDA_HIGH(); // 发送 NACK（1）
+        SDA_LOW(); // 发送 ACK（0）
     }
     I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
 
@@ -241,7 +241,7 @@ static uint8_t I2C1_SW_Write(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8
 {
     I2C_Start();
 
-    I2C_SendByte((dev_addr << 1) | 0); // 发送从机地址（写方向）
+    I2C_SendByte((dev_addr << 1) | 0x00); // 发送从机地址（写方向）
     if(I2C_WaitAck()){
         I2C_Stop();
         return I2C_ERR_NACK_ADDR; // 从机无应答
@@ -275,7 +275,7 @@ static uint8_t I2C1_SW_Read(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_
 
     I2C_Start();
 
-    I2C_SendByte((dev_addr << 1) | 0); // 发送从机地址（写方向）
+    I2C_SendByte((dev_addr << 1) | 0x00); // 发送从机地址（写方向）
     if(I2C_WaitAck()){
         I2C_Stop();
         return I2C_ERR_NACK_ADDR; // 从机无应答
@@ -289,6 +289,11 @@ static uint8_t I2C1_SW_Read(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_
 
     I2C_Start(); // 重复起始
 
+    I2C_SendByte((dev_addr << 1) | 0x01); // 发送从机地址（读方向）
+    if(I2C_WaitAck()){
+        I2C_Stop();
+        return I2C_ERR_NACK_ADDR; // 从机无应答
+    }
     for(int i = 0; i < len; i++){
         data[i] = I2C_ReadByte(); // 读取数据字节
         I2C_SendAck(i < (len - 1)); // 最后一个字节发送 NACK
@@ -296,5 +301,5 @@ static uint8_t I2C1_SW_Read(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_
 
     I2C_Stop();
 
-    return 0; // 临时返回成功
+    return I2C_OK; // 临时返回成功
 }

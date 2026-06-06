@@ -1,0 +1,56 @@
+23:40:17:979 -> [0][I][OLED] OLED Init start...
+23:40:17:981 -> [0][I][OLED] Initializing I2C subsystem...
+23:40:17:984 -> [0][I][OLED] SW I2C1 initialized (PB6=SCL, PB7=SDA)
+23:40:17:990 -> [0][I][OLED] OLED Init complete
+23:40:17:993 -> [0][I][MAIN] System boot...
+23:40:17:995 -> [0][I][TEST] I2C test task created (stack=256 words, priority=3)
+23:40:18:001 -> [0][I][TEST] I2C test task started
+23:40:18:004 -> [0][I][OLED] OLED Init start...
+23:40:18:101 -> [122][I][OLED] OLED Init complete
+23:40:18:104 -> [122][I][TEST] ==== OLED functional test start ====
+23:40:18:106 -> [122][I][TEST] [Test 1] Full screen fill -> clear -> refresh
+23:40:19:835 -> [1856][I][TEST] [Test 2] ASCII text display
+23:40:21:950 -> [3972][I][TEST] [Test 3] Chinese text display
+23:40:24:067 -> [6089][I][TEST] [Test 4] Number display
+23:40:26:182 -> [8204][I][TEST] [Test 5] Float number display
+23:40:28:296 -> [10319][I][TEST] [Test 6] OLED_Printf formatted output
+23:40:30:411 -> [12434][I][TEST] [Test 7] Shape drawing
+23:40:33:525 -> [15548][I][TEST] [Test 8] Progress bar animation
+23:40:41:057 -> [23081][I][TEST] [Test 9] Final screen - test complete
+23:40:41:173 -> [23197][I][TEST] ==== OLED functional test complete ====
+23:40:41:175 -> [23197][I][TEST] Test finished at tick: 23197 (~23 seconds)
+23:44:37:162 -> [0][I][OLED] OLED Init start...
+23:44:37:164 -> [0][I][OLED] Initializing I2C subsystem...
+23:44:37:167 -> [0][I][OLED] SW I2C1 initialized (PB6=SCL, PB7=SDA)
+23:44:37:173 -> [0][I][OLED] OLED Init complete
+23:44:37:176 -> [0][I][MAIN] System boot...
+23:44:37:178 -> [0][I][TEST] I2C test task created (stack=256 words, priority=3)
+23:44:37:184 -> [0][I][TEST] I2C test task started
+23:44:37:187 -> [0][I][OLED] OLED Init start...
+23:44:37:284 -> [122][I][OLED] OLED Init complete
+23:44:37:287 -> [122][I][TEST] ==== OLED functional test start ====
+23:44:37:289 -> [122][I][TEST] [Test 1] Full screen fill -> clear -> refresh
+23:44:43:016 -> [5855][I][TEST] [Test 2] ASCII text display
+23:44:48:131 -> [10971][I][TEST] [Test 3] Chinese text display
+23:44:53:248 -> [16088][I][TEST] [Test 4] Number display
+23:44:58:362 -> [21203][I][TEST] [Test 5] Float number display
+23:45:03:476 -> [26318][I][TEST] [Test 6] OLED_Printf formatted output
+23:45:08:590 -> [31433][I][TEST] [Test 7] Shape drawing
+23:45:13:712 -> [36547][I][TEST] [Test 8] Progress bar animation
+23:45:21:228 -> [44073][I][TEST] [Test 9] Final screen - test complete
+23:45:21:344 -> [44189][I][TEST] ==== OLED functional test complete ====
+23:45:21:348 -> [44189][I][TEST] Test finished at tick: 44189 (~44 seconds)
+23:46:54:320 -> [0][I][OLED] OLED Init start...
+23:46:54:323 -> [0][I][OLED] Initializing I2C subsystem...
+23:46:54:326 -> [0][I][OLED] SW I2C1 initialized (PB6=SCL, PB7=SDA)
+23:46:54:331 -> [0][I][OLED] OLED Init complete
+23:46:54:334 -> [0][I][MAIN] System boot...
+23:46:54:337 -> [0][I][TEST] I2C test task created (stack=256 words, priority=3)
+23:46:54:342 -> [0][I][TEST] I2C test task started
+23:46:54:345 -> [0][I][OLED] OLED Init start...
+23:46:54:443 -> [122][I][OLED] OLED Init complete
+23:46:54:445 -> [122][I][TEST] ==== OLED functional test start ====
+23:46:54:448 -> [122][I][TEST] [Test 3] Chinese text display
+23:47:14:557 -> [20239][I][TEST] [Test 9] Final screen - test complete
+23:47:14:673 -> [20355][I][TEST] ==== OLED functional test complete ====
+23:47:14:675 -> [20355][I][TEST] Test finished at tick: 20355 (~20 seconds)

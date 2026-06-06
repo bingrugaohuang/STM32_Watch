@@ -2,6 +2,10 @@ stm32_watch_rewrite\i2c_test.o: ../User/Drivers/i2c_test.c
 stm32_watch_rewrite\i2c_test.o: ../User/Middlewares/I2C/i2c_interface.h
 stm32_watch_rewrite\i2c_test.o: D:\keil\ARM\ARMCC\Bin\..\include\stdint.h
 stm32_watch_rewrite\i2c_test.o: ../User/BSP/bsp_i2c1_sw.h
+stm32_watch_rewrite\i2c_test.o: ../User/Drivers/oled_driver.h
+stm32_watch_rewrite\i2c_test.o: ../User/Drivers/oled_data.h
+stm32_watch_rewrite\i2c_test.o: ../User/Drivers/oled_common.h
+stm32_watch_rewrite\i2c_test.o: ../User/Drivers/oled_strings_gbk.h
 stm32_watch_rewrite\i2c_test.o: ../User/OSAL/osal.h
 stm32_watch_rewrite\i2c_test.o: ../User/Middlewares/FreeRTOS/include/FreeRTOS.h
 stm32_watch_rewrite\i2c_test.o: D:\keil\ARM\ARMCC\Bin\..\include\stddef.h
@@ -48,4 +52,6 @@ stm32_watch_rewrite\i2c_test.o: ../User/Middlewares/FreeRTOS/include/list.h
 stm32_watch_rewrite\i2c_test.o: ../User/Middlewares/FreeRTOS/include/queue.h
 stm32_watch_rewrite\i2c_test.o: ../User/Middlewares/FreeRTOS/include/semphr.h
 stm32_watch_rewrite\i2c_test.o: ../User/Middlewares/FreeRTOS/include/timers.h
+stm32_watch_rewrite\i2c_test.o: ../User/Services/log.h
+stm32_watch_rewrite\i2c_test.o: D:\keil\ARM\ARMCC\Bin\..\include\stdarg.h
 stm32_watch_rewrite\i2c_test.o: ../User/Drivers/i2c_test.h

@@ -126,6 +126,13 @@ virtualFolder:
         - path: ../User/Drivers/serial.h
         - path: ../User/Drivers/i2c_test.c
         - path: ../User/Drivers/i2c_test.h
+        - path: ../User/Drivers/oled_driver.c
+        - path: ../User/Drivers/oled_driver.h
+        - path: ../User/Drivers/oled_data.c
+        - path: ../User/Drivers/oled_data.h
+        - path: ../User/Drivers/oled_common.h
+        - path: ../User/Drivers/oled_strings_gbk.c
+        - path: ../User/Drivers/oled_strings_gbk.h
       folders: []
 dependenceList: []
 outDir: build

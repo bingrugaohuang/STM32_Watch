@@ -615,6 +615,21 @@
               <FileType>1</FileType>
               <FilePath>../User/Drivers/i2c_test.c</FilePath>
             </File>
+            <File>
+              <FileName>oled_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../User/Drivers/oled_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../User/Drivers/oled_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled_strings_gbk.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../User/Drivers/oled_strings_gbk.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -6,6 +6,7 @@
 #include "osal.h"           /* 包含 OSAL 抽象层 */
 #include "log.h"            /* 包含日志模块 */
 #include "serial.h"
+#include "oled_driver.h"    /* 包含 OLED 驱动 */
 #include "button_service.h" /* 包含按钮服务模块 */
 #include "hardfault_debug.h"
 
@@ -29,12 +30,12 @@ static void prvCreateTasks(void);     /* 创建系统任务 */
   */
 static void total_init(void)
 {
+	serial_init();           // Driver 层
   check_crash_log_on_startup();  /* 最先检查上次 HardFault 是否有 FLASH 崩溃日志 */
-  serial_init();           // Driver 层（创建串口锁）
-  log_init();              // Service 层（创建日志锁、队列，设置后端）
+  log_init();              // Service 层
   button_service_init();   // Service 层（创建按键事件队列，配置按键控制块）
-  I2C_Init();              // Driver 层（初始化 I2C 硬件或软件实现）
   hardfault_debug_init();  // MiddleWares/Debug（配置相关寄存器，准备 HardFault 调试）
+  OLED_Init();              // Driver 层（初始化 I2C 硬件或软件实现）
   LOG_I("MAIN", "System boot...");
 }
 
@@ -97,7 +98,7 @@ static void prvCreateObjects(void)
 static void prvCreateTasks(void)
 {
     /* 创建日志后台任务，该任务负责异步输出所有日志 */
-
+    I2CTestTask_Init();
     /* 创建其他应用任务 */
     // osal_task_create( "Sensor", vTask_Sensor, 256, NULL, 2 );
     // ...
@@ -112,10 +113,9 @@ static void prvCreateTasks(void)
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     /* 1. 打印是哪个任务炸了栈（非常关键的信息！） */
-    printf("FATAL ERROR: Stack Overflow in task: %s\r\n", pcTaskName);
+    // printf("FATAL ERROR: Stack Overflow in task: %s\r\n", pcTaskName);
+    LOG_E("MAIN", "Stack overflow detected in task: %s\r\n", pcTaskName);
 
-    /* 2. 既然已经栈溢出了，系统状态已经不可控，直接死循环 */
-    /* 配合你之前写的硬错误处理，这里也可以触发一个断言或者直接禁用中断 */
     __disable_irq(); 
     while (1) 
     {
