@@ -14,13 +14,19 @@
 
 #include "oled_driver.h"
 #include "i2c_interface.h"
-#include "bsp_i2c1_sw.h"
 #include "oled_common.h"
 #include "log.h"
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include "common_macro.h"
+
+#if I2C1_SW_ENABLE
+#include "bsp_i2c1_sw.h"
+#else
+#include "bsp_i2c1_hw.h"
+#endif
 
 /* ================== 模块标签（用于日志系统） ================== */
 #define TAG "OLED"
@@ -31,7 +37,7 @@
 uint8_t OLED_DisplayBuf[8][128];
 
 /** I2C 驱动实例指针，初始化后指向软件 I2C1 驱动 */
-static I2C_Driver_t *i2c_drv = NULL;
+static const I2C_Driver_t *i2c_drv = NULL;
 
 /* ================== 局部工具函数（I2C 通信层） ================== */
 
@@ -137,11 +143,17 @@ void OLED_Init(void)
     LOG_I(TAG, "OLED Init start...");
 
     /* 1. 获取 I2C 驱动实例 */
-    i2c_drv = (I2C_Driver_t *)I2C1_SW_GetDriver();
+#if I2C1_SW_ENABLE
+    LOG_I(TAG, "Using software I2C1 (PB6=SCL, PB7=SDA)");
+    i2c_drv = I2C1_SW_GetDriver();
+#else
+    LOG_I(TAG, "Using hardware I2C1 (PB6=SCL, PB7=SDA)");
+    i2c_drv = I2C1_HW_GetDriver();
+#endif
     
     LOG_I(TAG, "Initializing I2C subsystem...");
     i2c_drv->init();
-    LOG_I(TAG, "SW I2C1 initialized (PB6=SCL, PB7=SDA)");
+    LOG_I(TAG, "I2C1 initialized (PB6=SCL, PB7=SDA)");
 
     /* 2. 发送初始化命令序列 */
     OLED_WriteCmd(0xAE);    /* 关闭显示                                */

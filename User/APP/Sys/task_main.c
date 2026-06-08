@@ -9,7 +9,7 @@
 #include "oled_driver.h"    /* 包含 OLED 驱动 */
 #include "button_service.h" /* 包含按钮服务模块 */
 #include "hardfault_debug.h"
-
+#include "common_macro.h"
 //测试
 #include "i2c_test.h"
 
@@ -97,8 +97,10 @@ static void prvCreateObjects(void)
   */
 static void prvCreateTasks(void)
 {
-    /* 创建日志后台任务，该任务负责异步输出所有日志 */
+    /* 创建OLED测试任务 */
+#if I2C1_OLED_TEST_ENABLE
     I2CTestTask_Init();
+#endif
     /* 创建其他应用任务 */
     // osal_task_create( "Sensor", vTask_Sensor, 256, NULL, 2 );
     // ...

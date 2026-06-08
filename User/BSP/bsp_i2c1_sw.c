@@ -15,9 +15,11 @@
  *   - 引脚配置建议：开漏输出模式，以兼容 I2C 总线的线与特性并避免电平冲突
  *   - 确保外部硬件已连接 4.7kΩ 上拉电阻至 3.3V
  */
-
+#include "common_macro.h"   /* 包含 I2C 错误码定义 */
 #include "bsp_i2c1_sw.h"
 #include "stm32f1xx_hal.h"  /* 寄存器定义，根据你的实际环境调整 */
+
+#if I2C1_SW_ENABLE
 
 /* ====================== 硬件抽象宏定义 ====================== */
 //引脚操作宏
@@ -303,3 +305,5 @@ static uint8_t I2C1_SW_Read(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_
 
     return I2C_OK; // 临时返回成功
 }
+
+#endif /* I2C1_SW_ENABLE */

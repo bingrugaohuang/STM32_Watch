@@ -15,7 +15,7 @@
 #include "oled_strings_gbk.h"
 
 /* ---- 测试用字符串 ---- */
-// const char str_hello[]            = "你好，世界！";
-// const char str_oled_driver[]      = "江协科技 OLED 驱动";
-// const char str_freertos_watch[]   = "FreeRTOS 手表项目";
-// const char str_all_tests_passed[] = "所有测试通过！";
+const char str_hello[]            = "你好，世界！";
+const char str_oled_driver[]      = "江协科技 OLED 驱动";
+const char str_freertos_watch[]   = "FreeRTOS 手表项目";
+const char str_all_tests_passed[] = "所有测试通过！";
