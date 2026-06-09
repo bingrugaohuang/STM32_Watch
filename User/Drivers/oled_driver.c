@@ -21,11 +21,14 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "common_macro.h"
+#include "osal.h"
 
 #if I2C1_SW_ENABLE
 #include "bsp_i2c1_sw.h"
 #else
 #include "bsp_i2c1_hw.h"
+/* I2C DMA 传输完成信号量 */
+osal_semaphore_handle_t i2c1_dma_semaphore;  /* I2C DMA 传输完成信号量 */
 #endif
 
 /* ================== 模块标签（用于日志系统） ================== */
@@ -39,6 +42,9 @@ uint8_t OLED_DisplayBuf[8][128];
 /** I2C 驱动实例指针，初始化后指向软件 I2C1 驱动 */
 static const I2C_Driver_t *i2c_drv = NULL;
 
+/* ================== 静态函数声明 ================== */
+static void OLED_SetCursor(uint8_t Page, uint8_t X);
+
 /* ================== 局部工具函数（I2C 通信层） ================== */
 
 /**
@@ -48,6 +54,9 @@ static const I2C_Driver_t *i2c_drv = NULL;
 static void OLED_WriteCmd(uint8_t cmd)
 {
     i2c_drv->write(OLED_I2C_ADDR, OLED_CTRL_CMD, &cmd, 1);
+#if !I2C1_SW_ENABLE
+    osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER);  /* 等待 I2C 传输完成 */
+#endif
 }
 
 /**
@@ -57,6 +66,9 @@ static void OLED_WriteCmd(uint8_t cmd)
 static void OLED_WriteData(uint8_t *data, uint8_t len)
 {
     i2c_drv->write(OLED_I2C_ADDR, OLED_CTRL_DATA, data, len);
+#if !I2C1_SW_ENABLE
+    osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER);  /* 等待 I2C 传输完成 */
+#endif
 }
 
 /**
@@ -74,63 +86,24 @@ static void OLED_SetCursor(uint8_t Page, uint8_t X)
     OLED_WriteCmd(0x00 | (X & 0x0F));               /* 设置列地址低 4 位  */
 }
 
-/* ================== 局部工具函数（数学辅助） ================== */
+/* ================== 实例回调函数 ================== */
 
-/**
-  * 函 数：幂运算（整数）
-  * 返 回 值：X 的 Y 次方
-  */
-static uint32_t OLED_Pow(uint32_t X, uint32_t Y)
+#if !I2C1_SW_ENABLE
+/*
+ * 函 数：I2C DMA 传输完成回调函数
+ * 说 明：在 I2C DMA 传输完成后被调用
+ */
+static void OLED_DMA_TxCplt_Callback(void)
 {
-    uint32_t Result = 1;
-    while (Y--) { Result *= X; }
-    return Result;
-}
-
-/**
-  * 函 数：PNPoly 算法 — 判断指定点是否在指定多边形内部
-  * 参 数：nvert  - 多边形顶点数量
-  *         vertx  - 多边形各顶点 X 坐标数组
-  *         verty  - 多边形各顶点 Y 坐标数组
-  *         testx, testy - 测试点坐标
-  * 返 回 值：1 = 在内部，0 = 不在内部
-  * 说 明：W. Randolph Franklin 算法
-  */
-static uint8_t OLED_pnpoly(uint8_t nvert, int16_t *vertx, int16_t *verty, int16_t testx, int16_t testy)
-{
-    int16_t i, j, c = 0;
-    for (i = 0, j = nvert - 1; i < nvert; j = i++)
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    if(osal_semaphore_give_from_isr(i2c1_dma_semaphore, &xHigherPriorityTaskWoken) == OSAL_FAIL)
     {
-        if (((verty[i] > testy) != (verty[j] > testy)) &&
-            (testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i]))
-        {
-            c = !c;
-        }
+        LOG_E(TAG, "Failed to give I2C DMA semaphore from ISR");
+        Error_Handler();  // 或其他错误处理机制
     }
-    return c;
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
-
-/**
-  * 函 数：判断指定点是否在指定角度范围内
-  * 参 数：X, Y    - 指定点坐标
-  *         StartAngle, EndAngle - 角度范围 (-180~180)
-  *          水平向右为 0°，顺时针旋转，正角度向下
-  * 返 回 值：1 = 在范围内，0 = 不在
-  */
-static uint8_t OLED_IsInAngle(int16_t X, int16_t Y, int16_t StartAngle, int16_t EndAngle)
-{
-    int16_t PointAngle;
-    PointAngle = atan2(Y, X) / 3.1415926535 * 180;
-    if (StartAngle < EndAngle)
-    {
-        if (PointAngle >= StartAngle && PointAngle <= EndAngle) { return 1; }
-    }
-    else
-    {
-        if (PointAngle >= StartAngle || PointAngle <= EndAngle) { return 1; }
-    }
-    return 0;
-}
+#endif
 
 /* ================== OLED 初始化 ================== */
 
@@ -146,9 +119,15 @@ void OLED_Init(void)
 #if I2C1_SW_ENABLE
     LOG_I(TAG, "Using software I2C1 (PB6=SCL, PB7=SDA)");
     i2c_drv = I2C1_SW_GetDriver();
+    if(!i2c_drv) { Error_Handler(); }
 #else
     LOG_I(TAG, "Using hardware I2C1 (PB6=SCL, PB7=SDA)");
     i2c_drv = I2C1_HW_GetDriver();
+    if(!i2c_drv) { Error_Handler(); }
+    /* 创建 I2C DMA 传输完成信号量 */
+    i2c1_dma_semaphore = osal_semaphore_create(1, 0);
+    if(!i2c1_dma_semaphore) { Error_Handler(); }
+    I2C1_HW_SetDMATxCplt_Callback(OLED_DMA_TxCplt_Callback);
 #endif
     
     LOG_I(TAG, "Initializing I2C subsystem...");
@@ -270,6 +249,65 @@ void OLED_ReverseArea(int16_t X, int16_t Y, uint8_t Width, uint8_t Height)
             }
         }
     }
+}
+
+
+/* ================== 局部工具函数（数学辅助） ================== */
+
+/**
+  * 函 数：幂运算（整数）
+  * 返 回 值：X 的 Y 次方
+  */
+static uint32_t OLED_Pow(uint32_t X, uint32_t Y)
+{
+    uint32_t Result = 1;
+    while (Y--) { Result *= X; }
+    return Result;
+}
+
+/**
+  * 函 数：PNPoly 算法 — 判断指定点是否在指定多边形内部
+  * 参 数：nvert  - 多边形顶点数量
+  *         vertx  - 多边形各顶点 X 坐标数组
+  *         verty  - 多边形各顶点 Y 坐标数组
+  *         testx, testy - 测试点坐标
+  * 返 回 值：1 = 在内部，0 = 不在内部
+  * 说 明：W. Randolph Franklin 算法
+  */
+static uint8_t OLED_pnpoly(uint8_t nvert, int16_t *vertx, int16_t *verty, int16_t testx, int16_t testy)
+{
+    int16_t i, j, c = 0;
+    for (i = 0, j = nvert - 1; i < nvert; j = i++)
+    {
+        if (((verty[i] > testy) != (verty[j] > testy)) &&
+            (testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i]))
+        {
+            c = !c;
+        }
+    }
+    return c;
+}
+
+/**
+  * 函 数：判断指定点是否在指定角度范围内
+  * 参 数：X, Y    - 指定点坐标
+  *         StartAngle, EndAngle - 角度范围 (-180~180)
+  *          水平向右为 0°，顺时针旋转，正角度向下
+  * 返 回 值：1 = 在范围内，0 = 不在
+  */
+static uint8_t OLED_IsInAngle(int16_t X, int16_t Y, int16_t StartAngle, int16_t EndAngle)
+{
+    int16_t PointAngle;
+    PointAngle = atan2(Y, X) / 3.1415926535 * 180;
+    if (StartAngle < EndAngle)
+    {
+        if (PointAngle >= StartAngle && PointAngle <= EndAngle) { return 1; }
+    }
+    else
+    {
+        if (PointAngle >= StartAngle || PointAngle <= EndAngle) { return 1; }
+    }
+    return 0;
 }
 
 /* ================== 字符显示 ================== */

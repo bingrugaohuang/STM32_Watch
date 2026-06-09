@@ -26,10 +26,10 @@ static void OLED_ComprehensiveTest(void)
     OLED_Clear();
     OLED_DrawRectangle(0, 0, 128, 64, OLED_FILLED);
     OLED_Update();
-    osal_task_delay(5000);
+    osal_task_delay(1000);
     OLED_Clear();
     OLED_Update();
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test 2: ASCII 文本 ---- */
     LOG_I(TAG, "[Test 2] ASCII text display");
@@ -37,7 +37,7 @@ static void OLED_ComprehensiveTest(void)
     OLED_ShowString(0, 16, "STM32F103C8T6", OLED_6X8);
     OLED_ShowString(0, 32, "0123456789",    OLED_8X16);
     OLED_Update();
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test 3: 中文 (依赖于 GBK 字符集) ---- */
     LOG_I(TAG, "[Test 3] Chinese text display");
@@ -46,7 +46,7 @@ static void OLED_ComprehensiveTest(void)
     OLED_ShowString(0, 24, (char *)str_oled_driver,      OLED_8X16);
     OLED_ShowString(0, 48, (char *)str_freertos_watch,   OLED_6X8);
     OLED_Update();
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test 4: 数字显示 ---- */
     LOG_I(TAG, "[Test 4] Number display");
@@ -56,7 +56,7 @@ static void OLED_ComprehensiveTest(void)
     OLED_ShowHexNum(0, 40, 0xABCD, 4, OLED_8X16);
     OLED_ShowBinNum(0, 56, 0xA5, 8, OLED_6X8);
     OLED_Update();
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test 5: 浮点数显示 ---- */
     LOG_I(TAG, "[Test 5] Float number display");
@@ -65,7 +65,7 @@ static void OLED_ComprehensiveTest(void)
     OLED_ShowFloatNum(0, 20, -2.71828, 1, 4, OLED_8X16);
     OLED_ShowFloatNum(0, 40,  0.00000, 1, 3, OLED_8X16);
     OLED_Update();
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test 6: 输出格式显示 ---- */
     LOG_I(TAG, "[Test 6] OLED_Printf formatted output");
@@ -74,7 +74,7 @@ static void OLED_ComprehensiveTest(void)
     OLED_Printf(0, 20, OLED_6X8,  "Heap: %u",   (unsigned)xPortGetFreeHeapSize());
     OLED_Printf(0, 32, OLED_6X8,  "Time: %dms", 12345);
     OLED_Update();
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test 7: 图形绘制 ---- */
     LOG_I(TAG, "[Test 7] Shape drawing");
@@ -87,7 +87,7 @@ static void OLED_ComprehensiveTest(void)
     OLED_DrawCircle(100, 50, 8, OLED_FILLED);
     OLED_DrawTriangle(10, 50, 40, 30, 70, 55, OLED_UNFILLED);
     OLED_Update();
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test 8: 进度条动画 ---- */
     LOG_I(TAG, "[Test 8] Progress bar animation");
@@ -102,7 +102,7 @@ static void OLED_ComprehensiveTest(void)
         OLED_UpdateArea(10, 25, 108, 30);
         osal_task_delay(20);
     }
-    osal_task_delay(500);
+    osal_task_delay(1000);
 
     /* ---- Test complete ---- */
     LOG_I(TAG, "[Test 9] Final screen - test complete");
@@ -154,7 +154,7 @@ void I2CTestTask_Init(void)
 //     MX_I2C1_Init();
 //     LOG_I(TAG, "HW I2C1 initialized");
 // #endif
-
+    
     test_handle = osal_task_create("I2C_OLED_test", I2C_SW_test,
                                     256, NULL, 3);
     if (test_handle == NULL)

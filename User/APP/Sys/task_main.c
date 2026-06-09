@@ -30,12 +30,11 @@ static void prvCreateTasks(void);     /* 创建系统任务 */
   */
 static void total_init(void)
 {
-	serial_init();           // Driver 层
+  serial_init();           // Driver 层
   check_crash_log_on_startup();  /* 最先检查上次 HardFault 是否有 FLASH 崩溃日志 */
   log_init();              // Service 层
   button_service_init();   // Service 层（创建按键事件队列，配置按键控制块）
   hardfault_debug_init();  // MiddleWares/Debug（配置相关寄存器，准备 HardFault 调试）
-  OLED_Init();              // Driver 层（初始化 I2C 硬件或软件实现）
   LOG_I("MAIN", "System boot...");
 }
 

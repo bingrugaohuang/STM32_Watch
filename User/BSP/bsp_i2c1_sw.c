@@ -178,6 +178,7 @@ static I2C_Driver_t i2c1_sw_driver = {
     .write    = I2C1_SW_Write,
     .read     = I2C1_SW_Read,
     .delay_us = I2C1_SW_DelayUs,
+    .dma_callback = NULL,  // 软件 I2C 不使用 DMA 回调
 };
 
 /* ====================== 公开接口 ====================== */

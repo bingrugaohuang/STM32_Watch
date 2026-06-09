@@ -92,7 +92,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  //MX_I2C1_Init(); //条件编译，由I2C驱动调用
+  //MX_I2C1_Init(); /* I2C1 初始化由 OLED 驱动根据条件编译决定是软件模拟还是硬件实现 */
   MX_I2C2_Init();
   MX_RTC_Init();
   MX_TIM2_Init();

@@ -13,6 +13,8 @@
 
 #include <stdint.h>
 
+typedef void (*I2C1_DMACplt_Callback_t)(void);
+
 /*
  * I2C 驱动抽象结构体
  * 
@@ -26,6 +28,8 @@ typedef struct {
     uint8_t  (*write)(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len);
     uint8_t  (*read)(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len);
     void     (*delay_us)(uint32_t us);
+    void     (*dma_callback)(void);
+//  I2C1_DMACplt_Callback_t dma_callback;  // 可选的 DMA 传输完成回调函数指针
 } I2C_Driver_t;
 
 #endif /* I2C_INTERFACE_H */

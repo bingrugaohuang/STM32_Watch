@@ -20,6 +20,13 @@
  */
 const I2C_Driver_t * I2C1_HW_GetDriver(void);
 
+/*
+ * 设置 I2C1 DMA 传输完成回调函数
+ * 参 数：cb - 回调函数指针
+ * 说 明：在 I2C1 DMA 传输完成后被调用
+ */
+void I2C1_HW_SetDMATxCplt_Callback(I2C1_DMACplt_Callback_t cb);
+
 #endif /* !I2C1_SW_ENABLE */
 
 #endif /* BSP_I2C1_HW_H */
