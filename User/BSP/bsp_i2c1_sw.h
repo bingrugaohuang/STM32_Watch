@@ -19,6 +19,18 @@
 
 #if I2C1_SW_ENABLE
 
+/* I2C 相关错误码宏定义 */
+#define I2C1_TIMEOUT           30
+
+/* I2C 错误码定义 */
+typedef enum{
+    I2C_OK = 0,
+    I2C_ERR_NACK_ADDR,
+    I2C_ERR_NACK_DATA,
+    I2C_ERR_TIMEOUT,
+    I2C_ERR_BUS
+}I2C_Status_t;
+
 /*********************** 公开接口声明 ***********************/
 /*
  * 获取软件 I2C1 驱动实例的指针

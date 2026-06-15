@@ -18,12 +18,12 @@ typedef struct{
 /*==================公共函数==================*/
 
 /*
- * 函    数：btn_service_get_num
+ * 函    数：btn_service_getnum
  * 参    数：pkg - 输出参数，存储获取到的按键事件包
  *          timeout - 超时时间（ms）
  * 返 回 值：0 - 成功获取事件，-1 - 获取事件失败
  */
-int btn_service_get_num(Btn_pkg_t *pkg, uint32_t timeout);
+int btn_service_getnum(Btn_pkg_t *pkg, uint32_t timeout);
 
 /*
  * 函    数：button_service_init

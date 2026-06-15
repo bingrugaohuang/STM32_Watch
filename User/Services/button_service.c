@@ -30,7 +30,7 @@ static void btn_scan_timer_callback(osal_timer_handle_t xTimer); /* 按键扫描
 /**
  * 函    数：接口函数，供其他模块调用获取按键包，具体内容包括按键事件类型和按键ID，交给上层判断处理
  */
-int btn_service_get_num(Btn_pkg_t *pkg, uint32_t timeout)
+int btn_service_getnum(Btn_pkg_t *pkg, uint32_t timeout)
 {
     configASSERT(pkg != NULL);
 

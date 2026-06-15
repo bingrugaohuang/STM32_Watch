@@ -53,12 +53,31 @@ static void OLED_SetCursor(uint8_t Page, uint8_t X);
   */
 static void OLED_WriteCmd(uint8_t cmd)
 {
-    i2c_drv->write(OLED_I2C_ADDR, OLED_CTRL_CMD, &cmd, 1);
-#if !I2C1_SW_ENABLE
-    osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER);  /* 等待 I2C 传输完成 */
-#endif
-}
+    uint8_t status = 1;
+    uint8_t retry = 3;
+    
+    // 保证至少尝试发送一次，最多重试 3 次
+    do 
+    {
+        status = i2c_drv->write(OLED_I2C_ADDR, OLED_CTRL_CMD, &cmd, 1);
+        retry--;
+    } while(status != 0 && retry > 0);
 
+    // 只有 write 成功（status == 0），才说明底层确实启动了，才需要等信号量
+    if (status == 0) 
+    {
+#if !I2C1_SW_ENABLE
+        // 硬件 DMA 模式下，等待传输完成中断释放信号量
+        osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER);  
+#endif
+    }
+    else
+    {
+        // 走到这里说明重试 3 次都失败了，硬件总线肯定出问题了
+        // 这里千万不能等信号量！可以直接 return，或者加点错误打印
+        LOG_E(TAG, "Failed to write command 0x%02X after 3 attempts", cmd);
+    }
+}
 /**
   * 函 数：发送 OLED 数据块
   * 说 明：通过 I2C 抽象接口发送批量数据

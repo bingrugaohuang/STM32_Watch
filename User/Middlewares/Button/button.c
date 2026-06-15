@@ -1,11 +1,11 @@
 #include "button.h"
+#include "common_macro.h"
 #include <string.h> /* 用于 memset */
 
 /* ---------- 可配置参数（宏定义） ---------- */
 #define DEBOUNCE_TICKS   3          /**< 消抖次数（例如 3 次 = 15~30ms） */
 #define LONG_PRESS_TICKS 100        /**< 长按判定阈值（例如 100 次 = 1 秒@10ms 周期） */
 #define LONG_PRESS_REPEAT_TICKS 20  /**< 长按持续触发间隔（例如 20 次 = 200ms） */
-#define ButtonASSERT( x )    do { if (!(x)) { /* 可选：添加错误处理或日志输出 */Error_Handler();/* return;*/ } } while (0)
 
 /* 
  * 函数：button_init
@@ -18,8 +18,8 @@ void button_init(Button *btn,
                  uint8_t (*read_pin)(void),
                  uint8_t active_level)
 {
-    ButtonASSERT(btn != NULL);
-    ButtonASSERT(read_pin != NULL);
+    G_ASSERT(btn != NULL);
+    G_ASSERT(read_pin != NULL);
 
     memset(btn, 0, sizeof(Button));
     btn->active_level = active_level;
@@ -35,8 +35,8 @@ void button_attach_short(Button *btn,
                          ButtonCallback cb,
                          void *user_data)
 {
-    ButtonASSERT(btn != NULL);
-    // ButtonASSERT(cb != NULL);           // 短按回调可选，允许用户传入 NULL 以不使用短按事件
+    G_ASSERT(btn != NULL);
+    // G_ASSERT(cb != NULL);           // 短按回调可选，允许用户传入 NULL 以不使用短按事件
 
     btn->short_cb = cb;
     btn->short_user_data = user_data;
@@ -50,8 +50,8 @@ void button_attach_long(Button *btn,
                         ButtonCallback cb,
                         void *user_data)
 {
-    ButtonASSERT(btn != NULL);
-    // ButtonASSERT(cb != NULL);           // 长按回调可选，允许用户传入 NULL 以不使用长按事件
+    G_ASSERT(btn != NULL);
+    // G_ASSERT(cb != NULL);           // 长按回调可选，允许用户传入 NULL 以不使用长按事件
 
     btn->long_cb = cb;
     btn->long_user_data = user_data;
@@ -64,7 +64,7 @@ void button_attach_long(Button *btn,
  **/
 void button_ticks(Button *btn)
 {
-    ButtonASSERT(btn != NULL);
+    G_ASSERT(btn != NULL);
 
     uint8_t current_level = btn->readpin();
     if(current_level == btn->filtered_level){

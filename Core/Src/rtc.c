@@ -21,7 +21,7 @@
 #include "rtc.h"
 
 /* USER CODE BEGIN 0 */
-
+#define RTC_INIT_MAGIC 0x5AA5U //RTC初始化魔术字
 /* USER CODE END 0 */
 
 RTC_HandleTypeDef hrtc;
@@ -52,30 +52,46 @@ void MX_RTC_Init(void)
   }
 
   /* USER CODE BEGIN Check_RTC_BKUP */
-
+//检测是否写入魔术字，若写入则说明RTC的时间已经初始化过
+if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != RTC_INIT_MAGIC){
+  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, RTC_INIT_MAGIC); //写入魔术字
   /* USER CODE END Check_RTC_BKUP */
 
   /** Initialize RTC and set the Time and Date
   */
-  sTime.Hours = 0x23;
-  sTime.Minutes = 0x59;
-  sTime.Seconds = 0x0;
+  sTime.Hours = 14;
+  sTime.Minutes = 30;
+  sTime.Seconds = 0;
 
-  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
   {
     Error_Handler();
   }
-  DateToUpdate.WeekDay = RTC_WEEKDAY_THURSDAY;
-  DateToUpdate.Month = RTC_MONTH_APRIL;
-  DateToUpdate.Date = 0x23;
-  DateToUpdate.Year = 0x26;
+  DateToUpdate.WeekDay = RTC_WEEKDAY_SATURDAY;
+  DateToUpdate.Month = RTC_MONTH_JUNE;
+  DateToUpdate.Date = 13;
+  DateToUpdate.Year = 26;
 
-  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
+  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BIN) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN RTC_Init 2 */
-
+  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR2, (((uint16_t)DateToUpdate.Year) << 8) | DateToUpdate.Month); //将年月写入备份寄存器，方便后续读取
+  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR3, (((uint16_t)DateToUpdate.Date) << 8) | DateToUpdate.WeekDay); //将日和星期写入备份寄存器，方便后续读取
+}else{
+  /* 已经初始化过RTC，直接从备份寄存器读取年月日和星期，设置RTC的日期 */
+  uint16_t year_month = (uint16_t)HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR2);
+  uint16_t date_weekday = (uint16_t)HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3);
+  DateToUpdate.Year = (uint8_t)(year_month >> 8);
+  DateToUpdate.Month = (uint8_t)(year_month & 0xFF);
+  DateToUpdate.Date = (uint8_t)(date_weekday >> 8);
+  DateToUpdate.WeekDay = (uint8_t)(date_weekday & 0xFF);
+  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BIN) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
   /* USER CODE END RTC_Init 2 */
 
 }

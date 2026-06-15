@@ -10,6 +10,8 @@
 #include "button_service.h" /* 包含按钮服务模块 */
 #include "hardfault_debug.h"
 #include "common_macro.h"
+
+#include "display_service.h"
 //测试
 #include "i2c_test.h"
 
@@ -33,7 +35,6 @@ static void total_init(void)
   serial_init();           // Driver 层
   check_crash_log_on_startup();  /* 最先检查上次 HardFault 是否有 FLASH 崩溃日志 */
   log_init();              // Service 层
-  button_service_init();   // Service 层（创建按键事件队列，配置按键控制块）
   hardfault_debug_init();  // MiddleWares/Debug（配置相关寄存器，准备 HardFault 调试）
   LOG_I("MAIN", "System boot...");
 }
@@ -82,6 +83,8 @@ void APP_Init(void)
 static void prvCreateObjects(void)
 {
     /* 创建队列、递归锁等 */
+    button_service_init();
+    LOG_I("BTN","Initialized");
 }
 
 /**
@@ -100,6 +103,8 @@ static void prvCreateTasks(void)
 #if I2C1_OLED_TEST_ENABLE
     I2CTestTask_Init();
 #endif
+    /* 创建显示任务*/
+    displaytask_init();
     /* 创建其他应用任务 */
     // osal_task_create( "Sensor", vTask_Sensor, 256, NULL, 2 );
     // ...
@@ -113,7 +118,7 @@ static void prvCreateTasks(void)
  */
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
-    /* 1. 打印是哪个任务炸了栈（非常关键的信息！） */
+    /* 打印是哪个任务炸了栈 */
     // printf("FATAL ERROR: Stack Overflow in task: %s\r\n", pcTaskName);
     LOG_E("MAIN", "Stack overflow detected in task: %s\r\n", pcTaskName);
 
