@@ -58,6 +58,21 @@ void button_attach_long(Button *btn,
 }
 
 /* 
+ * 函数：button_attach_release
+ * 功能：注册释放回调函数及对应的用户数据
+ **/
+void button_attach_release(Button *btn,
+                           ButtonCallback cb,
+                           void *user_data)
+{
+    G_ASSERT(btn != NULL);
+    // G_ASSERT(cb != NULL);           // 释放回调可选，允许用户传入 NULL 以不使用释放事件
+
+    btn->release_cb = cb;
+    btn->release_user_data = user_data;
+}
+
+/* 
  * 函数：button_ticks
  * 功能：按键状态机核心处理，需周期性调用（例如每 10ms）
  *       主要完成：消抖、状态跳转、事件回调
@@ -91,7 +106,7 @@ void button_ticks(Button *btn)
                 if(btn->short_cb != NULL){
                     btn->short_cb(BTN_EVENT_SHORT_PRESS, btn->short_user_data);    // 触发短按回调
                 }
-                btn->state = BTN_STATE_IDLE;                // 返回空闲状态
+                btn->state = BTN_STATE_RELEASE;                // 返回空闲状态
             }else{
                 btn->press_ticks++;
                 if(btn->press_ticks >= LONG_PRESS_TICKS){
@@ -105,7 +120,7 @@ void button_ticks(Button *btn)
             break;
         case BTN_STATE_LONG_PRESS:
             if(btn->filtered_level != btn->active_level){
-                btn->state = BTN_STATE_IDLE;                // 长按结束，返回空闲状态
+                btn->state = BTN_STATE_RELEASE;                // 长按结束，返回空闲状态
             }else{
                 btn->press_ticks++;                         // 长按持续计数
                 if(btn->press_ticks >= LONG_PRESS_REPEAT_TICKS){
@@ -114,6 +129,17 @@ void button_ticks(Button *btn)
                     }
                     btn->press_ticks = 0;                   // 清零长按计数
                 }
+            }
+            break;
+        case BTN_STATE_RELEASE:
+            if(btn->filtered_level == btn->active_level){
+                btn->state = BTN_STATE_PRESS;               // 可能存在按键抖动导致的误判，返回按下状态
+                btn->press_ticks = 0;                       // 清零按下计数
+            }else{
+                if(btn->release_cb != NULL){
+                    btn->release_cb(BTN_EVENT_RELEASE, btn->release_user_data);  // 触发释放回调
+                }
+                btn->state = BTN_STATE_IDLE;                // 确认释放，返回空闲状态
             }
             break;
         default:

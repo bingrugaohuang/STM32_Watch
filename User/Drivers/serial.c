@@ -212,7 +212,7 @@ static void serial_dma_cleanup(uint8_t *pBuffer)
 }
 
 /*
- * 函    数：DMA 发送完成回调函数
+ * 函    数：串口空闲中断回调
  */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {

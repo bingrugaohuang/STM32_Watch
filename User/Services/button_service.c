@@ -67,6 +67,10 @@ void button_service_init(void)
     button_attach_long(&btn_next, btn_callback, (void*)(uintptr_t)BTN_NEXT);
     button_attach_long(&btn_cfm,  btn_callback, (void*)(uintptr_t)BTN_CFM);
 
+    button_attach_release(&btn_last, btn_callback, (void*)(uintptr_t)BTN_LAST);
+    button_attach_release(&btn_next, btn_callback, (void*)(uintptr_t)BTN_NEXT);
+    button_attach_release(&btn_cfm,  btn_callback, (void*)(uintptr_t)BTN_CFM);
+
     /* 创建按键扫描定时器 */
     btn_scan_timer  = osal_timer_create("Btn_Scan_Timer",
                                         BTN_SCAN_TIMER_PERIOD, 

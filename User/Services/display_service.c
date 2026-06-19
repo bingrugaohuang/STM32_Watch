@@ -43,7 +43,7 @@ static void displaytask(void* pvParameters)
 
         // 根据当前动画状态设置不同的等待时间，动画过程中更频繁地检查输入以保持响应性
         uint32_t wait_ticks = menu_engine_is_animating() ? 10 : 200;
-        
+
         if(btn_service_getnum(&btn, wait_ticks) == COMMON_ERR_OK){
            event = translate(&btn);
            if(event) LOG_I("DISPLAY","Received menu event %d", event);
@@ -65,18 +65,24 @@ static MenuEvent_t translate(Btn_pkg_t *btn)
             return MENU_EVENT_UP_SHORT;
         }else if(btn->event == BTN_EVENT_LONG_PRESS || btn->event == BTN_EVENT_LONG_PRESS_REPEAT){
             return MENU_EVENT_UP_LONG;
+        }else if(btn->event == BTN_EVENT_RELEASE){
+            return MENU_EVENT_UP_RELEASE;
         }
     }else if(btn->id == BTN_NEXT){
         if(btn->event == BTN_EVENT_SHORT_PRESS){
             return MENU_EVENT_DOWN_SHORT;
         }else if(btn->event == BTN_EVENT_LONG_PRESS || btn->event == BTN_EVENT_LONG_PRESS_REPEAT){
             return MENU_EVENT_DOWN_LONG;
+        }else if(btn->event == BTN_EVENT_RELEASE){
+            return MENU_EVENT_DOWN_RELEASE;
         }
     }else if(btn->id == BTN_CFM){
         if(btn->event == BTN_EVENT_SHORT_PRESS){
             return MENU_EVENT_CONFIRM_SHORT;
         }else if(btn->event == BTN_EVENT_LONG_PRESS || btn->event == BTN_EVENT_LONG_PRESS_REPEAT){
             return MENU_EVENT_CONFIRM_LONG;
+        }else if(btn->event == BTN_EVENT_RELEASE){
+            return MENU_EVENT_CONFIRM_RELEASE;
         }
     }
     return MENU_EVENT_NONE; // 无事件
