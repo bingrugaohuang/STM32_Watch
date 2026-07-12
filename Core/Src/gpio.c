@@ -50,17 +50,15 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin : BTN_CFM_Pin */
-  GPIO_InitStruct.Pin = BTN_CFM_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(BTN_CFM_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : BTN_NEXT_Pin BTN_LAST_Pin */
-  GPIO_InitStruct.Pin = BTN_NEXT_Pin|BTN_LAST_Pin;
+  /*Configure GPIO pins : BTN_CFM_Pin BTN_NEXT_Pin BTN_LAST_Pin */
+  GPIO_InitStruct.Pin = BTN_CFM_Pin|BTN_NEXT_Pin|BTN_LAST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
 }
 

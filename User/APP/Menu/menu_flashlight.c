@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "math.h"
 #include "string.h"
+#include "log.h"
 
 /* ── 外部返回图标 ── */
 extern const uint8_t Return[];
@@ -97,7 +98,7 @@ static void fl_on_enter(MenuNode_t *self)
 static void fl_on_exit(MenuNode_t *self)
 {
     (void)self;
-    flashlight_off();   /* 离开手电页面自动关闭硬件输出 */
+    //flashlight_off();   /* 离开手电页面自动关闭硬件输出 */
 }
 
 /* ══════════════════════════════════════════════════════
@@ -111,16 +112,20 @@ static MenuResult_t fl_on_input(MenuNode_t *self, MenuEvent_t event)
    if (s->state == FL_STATE_ADJUST) {
         switch (event) {
             case MENU_EVENT_UP_SHORT:
-                flashlight_adjust(-ADJ_STEP_SHORT);   /* 恢复滤波版本 */
+                flashlight_adjust(-ADJ_STEP_SHORT);   
+                LOG_I(TAG_FLSH,"Flashlight brightness decreased by %d, current CCR: %d", ADJ_STEP_SHORT, flashlight_get_ccr());
                 break;
             case MENU_EVENT_DOWN_SHORT:
                 flashlight_adjust(+ADJ_STEP_SHORT);
+                LOG_I(TAG_FLSH,"Flashlight brightness increased by %d, current CCR: %d", ADJ_STEP_SHORT, flashlight_get_ccr());
                 break;
             case MENU_EVENT_UP_LONG:
                 flashlight_adjust(-ADJ_STEP_LONG);
+                LOG_I(TAG_FLSH,"Flashlight brightness decreased by %d, current CCR: %d", ADJ_STEP_LONG, flashlight_get_ccr());
                 break;
             case MENU_EVENT_DOWN_LONG:
                 flashlight_adjust(+ADJ_STEP_LONG);
+                LOG_I(TAG_FLSH,"Flashlight brightness increased by %d, current CCR: %d", ADJ_STEP_LONG, flashlight_get_ccr());
                 break;
             case MENU_EVENT_CONFIRM_SHORT:
             case MENU_EVENT_CONFIRM_LONG:
@@ -142,10 +147,16 @@ static MenuResult_t fl_on_input(MenuNode_t *self, MenuEvent_t event)
         case MENU_EVENT_CONFIRM_SHORT:
             switch (self->cursor) {
                 case OPT_BACK:
+                    LOG_I(TAG_FLSH,"Menu:%s->%s", self->title, self->parent->title);
                     return MENU_RESULT_BACK;
                 case OPT_TOGGLE:
-                    if (flashlight_is_on()) flashlight_off();
-                    else                    flashlight_on();
+                    if (flashlight_is_on()) {
+                        flashlight_off();
+                        LOG_I(TAG_FLSH,"Flashlight turned OFF");
+                    } else {
+                        flashlight_on();
+                        LOG_I(TAG_FLSH,"Flashlight turned ON");
+                    }
                     break;
                 case OPT_ADJUST:
                     s->state = FL_STATE_ADJUST; // 进入亮度调节

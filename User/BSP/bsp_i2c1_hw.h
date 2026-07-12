@@ -1,22 +1,12 @@
-#ifndef BSP_I2C1_HW_H
-#define BSP_I2C1_HW_H
-
-#include "i2c_interface.h"
 #include "common_macro.h"
 
 #if !I2C1_SW_ENABLE
 
-/* I2C 相关错误码宏定义 */
-#define I2C1_TIMEOUT           30
+#ifndef BSP_I2C1_HW_H
+#define BSP_I2C1_HW_H
 
-/* I2C 错误码定义 */
-typedef enum{
-    I2C_OK = 0,
-    I2C_ERR_NACK_ADDR,
-    I2C_ERR_NACK_DATA,
-    I2C_ERR_TIMEOUT,
-    I2C_ERR_BUS
-}I2C_Status_t;
+#include "i2c_interface.h"
+
 
 /* ====================== 公开接口 ====================== */
 /*
@@ -37,7 +27,6 @@ const I2C_Driver_t * I2C1_HW_GetDriver(void);
  */
 void I2C1_HW_SetDMATxCplt_Callback(I2C1_DMACplt_Callback_t cb);
 
-#endif /* !I2C1_SW_ENABLE */
-
 #endif /* BSP_I2C1_HW_H */
 
+#endif /* !I2C1_SW_ENABLE */

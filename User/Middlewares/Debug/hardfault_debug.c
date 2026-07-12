@@ -22,6 +22,28 @@
 #define CRASH_MAGIC         0xDEADBEEFU // 用于标识有效的崩溃数据，避免误读垃圾数据，占用4字节
 #define CRASH_DATA_MAX      (CRASH_LOG_PAGE_SIZE - 8U)
 
+/* ---- FLASH 写入进度跟踪（调试用） ---- */
+#if HARDFAULT_CFG_FLASH_DEBUG_TRACE
+#define HFDBG_CHAR(c) do { \
+    while (!(USART1->SR & USART_SR_TXE)) {} \
+    USART1->DR = (uint8_t)(c); \
+} while(0)
+
+/* 输出 FLASH_SR 低 8 位的 hex 错误码 */
+static void hfdbg_sr_err(void)
+{
+    uint8_t sr = (uint8_t)(FLASH->SR & 0xFFU);
+    uint8_t hi = (sr >> 4) & 0x0FU;
+    uint8_t lo = sr & 0x0FU;
+    HFDBG_CHAR('X');
+    HFDBG_CHAR((hi < 10) ? ('0' + hi) : ('A' + hi - 10));
+    HFDBG_CHAR((lo < 10) ? ('0' + lo) : ('A' + lo - 10));
+}
+#else
+#define HFDBG_CHAR(c)    ((void)0)
+#define hfdbg_sr_err()   ((void)0)
+#endif
+
 /* ---- 前向声明 ---- */
 static void dump_line(const char *s);
 static void dump_hex_word(const char *label, uint32_t val);
@@ -35,6 +57,7 @@ static void init_usart_for_hardfault(void);
 
 #if HARDFAULT_CFG_FLASH_SAVE
 static void write_crash_to_flash(void);
+static void write_crash_to_flash_simple(void);
 static char          crash_buffer[CRASH_DATA_MAX];
 static uint32_t      crash_buf_idx;
 #endif
@@ -237,37 +260,60 @@ static void write_crash_to_flash(void)
     uint16_t *src;
     volatile uint16_t *dst;
 
+    HFDBG_CHAR('A');  /* 入口 */
+
     if (data_len == 0) {
-        return;  /* 无数据，跳过写入 */
+        HFDBG_CHAR('Z');  /* 无数据，跳过 */
+        return;
     }
 
-    /* 1. 解锁 FLASH */
-    FLASH->KEYR = 0x45670123;
-    FLASH->KEYR = 0xCDEF89AB;
+    /* 1. 确保 FLASH CR 无残留编程/擦除模式 */
+    if (FLASH->CR & (FLASH_CR_PG | FLASH_CR_PER)) {
+        FLASH->CR &= ~(FLASH_CR_PG | FLASH_CR_PER);
+    }
 
-    /* 2. 等待 FLASH 空闲 */
+    /* 2. 解锁 FLASH（仅当确实被锁定时才写解锁序列） */
+    if (FLASH->CR & FLASH_CR_LOCK) {
+        FLASH->KEYR = 0x45670123;
+        FLASH->KEYR = 0xCDEF89AB;
+    }
+
+    /* 3. 等待 FLASH 空闲，并清除任何残留错误标志 */
     while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+    FLASH->SR = (FLASH_SR_PGERR | FLASH_SR_WRPRTERR);
 
-    /* 3. 擦除目标页 */
-    FLASH->CR |= FLASH_CR_PER;   // 设置页擦除
-    FLASH->AR  = CRASH_LOG_ADDR; // 设置要擦除的页地址
-    FLASH->CR |= FLASH_CR_STRT;  // 启动擦除
+    HFDBG_CHAR('B');  /* 解锁完成 */
+
+    /* 4. 擦除目标页 */
+    FLASH->CR |= FLASH_CR_PER;
+    FLASH->AR  = CRASH_LOG_ADDR;
+    FLASH->CR |= FLASH_CR_STRT;
     while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
-    FLASH->CR &= ~FLASH_CR_PER;  // 清除页擦除位
+    FLASH->CR &= ~FLASH_CR_PER;
 
-    /* 4. 开启编程模式 */
+    /* 检查擦除是否成功 */
+    if (FLASH->SR & (FLASH_SR_PGERR | FLASH_SR_WRPRTERR)) {
+        hfdbg_sr_err();  /* 擦除失败 */
+        FLASH->SR = (FLASH_SR_PGERR | FLASH_SR_WRPRTERR);
+        FLASH->CR |= FLASH_CR_LOCK;
+        return;
+    }
+
+    HFDBG_CHAR('C');  /* 擦除完成 */
+
+    /* 5. 开启编程模式 */
     FLASH->CR |= FLASH_CR_PG;
 
-    /* 5. 写入魔数 (4 字节) */
-    dst = (volatile uint16_t *)(CRASH_LOG_ADDR);// 半字编程，因此分两步写入
-    *dst = (uint16_t)(CRASH_MAGIC & 0xFFFFU);   // 低半字
+    /* 6. 写入魔数 (4 字节，半字编程分两步) */
+    dst = (volatile uint16_t *)(CRASH_LOG_ADDR);
+    *dst = (uint16_t)(CRASH_MAGIC & 0xFFFFU);
     while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
     dst++;
-    *dst = (uint16_t)((CRASH_MAGIC >> 16) & 0xFFFFU);// 高半字
+    *dst = (uint16_t)((CRASH_MAGIC >> 16) & 0xFFFFU);
     while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
     dst++;
 
-    /* 6. 写入数据长度 (4 字节) */
+    /* 7. 写入数据长度 (4 字节) */
     *dst = (uint16_t)(data_len & 0xFFFFU);
     while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
     dst++;
@@ -275,7 +321,18 @@ static void write_crash_to_flash(void)
     while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
     dst++;
 
-    /* 7. 写入崩溃数据（按半字编程） */
+    /* 检查头部编程是否有错误 */
+    if (FLASH->SR & (FLASH_SR_PGERR | FLASH_SR_WRPRTERR)) {
+        hfdbg_sr_err();  /* 头部写入失败 */
+        FLASH->SR = (FLASH_SR_PGERR | FLASH_SR_WRPRTERR);
+        FLASH->CR &= ~FLASH_CR_PG;
+        FLASH->CR |= FLASH_CR_LOCK;
+        return;
+    }
+
+    HFDBG_CHAR('D');  /* 头部写入完成 */
+
+    /* 8. 写入崩溃数据（按半字编程） */
     src = (uint16_t *)crash_buffer;
     total_halfwords = (data_len + 1U) / 2U;
     for (i = 0; i < total_halfwords; i++) {
@@ -284,8 +341,114 @@ static void write_crash_to_flash(void)
         dst++;
     }
 
-    /* 8. 关闭编程模式并锁定 */
+    /* 检查数据写入是否有错误 */
+    if (FLASH->SR & (FLASH_SR_PGERR | FLASH_SR_WRPRTERR)) {
+        hfdbg_sr_err();  /* 数据写入失败 */
+        FLASH->SR = (FLASH_SR_PGERR | FLASH_SR_WRPRTERR);
+        FLASH->CR &= ~FLASH_CR_PG;
+        FLASH->CR |= FLASH_CR_LOCK;
+        return;
+    }
+
+    HFDBG_CHAR('E');  /* 数据写入完成 */
+
+    /* 9. 关闭编程模式 */
     FLASH->CR &= ~FLASH_CR_PG;
+
+    /* 10. 写后验证：读回魔数确认写入真正生效 */
+    if (*(volatile uint32_t *)CRASH_LOG_ADDR != CRASH_MAGIC) {
+        HFDBG_CHAR('V');  /* 验证失败 */
+        FLASH->CR |= FLASH_CR_LOCK;
+        return;
+    }
+
+    HFDBG_CHAR('F');  /* 验证通过，写入成功 */
+
+    /* 11. 锁定 FLASH */
+    FLASH->CR |= FLASH_CR_LOCK;
+}
+
+/* ================================================================
+ *  write_crash_to_flash_simple — 简化版 FLASH 写入（无错误检查 + 重试）
+ *
+ *  适用于带错误检查版间歇性失败的场景，作为备选方案。
+ *  写入失败时最多重试 2 次（共 3 次写入机会）。
+ * ================================================================ */
+static void write_crash_to_flash_simple(void)
+{
+    uint32_t data_len = crash_buf_idx;
+    uint32_t total_halfwords;
+    uint32_t attempt;
+    uint32_t i;
+    uint16_t *src;
+    volatile uint16_t *dst;
+
+    HFDBG_CHAR('a');  /* 简化版入口 */
+
+    if (data_len == 0) {
+        return;
+    }
+
+    for (attempt = 0; attempt < 3; attempt++) {
+        /* 1. 解锁 FLASH */
+        FLASH->KEYR = 0x45670123;
+        FLASH->KEYR = 0xCDEF89AB;
+
+        /* 2. 等待空闲 */
+        while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+
+        /* 3. 擦除目标页 */
+        FLASH->CR |= FLASH_CR_PER;
+        FLASH->AR  = CRASH_LOG_ADDR;
+        FLASH->CR |= FLASH_CR_STRT;
+        while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+        FLASH->CR &= ~FLASH_CR_PER;
+
+        /* 4. 开启编程模式 */
+        FLASH->CR |= FLASH_CR_PG;
+
+        /* 5. 写入魔数 */
+        dst = (volatile uint16_t *)(CRASH_LOG_ADDR);
+        *dst = (uint16_t)(CRASH_MAGIC & 0xFFFFU);
+        while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+        dst++;
+        *dst = (uint16_t)((CRASH_MAGIC >> 16) & 0xFFFFU);
+        while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+        dst++;
+
+        /* 6. 写入数据长度 */
+        *dst = (uint16_t)(data_len & 0xFFFFU);
+        while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+        dst++;
+        *dst = (uint16_t)((data_len >> 16) & 0xFFFFU);
+        while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+        dst++;
+
+        /* 7. 写入崩溃数据 */
+        src = (uint16_t *)crash_buffer;
+        total_halfwords = (data_len + 1U) / 2U;
+        for (i = 0; i < total_halfwords; i++) {
+            *dst = src[i];
+            while ((FLASH->SR & FLASH_SR_BSY) != 0U) {}
+            dst++;
+        }
+
+        /* 8. 关闭编程模式 */
+        FLASH->CR &= ~FLASH_CR_PG;
+
+        /* 9. 写后验证 */
+        if (*(volatile uint32_t *)CRASH_LOG_ADDR == CRASH_MAGIC) {
+            HFDBG_CHAR('f');  /* 写入成功 */
+            FLASH->CR |= FLASH_CR_LOCK;
+            return;
+        }
+
+        /* 验证失败，重试 */
+        HFDBG_CHAR('r');  /* retry marker */
+        FLASH->CR |= FLASH_CR_LOCK;
+    }
+
+    HFDBG_CHAR('v');  /* 3 次重试全部失败 */
     FLASH->CR |= FLASH_CR_LOCK;
 }
 #endif /* HARDFAULT_CFG_FLASH_SAVE */
@@ -342,10 +505,16 @@ void hardfault_dump(uint32_t *stack_frame)
     dump_line("================================================");
     dump_line("        END OF CRASH DUMP");
     dump_line("================================================");
-    dump_line("");
 
 #if HARDFAULT_CFG_FLASH_SAVE
+    /* 调试模式：输出空行分隔 FLASH 写入进度标记 */
+    dump_line("");
+#if HARDFAULT_CFG_FLASH_MODE
     write_crash_to_flash();
+#else
+    write_crash_to_flash_simple();
+#endif
+    dump_line("");
 #endif
 
     /* 死循环 —— 等待用户手动复位，留时间连接串口 */
@@ -369,6 +538,23 @@ void check_crash_log_on_startup(void)
 
     /* 检查是否为有效的崩溃数据 */
     if (magic != CRASH_MAGIC) {
+#if HARDFAULT_CFG_DIAGNOSTIC
+        /* 诊断模式：输出 FLASH 页前 16 字节供调试 */
+        char diag_buf[64];
+        uint8_t i;
+        const volatile uint8_t *p = (const volatile uint8_t *)CRASH_LOG_ADDR;
+        serial_send_blocking((const uint8_t *)"\r\n[HFDBG] No crash log, FLASH dump: ", 38);
+        for (i = 0; i < 16; i++) {
+            uint8_t hi = (p[i] >> 4) & 0x0FU;
+            uint8_t lo = p[i] & 0x0FU;
+            diag_buf[i * 3]     = (hi < 10) ? ('0' + hi) : ('A' + hi - 10);
+            diag_buf[i * 3 + 1] = (lo < 10) ? ('0' + lo) : ('A' + lo - 10);
+            diag_buf[i * 3 + 2] = ' ';
+        }
+        diag_buf[47] = '\r';
+        diag_buf[48] = '\n';
+        serial_send_blocking((const uint8_t *)diag_buf, 49);
+#endif
         return;
     }
 

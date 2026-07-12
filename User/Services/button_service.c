@@ -38,7 +38,7 @@ int btn_service_getnum(Btn_pkg_t *pkg, uint32_t timeout)
     {
         return COMMON_ERR_OK; /* 成功获取事件 */
     }
-    return COMMON_ERR_QUEUE_FULL; /* 获取事件失败 */
+    return COMMON_ERR_TIMEOUT; /* 获取事件失败 */
 }
 
 /**
@@ -82,7 +82,24 @@ void button_service_init(void)
         Error_Handler();
     }
 
-    osal_timer_start(btn_scan_timer, 0);
+    //osal_timer_start(btn_scan_timer, 0);
+}
+
+/**
+ * 函    数：启动按键扫描定时器
+ * 注：由于mpu的配置是在开启调度后进行，
+ *    因此如果一开始就开启定时器会导致误扫描到确认信号一次
+ *    因此需要再mpu初始化后再开启定时器
+ */
+void button_serve_start_timer(void){
+    osal_timer_start(btn_scan_timer, 0);  
+}
+
+/**
+ * 函    数：停止按键扫描定时器
+ */
+void button_serve_stop_timer(void){
+    osal_timer_stop(btn_scan_timer, 0);  
 }
 
 /*=====================私有函数=====================*/

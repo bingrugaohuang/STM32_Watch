@@ -11,9 +11,9 @@
 #include "hardfault_debug.h"
 #include "common_macro.h"
 
-#include "display_service.h"
+#include "task_service.h"
 //测试
-#include "i2c_test.h"
+//#include "i2c_test.h"
 
 /* ---------- 私有函数声明 ---------- */
 static void prvCreateObjects(void);   /* 创建 IPC 对象 */
@@ -36,7 +36,7 @@ static void total_init(void)
   check_crash_log_on_startup();  /* 最先检查上次 HardFault 是否有 FLASH 崩溃日志 */
   log_init();              // Service 层
   hardfault_debug_init();  // MiddleWares/Debug（配置相关寄存器，准备 HardFault 调试）
-  LOG_I("MAIN", "System boot...");
+  LOG_I(TAG_MAIN, "System boot...");
 }
 
 /**
@@ -62,6 +62,7 @@ void APP_Init(void)
     prvCreateTasks();
 
     /* 步骤4：启动调度器，正常情况不会返回 */
+    LOG_I(TAG_MAIN, "Starting scheduler...");
     osal_start_scheduler();
 
     /* 若返回说明启动失败，卡死在错误处理 */
@@ -84,7 +85,8 @@ static void prvCreateObjects(void)
 {
     /* 创建队列、递归锁等 */
     button_service_init();
-    LOG_I("BTN","Initialized");
+    mpu6050_queue_init();
+    LOG_I(TAG_BTN,"Initialized");
 }
 
 /**
@@ -105,6 +107,8 @@ static void prvCreateTasks(void)
 #endif
     /* 创建显示任务*/
     displaytask_init();
+    /* 创建 MPU6050 处理任务 */
+    mpu6050task_init();
     /* 创建其他应用任务 */
     // osal_task_create( "Sensor", vTask_Sensor, 256, NULL, 2 );
     // ...
@@ -120,7 +124,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     /* 打印是哪个任务炸了栈 */
     // printf("FATAL ERROR: Stack Overflow in task: %s\r\n", pcTaskName);
-    LOG_E("MAIN", "Stack overflow detected in task: %s\r\n", pcTaskName);
+    LOG_E(TAG_MAIN, "Stack overflow detected in task: %s\r\n", pcTaskName);
 
     __disable_irq(); 
     while (1) 

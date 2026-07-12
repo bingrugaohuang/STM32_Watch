@@ -14,8 +14,11 @@
  *    SERIAL=0, FLASH=1 → 仅 FLASH（崩溃时静默保存到 FLASH，复位后输出）
  *    SERIAL=1, FLASH=1 → 两者同时启用
  */
-#define HARDFAULT_CFG_SERIAL_ENABLE   1
-#define HARDFAULT_CFG_FLASH_SAVE      1
+#define HARDFAULT_CFG_SERIAL_ENABLE      1
+#define HARDFAULT_CFG_FLASH_SAVE         1
+#define HARDFAULT_CFG_DIAGNOSTIC         1   /* 启动时若无崩溃日志，输出 FLASH 诊断信息（调试用，发布时置 0） */
+#define HARDFAULT_CFG_FLASH_MODE         1   /* 0=简化版(无错误检查+重试), 1=带错误检查版 */
+#define HARDFAULT_CFG_FLASH_DEBUG_TRACE  1   /* 写 FLASH 时输出进度字符（调试用，发布时置 0） */
 
 /**
   * HardFault 调试模块初始化函数 

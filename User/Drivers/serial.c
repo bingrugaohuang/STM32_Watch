@@ -4,9 +4,10 @@
 #include "main.h"           /* Error_Handler */
 #include <string.h>
 #include "common_macro.h"
+#include "task_service.h"
 
 /* ---------- 发送任务栈与优先级 ---------- */
-#define SERIAL_TX_TASK_STACK_SIZE   256
+#define SERIAL_TX_TASK_STACK_SIZE   128 * 1 + 64
 #define SERIAL_TX_TASK_PRIORITY     5
 
 /* ---------- 队列长度 ---------- */
@@ -191,6 +192,15 @@ static void serial_tx_task(void *pvParameters)
 
         s_dma_busy = 1;
         serial_start_dma(msg.pData, msg.size);
+#if STACK_MONITOR_ENABLE
+        static uint32_t last_monitor_time = 0;
+        uint32_t current_time = osal_get_tick();
+        if (current_time - last_monitor_time >= 5000) { // 每5秒打印一次
+            stackmonitor(s_tx_task, "SerialTxTask");
+            last_monitor_time = current_time;
+        }    
+       // 监控任务栈高水位标记
+#endif
     }
 }
 

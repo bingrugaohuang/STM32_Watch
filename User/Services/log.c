@@ -5,9 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef LOG_DEFAULT_LEVEL
-#define LOG_DEFAULT_LEVEL LOG_LEVEL_INFO
-#endif
+
 
 /* ---------- 静态全局变量 ---------- */
 static volatile LogLevel s_log_level = LOG_DEFAULT_LEVEL;
@@ -67,7 +65,7 @@ void log_register_backend(LogBackend backend)
   */
 void log_print(LogLevel level, const char *tag, const char *fmt, ...)
 {
-    if (s_log_level == LOG_LEVEL_OFF || level > s_log_level) {
+    if (level > s_log_level) {
         return;
     }
 

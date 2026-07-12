@@ -2,6 +2,8 @@
 #include "oled_driver.h"
 #include <stdio.h>
 #include "menu_common.h"
+#include <stdlib.h>
+#include "log.h"
 
 //  cover flow 常量
 #define CF_INTERVAL   28   // 图标间距（比32px小 → 相邻层叠4px）
@@ -55,10 +57,7 @@ MenuNode_t menu_return;
 //用extern声明其他节点，避免循环引用问题
 //extern MenuNode_t menu_home;
 /*extern*/ MenuNode_t menu_alarm;
-// /*extern*/ MenuNode_t menu_stopwatch;
-///*extern*/ MenuNode_t menu_flashlight;
-/*extern*/ MenuNode_t menu_gradienter;
-/*extern*/ MenuNode_t menu_game;
+///*extern*/ MenuNode_t menu_gradienter;
 /*extern*/ MenuNode_t menu_settings;
 
 //图标数据声明
@@ -69,7 +68,6 @@ MenuNode_t *applist_children[] = {
     &menu_return, //第0项为返回主页的虚构节点
     &menu_stopwatch,
     &menu_flashlight,
-    &menu_game,
     &menu_gradienter,
     &menu_alarm,
     &menu_settings,
@@ -86,7 +84,7 @@ MenuNode_t menu_applist = {
     .title       = "App_List",
     .parent      = &menu_home,
     .children    = applist_children,
-    .child_count = 7,
+    .child_count = sizeof(applist_children) / sizeof(applist_children[0]),
     .cursor      = 0,
 
     .on_enter    = applist_on_enter,
@@ -101,10 +99,9 @@ const uint8_t *app_icons[] = {
     Menu_Graph[0], //返回图标
     Menu_Graph[1], //秒表图标
     Menu_Graph[2], //手电筒图标
-    Menu_Graph[3], //游戏图标
-    Menu_Graph[4], //水平仪图标
-    Menu_Graph[5], //闹钟图标
-    Menu_Graph[6], //设置图标
+    Menu_Graph[3], //水平仪图标
+    Menu_Graph[4], //闹钟图标
+    Menu_Graph[5], //设置图标
 };
 
 /* ══════════════════════════════════════════════════════
@@ -249,7 +246,13 @@ static MenuResult_t applist_on_input(MenuNode_t *self, MenuEvent_t event)
                 s->anime_active = ANIME_STATE_AUTO_SCROLL; //进入自动滚动状态
                 start_animation(self, 1); //向右滑动
             }else if(event == MENU_EVENT_CONFIRM_SHORT){
-                return (self->cursor == 0) ? 
+                if(self->cursor){
+                    LOG_I(TAG_APPLIST,"Menu:%s->%s", self->title, self->children[self->cursor]->title);
+                }
+                else{
+                    LOG_I(TAG_APPLIST,"Menu:%s->%s", self->title, self->parent->title);
+                }
+                 return (self->cursor == 0) ? 
                  MENU_RESULT_BACK : MENU_RESULT_ENTER;
             }
             break;

@@ -16,3 +16,4 @@ void bsp_pwm_stop(void);
 void bsp_pwm_set(uint16_t value);
 
 #endif
+

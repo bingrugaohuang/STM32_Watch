@@ -27,7 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "serial.h"
+#include "common_macro.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +55,7 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 extern void APP_Init(void);   /* 应用初始化函数，定义在 APP 层 */
+extern void HardFault_Handler(void); /* 硬件故障处理函数，定义在 User/Drivers/hardfault_handler.c 中 */
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -92,8 +93,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  //MX_I2C1_Init(); /* I2C1 初始化由 OLED 驱动根据条件编译决定是软件模拟还是硬件实现 */
-  MX_I2C2_Init();
+  // MX_I2C1_Init();
+  // MX_I2C2_Init();
   MX_RTC_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
@@ -203,7 +204,10 @@ void Error_Handler(void)
     //    while ((USART->SR & USART_SR_TXE) == 0);
     //    USART->DR = 'E';
     //    或者调用一个你自己写的阻塞式串口输出函数
-    serial_send_blocking("ERROR: System halted!\r\n", 25);
+    //serial_send_blocking("ERROR: System halted!\r\n", 25);
+#if USE_HARDFAULT_HANDLER
+    HardFault_Handler(); // 调用硬件故障处理函数，进入死循环
+#endif
     // 3. 最后死循环
     while(1) {
         #ifdef __CC_ARM  // 如果使用调试器，可触发BKPT

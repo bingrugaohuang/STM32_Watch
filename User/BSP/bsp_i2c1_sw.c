@@ -16,10 +16,10 @@
  *   - 确保外部硬件已连接 4.7kΩ 上拉电阻至 3.3V
  */
 #include "common_macro.h"   /* 包含 I2C 错误码定义 */
+#if I2C1_SW_ENABLE
+
 #include "bsp_i2c1_sw.h"
 #include "stm32f1xx_hal.h"  /* 寄存器定义，根据你的实际环境调整 */
-
-#if I2C1_SW_ENABLE
 
 /* ====================== 硬件抽象宏定义 ====================== */
 //引脚操作宏
@@ -33,187 +33,7 @@
 #define I2C1_SCL_PIN GPIO_PIN_6
 #define I2C1_SDA_PIN GPIO_PIN_7
 
-/* I2C 时序延时参数（72MHz 下，约 5us 半个周期得到约 100kHz 时钟） */
-#define I2C_DELAY_HALF_CYCLE_US   5
-#define CYCLES_PER_US (72)
-
-/* ====================== 静态函数声明 ====================== */
-/* 
- * 以下 4 个函数对应 I2C_Driver_t 接口。
- */
-static void     I2C1_SW_Init(void);
-static uint8_t  I2C1_SW_Write(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len);
-static uint8_t  I2C1_SW_Read(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len);
-static void     I2C1_SW_DelayUs(uint32_t us);
-
-/* ====================== 传输辅助函数 ====================== */
-/*
- * 函数：I2C_Start
- */
-static void I2C_Start(void)
-{
-    SDA_HIGH();
-    SCL_HIGH();
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-    SDA_LOW();
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-    SCL_LOW();
-    //I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-}
-
-/*
- * 函数：I2C_Stop
- */
-static void I2C_Stop(void)
-{
-    SCL_LOW();
-    SDA_LOW();
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-    SCL_HIGH();
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-    SDA_HIGH();
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-}
-
-/*
- * 函数：I2C_WaitAck
- */
-static uint8_t I2C_WaitAck(void)
-{
-    SCL_LOW();
-    SDA_HIGH(); // 释放 SDA 线
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-    SCL_HIGH();
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-    uint8_t ack = SDA_READ(); // 读取 ACK 位
-
-    SCL_LOW();
-    ///I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-    return ack;
-}
-
-/*
- * 函数：I2C_SendByte
- */
-static void I2C_SendByte(uint8_t byte)
-{
-    for(int i = 0; i < 8; i++)
-    {
-        SCL_LOW();
-        //I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-        if(byte & 0x80){ // 发送最高位
-            SDA_HIGH();
-        }
-        else{
-            SDA_LOW();
-        }
-        byte <<= 1; // 移出已发送的最高位
-        I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-        SCL_HIGH();
-        I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-    }
-    SCL_LOW();
-}
-
-/*
- * 函数：I2C_ReadByte
- */
-static uint8_t I2C_ReadByte(void)
-{
-    uint8_t byte = 0;
-    SDA_HIGH(); // 释放 SDA 线
-
-    for(int i = 0; i < 8; i++)
-    {
-        SCL_LOW();
-        I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-        SCL_HIGH();
-        I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-        byte <<= 1; // 为新位腾出空间
-        if(SDA_READ()){
-            byte |= 0x01; // 读到 1
-        }
-    }
-    SCL_LOW();
-    return byte;
-}
-
-/*
- * 函数：I2C_SendAck
- */
-static void I2C_SendAck(uint8_t ack)
-{
-    SCL_LOW();
-    if(ack){
-        SDA_HIGH(); // 发送 NACK（1）
-    }
-    else{
-        SDA_LOW(); // 发送 ACK（0）
-    }
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-    SCL_HIGH();
-    I2C1_SW_DelayUs(I2C_DELAY_HALF_CYCLE_US);
-
-    SCL_LOW();
-}
-
-/* ====================== 驱动实例（全局） ====================== */
-/*
- * 这是当前文件的核心数据结构。
- * 所有上层驱动都通过 I2C1_SW_GetDriver() 获取它的指针。
- * 它的四个函数指针指向本文件的静态函数。
- */
-static I2C_Driver_t i2c1_sw_driver = {
-    .init     = I2C1_SW_Init,
-    .write    = I2C1_SW_Write,
-    .read     = I2C1_SW_Read,
-    .delay_us = I2C1_SW_DelayUs,
-    .dma_callback = NULL,  // 软件 I2C 不使用 DMA 回调
-};
-
-/* ====================== 公开接口 ====================== */
-const I2C_Driver_t * I2C1_SW_GetDriver(void)
-{
-    return &i2c1_sw_driver;
-}
-
-/* ====================== 延时实现 ====================== */
-/*
- * 函数：DWT初始化
- */
-static void DWT_Init(void)
-{
-    if((!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)))
-    {
-        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; // 使能 DWT
-    }
-    DWT->CYCCNT = 0;                     // 清零计数器
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk; // 使能周期计数器
-}
-
-/*
- * 函数：I2C1_SW_DelayUs,通过 DWT 周期计数器实现微秒级延时
- * 说明: 如从机有超时限制，可以短暂屏蔽 SysTick 中断（不是全局中断） 
- */
-static inline void I2C1_SW_DelayUs(uint32_t us)
-{
-    uint32_t start = DWT->CYCCNT;
-    uint32_t cycles = us * CYCLES_PER_US; // 计算需要的周期数
-    while(DWT->CYCCNT - start < cycles);  // 等待直到达到所需周期数
-    // for(int i = 0; i < 72 * us; i++){
-    //     __nop;
-    // }
-}
+#include "protocol_swi2c.h" // 包含 I2C 时序函数和 DWT 延时函数
 
 /* ====================== 硬件初始化 ====================== */
 /*
@@ -242,29 +62,29 @@ static void I2C1_SW_Init(void)
  */
 static uint8_t I2C1_SW_Write(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len)
 {
-    I2C_Start();
+    SW_I2C_Start();
 
-    I2C_SendByte((dev_addr << 1) | 0x00); // 发送从机地址（写方向）
-    if(I2C_WaitAck()){
-        I2C_Stop();
+    SW_I2C_SendByte((dev_addr << 1) | 0x00); // 发送从机地址（写方向）
+    if(SW_I2C_WaitAck()){
+        SW_I2C_Stop();
         return I2C_ERR_NACK_ADDR; // 从机无应答
     }
 
-    I2C_SendByte(reg); // 发送寄存器地址
-    if(I2C_WaitAck()){
-        I2C_Stop();
+    SW_I2C_SendByte(reg); // 发送寄存器地址
+    if(SW_I2C_WaitAck()){
+        SW_I2C_Stop();
         return I2C_ERR_NACK_DATA; // 寄存器地址无应答
     }
     
     for(uint8_t i = 0; i < len; i++){
-        I2C_SendByte(data[i]); // 发送数据字节
-        if(I2C_WaitAck()){
-            I2C_Stop();
+        SW_I2C_SendByte(data[i]); // 发送数据字节
+        if(SW_I2C_WaitAck()){
+            SW_I2C_Stop();
             return I2C_ERR_NACK_DATA; // 数据字节无应答
         }
     }
 
-    I2C_Stop();
+    SW_I2C_Stop();
 
     return I2C_OK; // 临时返回成功
 }
@@ -276,35 +96,56 @@ static uint8_t I2C1_SW_Write(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8
 static uint8_t I2C1_SW_Read(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len)
 {
 
-    I2C_Start();
+    SW_I2C_Start();
 
-    I2C_SendByte((dev_addr << 1) | 0x00); // 发送从机地址（写方向）
-    if(I2C_WaitAck()){
-        I2C_Stop();
+    SW_I2C_SendByte((dev_addr << 1) | 0x00); // 发送从机地址（写方向）
+    if(SW_I2C_WaitAck()){
+        SW_I2C_Stop();
         return I2C_ERR_NACK_ADDR; // 从机无应答
     }
 
-    I2C_SendByte(reg); // 发送寄存器地址
-    if(I2C_WaitAck()){
-        I2C_Stop();
+    SW_I2C_SendByte(reg); // 发送寄存器地址
+    if(SW_I2C_WaitAck()){
+        SW_I2C_Stop();
         return I2C_ERR_NACK_DATA; // 寄存器地址无应答
     }
 
-    I2C_Start(); // 重复起始
+    SW_I2C_Start(); // 重复起始
 
-    I2C_SendByte((dev_addr << 1) | 0x01); // 发送从机地址（读方向）
-    if(I2C_WaitAck()){
-        I2C_Stop();
+    SW_I2C_SendByte((dev_addr << 1) | 0x01); // 发送从机地址（读方向）
+    if(SW_I2C_WaitAck()){
+        SW_I2C_Stop();
         return I2C_ERR_NACK_ADDR; // 从机无应答
     }
     for(int i = 0; i < len; i++){
-        data[i] = I2C_ReadByte(); // 读取数据字节
-        I2C_SendAck(i < (len - 1)); // 最后一个字节发送 NACK
+        data[i] = SW_I2C_ReadByte(); // 读取数据字节
+        SW_I2C_SendAck(i < (len - 1)); // 最后一个字节发送 NACK
     }
 
-    I2C_Stop();
+    SW_I2C_Stop();
 
     return I2C_OK; // 临时返回成功
+}
+
+
+/* ====================== 驱动实例（全局） ====================== */
+/*
+ * 这是当前文件的核心数据结构。
+ * 所有上层驱动都通过 I2C1_SW_GetDriver() 获取它的指针。
+ * 它的四个函数指针指向本文件的静态函数。
+ */
+static I2C_Driver_t i2c1_sw_driver = {
+    .init     = I2C1_SW_Init,
+    .write    = I2C1_SW_Write,
+    .read     = I2C1_SW_Read,
+    .delay_us = SW_I2C_DelayUs,  // 使用协议层的通用延时函数
+    .dma_callback = NULL,  // 软件 I2C 不使用 DMA 回调
+};
+
+/* ====================== 公开接口 ====================== */
+const I2C_Driver_t * I2C1_SW_GetDriver(void)
+{
+    return &i2c1_sw_driver;
 }
 
 #endif /* I2C1_SW_ENABLE */

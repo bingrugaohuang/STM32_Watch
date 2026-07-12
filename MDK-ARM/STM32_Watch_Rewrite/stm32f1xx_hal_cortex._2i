@@ -1,0 +1,6 @@
+--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../User/Middlewares/FreeRTOS/include -I ../User/Middlewares/FreeRTOS/portable/RVDS/ARM_CM3 -I ../User/Middlewares/FreeRTOS/cfg -I ../User/Middlewares/Debug -I ../User/Drivers -I ../User/OSAL -I ../User/Services -I ../User/Middlewares/Button -I ../User/Middlewares/I2C -I ../User/BSP -I ../User/Common -I ..\User\Middlewares\Menu
+-I.\RTE\_STM32_Watch_Rewrite
+-ID:\keil\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include
+-ID:\keil\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include
+-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB
+-o stm32_watch_rewrite\stm32f1xx_hal_cortex.o --omf_browse stm32_watch_rewrite\stm32f1xx_hal_cortex.crf --depend stm32_watch_rewrite\stm32f1xx_hal_cortex.d --feedback "STM32_Watch_Rewrite\STM32_Watch_Rewrite.fed" "../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c"

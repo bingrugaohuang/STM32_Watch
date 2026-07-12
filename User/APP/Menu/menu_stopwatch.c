@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "menu_engine.h"
 #include "osal.h"
+#include "menu_common.h"
+#include "log.h"
 
 // 引入外部图标
 extern const uint8_t Return[];
@@ -38,8 +40,6 @@ static void sw_timer_callback(osal_timer_handle_t xTimer)
 {
     sw_data.total_ms += 100;
 }
-
-extern MenuNode_t menu_applist;
 
 /* 静态函数声明 */
 static void stopwatch_on_enter(MenuNode_t *self);
@@ -89,23 +89,32 @@ static MenuResult_t stopwatch_on_input(MenuNode_t *self, MenuEvent_t event)
             break;
         case MENU_EVENT_CONFIRM_SHORT:
             if(self->cursor == 0){ // 0: 左上角返回
+                LOG_I(TAG_STPW,"Menu:%s->%s", self->title, self->parent->title);
                 return MENU_RESULT_BACK;
             }else if(self->cursor == 1){ // 1: START/PAUSE
                 if(data->state == STOPWATCH_STATE_IDLE || data->state == STOPWATCH_STATE_PAUSED){
                     data->state = STOPWATCH_STATE_RUNNING; 
-                    if (sw_timer) osal_timer_start(sw_timer, 0); // 启动软件定时器
+                    if (sw_timer) {
+                        osal_timer_start(sw_timer, 0); // 启动软件定时器
+                        LOG_I(TAG_STPW,"Stopwatch started");
+                    }
                 }else if(data->state == STOPWATCH_STATE_RUNNING){
                     data->state = STOPWATCH_STATE_PAUSED; 
-                    if (sw_timer) osal_timer_stop(sw_timer, 0);  // 暂停软件定时器
+                    if (sw_timer) {
+                        osal_timer_stop(sw_timer, 0);  // 暂停软件定时器
+                        LOG_I(TAG_STPW,"Stopwatch paused");
+                    }
                 }
             }else if(self->cursor == 2){ // 2: LAP/CLR
                 if(data->state == STOPWATCH_STATE_RUNNING && data->lap_count < MAX_LAPS){
                     data->lap_times[data->lap_count] = data->total_ms;
                     data->lap_count++;
+                    LOG_I(TAG_STPW,"Lap time recorded");
                 }else if(data->state == STOPWATCH_STATE_PAUSED){
                     data->total_ms = 0;
                     data->lap_count = 0;
                     data->state = STOPWATCH_STATE_IDLE;
+                    LOG_I(TAG_STPW,"Stopwatch cleared");
                 }
             }
             break;

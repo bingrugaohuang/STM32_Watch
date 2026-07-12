@@ -187,7 +187,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../User/Middlewares/FreeRTOS/include;../User/Middlewares/FreeRTOS/portable/RVDS/ARM_CM3;../User/Middlewares/FreeRTOS/cfg;../User/Middlewares/Debug;../User/Drivers;../User/OSAL;../User/Services;../User/Middlewares/Button;../User/Middlewares/I2C;../User/BSP;../User/Common</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../User/Middlewares/FreeRTOS/include;../User/Middlewares/FreeRTOS/portable/RVDS/ARM_CM3;../User/Middlewares/FreeRTOS/cfg;../User/Middlewares/Debug;../User/Drivers;../User/OSAL;../User/Services;../User/Middlewares/Button;../User/Middlewares/I2C;../User/BSP;../User/Common;../User/Middlewares/Menu;..\User\APP\Compute</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -630,6 +630,11 @@
               <FileType>1</FileType>
               <FilePath>../User/Drivers/oled_strings_gbk.c</FilePath>
             </File>
+            <File>
+              <FileName>mpu6050_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Drivers\mpu6050_driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -655,6 +660,31 @@
               <FileType>1</FileType>
               <FilePath>../User/Services/button_service.c</FilePath>
             </File>
+            <File>
+              <FileName>display_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Services\display_service.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Services\rtc_service.c</FilePath>
+            </File>
+            <File>
+              <FileName>flashlight_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Services\flashlight_service.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6050_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Services\mpu6050_service.c</FilePath>
+            </File>
+            <File>
+              <FileName>stackmonitor_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Services\stackmonitor_service.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -669,6 +699,31 @@
               <FileName>bsp_i2c1_sw.c</FileName>
               <FileType>1</FileType>
               <FilePath>../User/BSP/bsp_i2c1_sw.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_i2c1_hw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\BSP\bsp_i2c1_hw.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\BSP\bsp_pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\BSP\bsp_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_i2c2_sw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\BSP\bsp_i2c2_sw.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_i2c2_hw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\BSP\bsp_i2c2_hw.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -689,6 +744,61 @@
               <FileName>button.c</FileName>
               <FileType>1</FileType>
               <FilePath>../User/Middlewares/Button/button.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Middlewares/Menu</GroupName>
+          <Files>
+            <File>
+              <FileName>menu_engine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Middlewares\Menu\menu_engine.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>APP/Menu</GroupName>
+          <Files>
+            <File>
+              <FileName>menu_home.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Menu\menu_home.c</FilePath>
+            </File>
+            <File>
+              <FileName>menu_applist.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Menu\menu_applist.c</FilePath>
+            </File>
+            <File>
+              <FileName>menu_stopwatch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Menu\menu_stopwatch.c</FilePath>
+            </File>
+            <File>
+              <FileName>menu_flashlight.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Menu\menu_flashlight.c</FilePath>
+            </File>
+            <File>
+              <FileName>menu_gradienter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Menu\menu_gradienter.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>APP/MPU</GroupName>
+          <Files>
+            <File>
+              <FileName>mpu_angle.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Compute\mpu_angle.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu_stepcnt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Compute\mpu_stepcnt.c</FilePath>
             </File>
           </Files>
         </Group>

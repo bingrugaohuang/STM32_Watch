@@ -353,3 +353,14 @@ void osal_start_scheduler(void)
     Error_Handler();
 }
 
+/**
+  * 函    数：获取任务栈的高水位标记
+  * 参    数：xTask - 任务句柄
+  * 返 回 值：任务栈的高水位标记（剩余栈空间的最小值）
+  * 说    明：封装 uxTaskGetStackHighWaterMark，返回剩余栈空间的最小值。
+  */
+osal_UBaseType_t osal_getstackhighwatermark(osal_task_handle_t xTask)
+{
+    configASSERT(xTask != NULL);
+    return (osal_UBaseType_t)uxTaskGetStackHighWaterMark(xTask);
+}

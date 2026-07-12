@@ -5,6 +5,7 @@
 #include "oled_common.h"
 #include "osal.h"
 #include "common_macro.h"
+#include "mpu_common.h"
 #include <stdio.h> /* 用于 sprintf */
 
 //用extern声明其他节点，避免循环引用问题
@@ -45,7 +46,7 @@ static void home_on_enter(MenuNode_t *self)
     (void)self;
     self->cursor = 0;
     int i;
-    LOG_I("MENU","Entering Home menu");
+    LOG_I(TAG_MENU,"Entering Home menu");
     OLED_Clear();
     OLED_Update();
     
@@ -73,11 +74,12 @@ static void home_on_exit(MenuNode_t *self)
 {
     (void)self;
     int i;
-    LOG_I("MENU","Exiting Home menu");
+    LOG_I(TAG_MENU,"Exiting Home menu");
     // 1. 抹除文字，只保留中间那条横线
     OLED_ClearArea(16, 0, 97, 40); // 清除主页内容区域，保留底部横线
+    OLED_ClearArea(22, 50, 72, 8); // 清除步数显示区域
     // OLED_DrawLine(16, 44, 112, 44);
-    OLED_UpdateArea(16, 0, 97, 40);
+    OLED_UpdateArea(16, 0, 97, 58);
     osal_task_delay(50); // 稍微停顿一下，增加呼吸感
     
     // 2. 横线收缩动画
@@ -124,11 +126,16 @@ static void home_on_render(MenuNode_t *self)
     /* ── 分隔线 ── */
     OLED_DrawLine(16, 44, 112, 44);
 
-    /* 传输延时优化 */
-    OLED_UpdateArea(16, 0, 97, 40); // 只更新主页内容区域，减少刷新时间
+    /* ── 步数显示 ── */
+    OLED_ClearArea(22, 50, 72, 8);
+    char step_str[16];
+    snprintf(step_str, sizeof(step_str), "Steps: %lu", step_detector_get_count());
+    OLED_ShowString(22, 50, step_str, OLED_6X8);
 
-    /* 下方留白 - 简约大气 */
-    
+    /* 传输延时优化 */
+    OLED_UpdateArea(16, 0, 97, 40);  // 内容区
+    OLED_UpdateArea(16, 44, 97, 20); // 分隔线 + 步数区
+
 }
 
 //输入处理函数
@@ -138,10 +145,12 @@ static MenuResult_t home_on_input(MenuNode_t *self, MenuEvent_t event)
     case MENU_EVENT_CONFIRM_SHORT:
         self->cursor = 0;
         menu_engine_set_animating(1); //设置动画状态
+        LOG_I(TAG_MENU,"Menu:%s->%s",self->title, self->children[self->cursor]->title);
         return MENU_RESULT_ENTER;
     case MENU_EVENT_CONFIRM_LONG:
         self->cursor = 1;
         menu_engine_set_animating(1); //设置动画状态
+        LOG_I(TAG_MENU,"Menu:%s->%s", self->title,self->children[self->cursor]->title);
         return MENU_RESULT_ENTER;
     default:
         break;

@@ -3,16 +3,35 @@
 
 #include <stdarg.h>
 #include <stdint.h>
+#include "log_tags.h"
 
-/* ---------- 日志等级 ---------- */
+/* ---------- 日志等级（预处理器宏 — 供 #if 条件编译使用） ---------- */
+#define LOG_LVL_OFF     0
+#define LOG_LVL_ERROR   1
+#define LOG_LVL_WARN    2
+#define LOG_LVL_INFO    3
+#define LOG_LVL_DEBUG   4
+#define LOG_LVL_TRACE   5
+
+/* ---------- 日志等级（枚举 — 供 C 代码运行时使用） ---------- */
 typedef enum {
-    LOG_LEVEL_ERROR = 0,   /**< 错误信息，系统异常 */
-    LOG_LEVEL_WARN,        /**< 警告信息，可恢复 */
-    LOG_LEVEL_INFO,        /**< 一般信息，正常运行记录 */
-    LOG_LEVEL_DEBUG,       /**< 调试信息，开发阶段使用 */
-    LOG_LEVEL_TRACE,       /**< 详细追踪，函数级调用 */
-    LOG_LEVEL_OFF          /**< 关闭日志输出 */
+    LOG_LEVEL_OFF   = LOG_LVL_OFF,
+    LOG_LEVEL_ERROR = LOG_LVL_ERROR,
+    LOG_LEVEL_WARN  = LOG_LVL_WARN,
+    LOG_LEVEL_INFO  = LOG_LVL_INFO,
+    LOG_LEVEL_DEBUG = LOG_LVL_DEBUG,
+    LOG_LEVEL_TRACE = LOG_LVL_TRACE,
 } LogLevel;
+
+/* 编译期最高日志等级（高于此等级的宏在编译时直接抹掉，零 ROM 开销） */
+#ifndef LOG_MAX_LEVEL
+#define LOG_MAX_LEVEL LOG_LVL_INFO   /* 默认：全部开启 */
+#endif
+
+/* 运行期初始日志等级（启动后可通过 log_set_level() 动态调整） */
+#ifndef LOG_DEFAULT_LEVEL
+#define LOG_DEFAULT_LEVEL LOG_LEVEL_INFO
+#endif
 
 /* ---------- 后端回调类型 ---------- */
 typedef void (*LogBackend)(LogLevel level,
@@ -63,11 +82,35 @@ void log_register_backend(LogBackend backend);
   */
 void log_print(LogLevel level, const char *tag, const char *fmt, ...);
 
-/* ---------- 便捷宏（直接调用 log_print）---------- */
+/* ---------- 便捷宏（直接调用 log_print，高于 LOG_MAX_LEVEL 的宏编译期抹除）---------- */
+#if LOG_MAX_LEVEL >= LOG_LVL_ERROR
 #define LOG_E(tag, fmt, ...) log_print(LOG_LEVEL_ERROR, tag, fmt, ##__VA_ARGS__)
+#else
+#define LOG_E(tag, fmt, ...) ((void)0)
+#endif
+
+#if LOG_MAX_LEVEL >= LOG_LVL_WARN
 #define LOG_W(tag, fmt, ...) log_print(LOG_LEVEL_WARN,  tag, fmt, ##__VA_ARGS__)
+#else
+#define LOG_W(tag, fmt, ...) ((void)0)
+#endif
+
+#if LOG_MAX_LEVEL >= LOG_LVL_INFO
 #define LOG_I(tag, fmt, ...) log_print(LOG_LEVEL_INFO,  tag, fmt, ##__VA_ARGS__)
+#else
+#define LOG_I(tag, fmt, ...) ((void)0)
+#endif
+
+#if LOG_MAX_LEVEL >= LOG_LVL_DEBUG
 #define LOG_D(tag, fmt, ...) log_print(LOG_LEVEL_DEBUG, tag, fmt, ##__VA_ARGS__)
+#else
+#define LOG_D(tag, fmt, ...) ((void)0)
+#endif
+
+#if LOG_MAX_LEVEL >= LOG_LVL_TRACE
 #define LOG_T(tag, fmt, ...) log_print(LOG_LEVEL_TRACE, tag, fmt, ##__VA_ARGS__)
+#else
+#define LOG_T(tag, fmt, ...) ((void)0)
+#endif
 
 #endif /* SERVICE_LOG_H */

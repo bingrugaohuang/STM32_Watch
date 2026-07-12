@@ -59,20 +59,20 @@ if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != RTC_INIT_MAGIC){
 
   /** Initialize RTC and set the Time and Date
   */
-  sTime.Hours = 14;
-  sTime.Minutes = 30;
-  sTime.Seconds = 0;
+  sTime.Hours = 0x23;
+  sTime.Minutes = 0x59;
+  sTime.Seconds = 0x0;
 
-  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
   {
     Error_Handler();
   }
-  DateToUpdate.WeekDay = RTC_WEEKDAY_SATURDAY;
-  DateToUpdate.Month = RTC_MONTH_JUNE;
-  DateToUpdate.Date = 13;
-  DateToUpdate.Year = 26;
+  DateToUpdate.WeekDay = RTC_WEEKDAY_THURSDAY;
+  DateToUpdate.Month = RTC_MONTH_APRIL;
+  DateToUpdate.Date = 0x23;
+  DateToUpdate.Year = 0x26;
 
-  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BIN) != HAL_OK)
+  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
   {
     Error_Handler();
   }

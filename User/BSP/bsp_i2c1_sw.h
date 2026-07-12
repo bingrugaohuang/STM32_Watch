@@ -10,26 +10,15 @@
  *   PB6 - SCL
  *   PB7 - SDA
  */
+#include "common_macro.h"
+
+#if I2C1_SW_ENABLE
 
 #ifndef I2C1_SW_H
 #define I2C1_SW_H
 
 #include "i2c_interface.h"
-#include "common_macro.h"
 
-#if I2C1_SW_ENABLE
-
-/* I2C 相关错误码宏定义 */
-#define I2C1_TIMEOUT           30
-
-/* I2C 错误码定义 */
-typedef enum{
-    I2C_OK = 0,
-    I2C_ERR_NACK_ADDR,
-    I2C_ERR_NACK_DATA,
-    I2C_ERR_TIMEOUT,
-    I2C_ERR_BUS
-}I2C_Status_t;
 
 /*********************** 公开接口声明 ***********************/
 /*
@@ -43,7 +32,6 @@ typedef enum{
  */
 const I2C_Driver_t * I2C1_SW_GetDriver(void);
 
-#endif /* I2C1_SW_ENABLE */
-
 #endif /* I2C1_SW_H */
 
+#endif /* I2C1_SW_ENABLE */

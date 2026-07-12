@@ -31,3 +31,4 @@ uint16_t flashlight_get_ccr(void);
 void flashlight_adjust_snap(int16_t delta);   
 
 #endif
+

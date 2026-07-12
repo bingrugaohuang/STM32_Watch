@@ -77,7 +77,7 @@ extern TIM_HandleTypeDef htim4;
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
-
+  
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
    while (1)
@@ -89,6 +89,9 @@ void NMI_Handler(void)
 /**
   * @brief This function handles Hard fault interrupt.
   */
+// void HardFault_Handler(void)
+// {
+  /* USER CODE BEGIN HardFault_IRQn 0 */
 __asm void HardFault_Handler(void)
 {
     PRESERVE8
@@ -101,6 +104,15 @@ __asm void HardFault_Handler(void)
     mrsne  r0, psp
     b      hardfault_dump
 }
+
+   /* USER CODE END HardFault_IRQn 0 */
+//   while (1)
+//   {
+//     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
+    
+//     /* USER CODE END W1_HardFault_IRQn 0 */
+//   }
+// }
 
 /**
   * @brief This function handles Memory management fault.
@@ -179,6 +191,20 @@ void RTC_IRQHandler(void)
   /* USER CODE BEGIN RTC_IRQn 1 */
 
   /* USER CODE END RTC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line0 interrupt.
+  */
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+
+  /* USER CODE END EXTI0_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(BTN_CFM_Pin);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+
+  /* USER CODE END EXTI0_IRQn 1 */
 }
 
 /**

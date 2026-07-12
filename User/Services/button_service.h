@@ -33,4 +33,22 @@ int btn_service_getnum(Btn_pkg_t *pkg, uint32_t timeout);
  */
 void button_service_init(void);
 
+/*
+ * 函    数：button_serve_start_timer
+ * 参    数：无
+ * 返 回 值：无
+ * 说    明：启动按键扫描定时器。由于MPU的配置是在开启调度后进行，
+ *           因此如果一开始就开启定时器会导致误扫描到确认信号一次。
+ *           因此需要在MPU初始化后再开启定时器。也可以选择在exti回调中开启，空闲时关闭。
+ */
+void button_serve_start_timer(void);
+
+/*
+ * 函    数：button_serve_stop_timer
+ * 参    数：无
+ * 返 回 值：无
+ * 说    明：停止按键扫描定时器。
+ */
+void button_serve_stop_timer(void);
+
 #endif /* BUTTON_SERVICE_H */

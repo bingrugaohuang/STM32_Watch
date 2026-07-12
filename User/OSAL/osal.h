@@ -17,6 +17,7 @@ typedef TimerHandle_t         osal_timer_handle_t;     /**< 软件定时器句�
 typedef SemaphoreHandle_t osal_semaphore_handle_t;     /**< 信号量句柄 */
 typedef SemaphoreHandle_t     osal_mutex_handle_t;     /**< 互斥锁句柄（递归锁也用此类型） */
 typedef BaseType_t            osal_status_t;           /**< 操作状态 */
+typedef UBaseType_t           osal_UBaseType_t;             /**< 无符号通用计数类型 */
 
 /* ---------- 通用返回值定义 ---------- */
 #define OSAL_OK                 pdPASS
@@ -317,5 +318,13 @@ void  osal_free(void *ptr);
   * 说    明：调用 vTaskStartScheduler，之后由RTOS接管，不再返回。
   */
 void osal_start_scheduler(void);
+
+/**
+  * 函    数：获取任务栈的高水位标记
+  * 参    数：xTask - 任务句柄
+  * 返 回 值：任务栈的高水位标记（剩余栈空间的最小值）
+  * 说    明：用于监测任务栈使用情况，帮助调试和优化。
+  */
+osal_UBaseType_t osal_getstackhighwatermark(osal_task_handle_t xTask);
 
 #endif /* _OSAL_H */

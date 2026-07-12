@@ -31,9 +31,6 @@
 osal_semaphore_handle_t i2c1_dma_semaphore;  /* I2C DMA 传输完成信号量 */
 #endif
 
-/* ================== 模块标签（用于日志系统） ================== */
-#define TAG "OLED"
-
 /* ================== 静态变量 ================== */
 
 /** OLED 显存缓冲区，所有显示操作都只对此缓冲区读写 */
@@ -59,6 +56,10 @@ static void OLED_WriteCmd(uint8_t cmd)
     // 保证至少尝试发送一次，最多重试 3 次
     do 
     {
+        // 重试时打印警告日志，帮助调试通信问题
+        if(retry < 3) LOG_W(TAG_OLED, 
+            "Retry %d: Failed to write command 0x%02X", 3 - retry, cmd);
+
         status = i2c_drv->write(OLED_I2C_ADDR, OLED_CTRL_CMD, &cmd, 1);
         retry--;
     } while(status != 0 && retry > 0);
@@ -68,15 +69,18 @@ static void OLED_WriteCmd(uint8_t cmd)
     {
 #if !I2C1_SW_ENABLE
         // 硬件 DMA 模式下，等待传输完成中断释放信号量
-        osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER);  
+        osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER);
+        
 #endif
+        LOG_D(TAG_OLED, "Command 0x%02X sent successfully", cmd);  
     }
     else
     {
         // 走到这里说明重试 3 次都失败了，硬件总线肯定出问题了
         // 这里千万不能等信号量！可以直接 return，或者加点错误打印
-        LOG_E(TAG, "Failed to write command 0x%02X after 3 attempts", cmd);
+        LOG_E(TAG_OLED, "Failed to write command 0x%02X after 3 attempts", cmd);
     }
+    
 }
 /**
   * 函 数：发送 OLED 数据块
@@ -84,10 +88,17 @@ static void OLED_WriteCmd(uint8_t cmd)
   */
 static void OLED_WriteData(uint8_t *data, uint8_t len)
 {
-    i2c_drv->write(OLED_I2C_ADDR, OLED_CTRL_DATA, data, len);
+
+    uint8_t status = i2c_drv->write(OLED_I2C_ADDR, OLED_CTRL_DATA, data, len);
 #if !I2C1_SW_ENABLE
-    osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER);  /* 等待 I2C 传输完成 */
-#endif
+    /* 等待 I2C 传输完成 */
+    osal_semaphore_take(i2c1_dma_semaphore, OSAL_WAIT_FOREVER); 
+#endif  
+    if(status == 0){
+        LOG_D(TAG_OLED, "Data block of length %d sent successfully", len);
+    }else{
+        LOG_W(TAG_OLED, "Failed to write data block of length %d", len);
+    }
 }
 
 /**
@@ -117,7 +128,7 @@ static void OLED_DMA_TxCplt_Callback(void)
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     if(osal_semaphore_give_from_isr(i2c1_dma_semaphore, &xHigherPriorityTaskWoken) == OSAL_FAIL)
     {
-        LOG_E(TAG, "Failed to give I2C DMA semaphore from ISR");
+        LOG_E(TAG_OLED, "Failed to give I2C DMA semaphore from ISR");
         Error_Handler();  // 或其他错误处理机制
     }
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -132,15 +143,15 @@ static void OLED_DMA_TxCplt_Callback(void)
   */
 void OLED_Init(void)
 {
-    LOG_I(TAG, "OLED Init start...");
+    LOG_I(TAG_OLED, "OLED Init start...");
 
     /* 1. 获取 I2C 驱动实例 */
 #if I2C1_SW_ENABLE
-    LOG_I(TAG, "Using software I2C1 (PB6=SCL, PB7=SDA)");
+    LOG_I(TAG_OLED, "Using software I2C1 (PB6=SCL, PB7=SDA)");
     i2c_drv = I2C1_SW_GetDriver();
     if(!i2c_drv) { Error_Handler(); }
 #else
-    LOG_I(TAG, "Using hardware I2C1 (PB6=SCL, PB7=SDA)");
+    LOG_I(TAG_OLED, "Using hardware I2C1 (PB6=SCL, PB7=SDA)");
     i2c_drv = I2C1_HW_GetDriver();
     if(!i2c_drv) { Error_Handler(); }
     /* 创建 I2C DMA 传输完成信号量 */
@@ -149,9 +160,9 @@ void OLED_Init(void)
     I2C1_HW_SetDMATxCplt_Callback(OLED_DMA_TxCplt_Callback);
 #endif
     
-    LOG_I(TAG, "Initializing I2C subsystem...");
+    LOG_I(TAG_OLED, "Initializing I2C subsystem...");
     i2c_drv->init();
-    LOG_I(TAG, "I2C1 initialized (PB6=SCL, PB7=SDA)");
+    LOG_I(TAG_OLED, "I2C1 initialized (PB6=SCL, PB7=SDA)");
 
     /* 2. 发送初始化命令序列 */
     OLED_WriteCmd(0xAE);    /* 关闭显示                                */
@@ -183,7 +194,7 @@ void OLED_Init(void)
     OLED_Clear();
     OLED_Update();
 
-    LOG_I(TAG, "OLED Init complete");
+    LOG_I(TAG_OLED, "OLED Init complete");
 }
 
 /* ================== 更新函数 ================== */
@@ -195,11 +206,14 @@ void OLED_Init(void)
 void OLED_Update(void)
 {
     uint8_t j;
+    uint32_t start = osal_get_tick();
     for (j = 0; j < 8; j++)
     {
         OLED_SetCursor(j, 0);
         OLED_WriteData(OLED_DisplayBuf[j], 128);
     }
+     uint32_t total_ms = osal_get_tick() - start;
+    LOG_D(TAG_OLED, "Full frame refresh cost=%lu ms", total_ms);
 }
 
 /**
