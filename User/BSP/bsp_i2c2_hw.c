@@ -27,7 +27,7 @@ const I2C_Driver_t * I2C2_HW_GetDriver(void) {
 
 static uint8_t i2c2_hw_write(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len) {
     // 使用 HAL 库的 I2C 写入函数
-    if (HAL_I2C_Mem_Write(&hi2c2, dev_addr << 1, reg, I2C_MEMADD_SIZE_8BIT, data, len, 1000) == HAL_OK) {
+    if (HAL_I2C_Mem_Write(&hi2c2, dev_addr << 1, reg, I2C_MEMADD_SIZE_8BIT, data, len, 10) == HAL_OK) {
         return 0; // 成功
     } else {
         return 1; // 失败
@@ -36,7 +36,7 @@ static uint8_t i2c2_hw_write(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8
 
 static uint8_t i2c2_hw_read(uint8_t dev_addr, uint8_t reg, uint8_t *data, uint8_t len) {
     // 使用 HAL 库的 I2C 读取函数
-    if (HAL_I2C_Mem_Read(&hi2c2, dev_addr << 1, reg, I2C_MEMADD_SIZE_8BIT, data, len, 1000) == HAL_OK) {
+    if (HAL_I2C_Mem_Read(&hi2c2, dev_addr << 1, reg, I2C_MEMADD_SIZE_8BIT, data, len, 10) == HAL_OK) {
         return 0; // 成功
     } else {
         return 1; // 失败

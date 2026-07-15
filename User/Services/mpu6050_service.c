@@ -78,11 +78,7 @@ static void mpu6050task(void* pvParameters)
 {
     (void)pvParameters; // 避免未使用参数的编译警告
     bsp_exti_register_callback(mpu6050_callback); // 注册中断回调函数
-    // 初始化 MPU6050
-    // 在系统调度开始前初始化mpu6050的话，由于在回调函数中使用了任务通知，可能会导致系统异常
-    MPU6050_Init();
-    // 在 MPU6050 初始化后启动按键扫描定时器,初始化前由于没有读寄存器，INT一直是低电平，影响按键扫描
-    button_serve_start_timer(); 
+
     // 初始化步数检测器
     step_detector_init();
 
@@ -97,15 +93,21 @@ static void mpu6050task(void* pvParameters)
             uint32_t interval = now - last_wake_time;
             last_wake_time = now;
 
-            if(interval < 10){
+            // 检测连续唤醒的情况，如果间隔大于60ms，认为是快速唤醒
+            // 因为快速唤醒说明无法读取mpu的数据
+            // 此时Hal库的硬件i2c读写会出现一个25msBUSY超时等待，三次重发就会超过60ms
+            if(interval > 60){
                 rapid_count++;
+                LOG_D(TAG_MPU, "MPU6050 rapid wakeup detected, interval: %lu ms, count: %lu", interval, rapid_count);
             }else{
                 rapid_count = 0;
+                LOG_D(TAG_MPU, "MPU6050 wakeup interval: %lu ms", interval);
             }
-            // 如果连续唤醒次数超过5次，说明可能存在异常情况，可以在这里进行处理，比如延时一段时间，或者记录日志
-            if(rapid_count > 5){
+            // 如果连续唤醒次数超过3次，说明可能存在异常情况，可以在这里进行处理，比如延时一段时间，或者记录日志
+            if(rapid_count >= 3){
                 LOG_E(TAG_MPU, "MPU6050 rapid wakeup detected, count: %lu", rapid_count);
                 osal_task_delay(100); // 延时100ms，避免过快唤醒
+                MPU6050_Reset_i2c(); // 复位 MPU6050 I2C 驱动，重新初始化 I2C 驱动
                 rapid_count = 0; // 重置计数器
             }
 

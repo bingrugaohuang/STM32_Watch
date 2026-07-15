@@ -3,6 +3,7 @@
 #include "osal.h"
 #include "main.h"         /* 引入 Error_Handler 声明 */
 #include "common_macro.h" /* 包含通用宏定义 */
+#include "log.h"          /* 包含日志模块 */
 
 /****************** 用户按钮服务层实现 ******************/
 /* 宏配置*/
@@ -96,6 +97,15 @@ void button_serve_start_timer(void){
 }
 
 /**
+ * 函    数：启动按键扫描定时器（从中断服务例程中调用）
+ */
+void button_serve_start_timer_from_isr(void){
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    osal_timer_start_from_isr(btn_scan_timer, 0, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+/**
  * 函    数：停止按键扫描定时器
  */
 void button_serve_stop_timer(void){
@@ -128,4 +138,16 @@ static void btn_scan_timer_callback(osal_timer_handle_t xTimer)
     button_ticks(&btn_last);
     button_ticks(&btn_next);
     button_ticks(&btn_cfm);
+
+    // 三个按键都空闲时停止定时器，给Tickless正确的空闲时间
+    if( btn_last.state == BTN_STATE_IDLE &&
+        btn_next.state == BTN_STATE_IDLE &&
+        btn_cfm.state  == BTN_STATE_IDLE &&
+        btn_last.debounce_cnt == 0 &&
+        btn_next.debounce_cnt == 0 &&
+        btn_cfm.debounce_cnt == 0 )
+    {
+        osal_timer_stop(btn_scan_timer, 0);
+        LOG_D(TAG_BTN, "All buttons idle, stopping scan timer.");
+    }
 }

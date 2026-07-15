@@ -10,6 +10,7 @@
 #include "button_service.h" /* 包含按钮服务模块 */
 #include "hardfault_debug.h"
 #include "common_macro.h"
+#include "mpu6050_driver.h"
 
 #include "task_service.h"
 //测试
@@ -36,6 +37,7 @@ static void total_init(void)
   check_crash_log_on_startup();  /* 最先检查上次 HardFault 是否有 FLASH 崩溃日志 */
   log_init();              // Service 层
   hardfault_debug_init();  // MiddleWares/Debug（配置相关寄存器，准备 HardFault 调试）
+  MPU6050_Init();          // Driver 层
   LOG_I(TAG_MAIN, "System boot...");
 }
 

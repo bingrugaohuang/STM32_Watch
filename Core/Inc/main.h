@@ -62,8 +62,10 @@ void Error_Handler(void);
 #define BTN_CFM_EXTI_IRQn EXTI0_IRQn
 #define BTN_NEXT_Pin GPIO_PIN_4
 #define BTN_NEXT_GPIO_Port GPIOA
+#define BTN_NEXT_EXTI_IRQn EXTI4_IRQn
 #define BTN_LAST_Pin GPIO_PIN_6
 #define BTN_LAST_GPIO_Port GPIOA
+#define BTN_LAST_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 

@@ -70,7 +70,7 @@ uint32_t step_detector_update(MPU_RawData_t *raw_data, uint32_t cur_step_time){
             step.last_step_time = cur_step_time;
             LOG_D(TAG_MPU, "Step detected! Total steps: %lu", step.step_cnt);
         }else{
-            LOG_I(TAG_MPU, "Step detected wrong: %lu ms, high_width: %lu ms", dt, high_width);
+            LOG_D(TAG_MPU, "Step detected wrong: %lu ms, high_width: %lu ms", dt, high_width);
         }
     } 
 
@@ -79,7 +79,7 @@ uint32_t step_detector_update(MPU_RawData_t *raw_data, uint32_t cur_step_time){
     static uint32_t logtime = 0;
     uint32_t dt = (cur_step_time - logtime) % 0xFFFFFFFF; // 考虑时间戳溢出
     if(dt > 200) { 
-    LOG_I(TAG_MPU, "Step Detector: filtered_mag=%.3f, avg_mag=%.3f, high_thresh=%.3f, low_thresh=%.3f, state=%d", 
+    LOG_D(TAG_MPU, "Step Detector: filtered_mag=%.3f, avg_mag=%.3f, high_thresh=%.3f, low_thresh=%.3f, state=%d", 
           filtered_mag, avg_mag, high_thresh, low_thresh, step.state);
     logtime = cur_step_time;
     }

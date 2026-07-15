@@ -8,6 +8,16 @@
 
 static const I2C_Driver_t *i2c_drv = NULL;
 
+// 复位 MPU6050 I2C 驱动，重新初始化 I2C 驱动
+void MPU6050_Reset_i2c(void){
+    if(i2c_drv != NULL && i2c_drv->init != NULL){
+        i2c_drv->init(); // 重新初始化 I2C 驱动
+        LOG_I(TAG_MPU, "MPU6050 I2C re-initialized.");
+    }else{
+        LOG_E(TAG_MPU, "MPU6050 I2C driver not initialized.");
+    }
+}
+
 static uint8_t MPU_Write_Buffer(uint8_t reg, uint8_t *buffer, uint8_t len){
     uint8_t status = 1;
     uint8_t retry = 3;
@@ -57,7 +67,7 @@ static uint8_t MPU_Read_Buffer(uint8_t reg, uint8_t *buffer, uint8_t len){
 
 // 读取单个字节的数据
 static uint8_t MPU_Read_Byte(uint8_t reg){
-    uint8_t temp;
+    uint8_t temp = 0;
     uint8_t status = 1;
     status = MPU_Read_Buffer(reg, &temp, 1);
 
@@ -124,7 +134,7 @@ void MPU6050_Init(void){
     MPU_Write_Byte(MPU_PWR_MGMT2_REG, 0x87);
 
     // 0x80: Active Low, Push-Pull, Pulse
-    MPU_Write_Byte(MPU_INTBP_CFG_REG, 0x80); 
+    MPU_Write_Byte(MPU_INTBP_CFG_REG, 0x00); 
 
     // 使能数据就绪中断（每次采样完成，INT引脚拉低）
     MPU_Write_Byte(MPU_INT_EN_REG, 0x01); // MPU_INT_ENABLE_REG 定义为 0x38

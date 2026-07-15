@@ -120,6 +120,16 @@ osal_timer_handle_t osal_timer_create( const char * const pcTimerName,
 void osal_timer_start( osal_timer_handle_t xTimer, uint32_t ulBlockTime );
 
 /**
+  * 函    数：从中断启动定时器
+  * 参    数：xTimer                    - 定时器句柄
+  *           ulBlockTime                - 阻塞等待时间（通常设为 OSAL_NO_WAIT）
+  *           pxHigherPriorityTaskWoken  - 输出参数，标记是否需要任务切换
+  * 返 回 值：无
+  * 说    明：封装 xTimerStartFromISR，适用于中断服务函数中调用。
+  */
+void osal_timer_start_from_isr( osal_timer_handle_t xTimer, uint32_t ulBlockTime, BaseType_t *pxHigherPriorityTaskWoken );
+
+/**
   * 函    数：停止定时器
   * 参    数：xTimer     - 定时器句柄
   *           ulBlockTime - 阻塞等待时间（通常设为 OSAL_NO_WAIT）

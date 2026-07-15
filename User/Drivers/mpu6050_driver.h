@@ -101,6 +101,7 @@ typedef struct{
     // int16_t Gyro_Z_RAW;
 }MPU_RawData_t;
 
+void MPU6050_Reset_i2c(void); // 复位 MPU6050 I2C 驱动，重新初始化 I2C 驱动
 void MPU6050_Init(void);
 uint8_t MPU_IsDataReady(void);
 uint8_t MPU_Get_RawData(MPU_RawData_t *raw_data);

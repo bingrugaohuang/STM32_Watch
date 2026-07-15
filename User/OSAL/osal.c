@@ -102,6 +102,15 @@ void osal_timer_start( osal_timer_handle_t xTimer, uint32_t ulBlockTime )
 }
 
 /**
+  * 函    数：从中断启动定时器
+  */
+void osal_timer_start_from_isr( osal_timer_handle_t xTimer, uint32_t ulBlockTime, BaseType_t *pxHigherPriorityTaskWoken )
+{
+    configASSERT( xTimer != NULL );
+    xTimerStartFromISR( xTimer, pxHigherPriorityTaskWoken);
+}
+
+/**
   * 函    数：停止定时器
   */
 void osal_timer_stop( osal_timer_handle_t xTimer, uint32_t ulBlockTime )
