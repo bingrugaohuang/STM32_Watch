@@ -130,6 +130,15 @@ void osal_timer_start( osal_timer_handle_t xTimer, uint32_t ulBlockTime );
 void osal_timer_start_from_isr( osal_timer_handle_t xTimer, uint32_t ulBlockTime, BaseType_t *pxHigherPriorityTaskWoken );
 
 /**
+  * 函    数：延迟执行定时器命令（从中断上下文调用）
+  * 参    数：pxFunction - 延迟执行的函数指针，类型为 PendedFunction_t
+  *           pxHigherPriorityTaskWoken - 输出参数，标记是否需要任务切换  
+  * 返 回 值：无
+  * 说    明：封装 xTimerPendFunctionCall，可在中断中延迟执行函数，避免直接在中断中启动定时器。
+  */
+void osal_timer_deferred( PendedFunction_t pxFunction, BaseType_t *pxHigherPriorityTaskWoken );
+
+/**
   * 函    数：停止定时器
   * 参    数：xTimer     - 定时器句柄
   *           ulBlockTime - 阻塞等待时间（通常设为 OSAL_NO_WAIT）

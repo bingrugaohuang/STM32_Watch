@@ -8,12 +8,26 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+extern TIM_HandleTypeDef  htim4;
 extern uint32_t SystemCoreClock;
 
 /* 内核配置 */
 #define configUSE_PREEMPTION                            1                       /* 1: 抢占式调度器, 0: 协作式调度器, 无默认需设定 */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION         1                       /* 1: 使用硬件计算下一个要运行的任务, 0: 使用软件算法计算下一个要运行的任务, 默认: 0 */
 #define configUSE_TICKLESS_IDLE                         1                       /* 1: 使用tickless低功耗模式, 默认: 0 */
+
+/* Tickless 睡眠宏 — SLEEP 模式：CPU 停止，外设时钟继续运行。
+   TIM4 (HAL 时基) 在休眠期间暂停，避免 1ms 中断唤醒 CPU。 */
+#define configPRE_SLEEP_PROCESSING(x)  do { \
+    __HAL_RCC_GPIOC_CLK_DISABLE();  /* GPIOC 空闲，关掉省电 */ \
+    HAL_TIM_Base_Stop_IT(&htim4);  /* 暂停 TIM4 中断，防止每 1ms 唤醒 CPU */ \
+    HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI); \
+    HAL_TIM_Base_Start_IT(&htim4);  /* 唤醒后恢复 TIM4 */ \
+    __HAL_RCC_GPIOC_CLK_ENABLE();  /* 恢复 GPIO 时钟 */ \
+    x = 0;  /* 已在宏内执行 WFI，告诉下面跳过裸 __wfi() */ \
+} while(0)
+
+#define configPOST_SLEEP_PROCESSING(x)
 #define configCPU_CLOCK_HZ                              SystemCoreClock         /* 定义CPU主频, 单位: Hz, 无默认需设定 */
 //#define configSYSTICK_CLOCK_HZ                          (configCPU_CLOCK_HZ / 8)/* 定义SysTick时钟频率，当SysTick时钟频率与内核时钟频率不同时才可以定义, 单位: Hz, 默认: 不定义 */
 #define configTICK_RATE_HZ                              1000                    /* 定义系统时钟节拍频率, 单位: Hz, 无默认需设定 */
@@ -45,7 +59,7 @@ extern uint32_t SystemCoreClock;
 #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP       0                       /* 1: 用户自行实现任务创建时使用的内存分配和释放函数, 默认: 0 */
 
 /* 钩子函数相关定义 */
-#define configUSE_IDLE_HOOK                             0                       /* 1: 启用空闲任务钩子函数, 无默认需设定  */
+#define configUSE_IDLE_HOOK                             1                       /* 1: 启用空闲任务钩子函数, 无默认需设定  */
 #define configUSE_TICK_HOOK                             0                       /* 1: 启用系统时钟节拍中断钩子函数, 无默认需设定 */
 #define configCHECK_FOR_STACK_OVERFLOW                  2                       /* 1: 使用栈溢出检测方法1, 2: 使用栈溢出检测方法2, 默认: 0 */
 #define configUSE_MALLOC_FAILED_HOOK                    0                       /* 1: 启用动态内存分配失败钩子函数, 默认: 0 */
@@ -70,7 +84,7 @@ extern uint32_t FreeRTOSRunTimeTicks;
 #define configUSE_TIMERS                                1                               /* 1: 启用软件定时器, 默认: 0 */
 #define configTIMER_TASK_PRIORITY                       ( configMAX_PRIORITIES - 1 )    /* 定义软件定时器服务任务的优先级, 需在configUSE_TIMERS为1时设定 */
 #define configTIMER_QUEUE_LENGTH                        5                               /* 定义软件定时器命令队列的长度, 需在configUSE_TIMERS为1时设定 */
-#define configTIMER_TASK_STACK_DEPTH                    ( configMINIMAL_STACK_SIZE * 2) /* 定义软件定时器服务任务的栈空间大小, 需在configUSE_TIMERS为1时设定 */
+#define configTIMER_TASK_STACK_DEPTH                    ( configMINIMAL_STACK_SIZE * 1) /* 定义软件定时器服务任务的栈空间大小, 需在configUSE_TIMERS为1时设定 */
 
 /* 可选函数, 1: 启用 */
 #define INCLUDE_vTaskPrioritySet                        1                       /* 设置任务优先级 */
@@ -113,6 +127,8 @@ extern uint32_t FreeRTOSRunTimeTicks;
 #define vPortSVCHandler SVC_Handler
 #define xPortSysTickHandler SysTick_Handler
 
+/* Tickless相关*/
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 11     /* 预期空闲时间阈值，单位: Tick, 当空闲时间超过该阈值时才进入低功耗模式, 默认: 5 */
 
 /* 断言 */
 #define vAssertCalled(file, line) do{printf("Error: %s, %d\r\n", file, line);Error_Handler();}while(0)

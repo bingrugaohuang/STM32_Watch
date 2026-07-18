@@ -37,6 +37,7 @@ static void displaytask(void* pvParameters)
     (void)pvParameters; // 避免未使用参数的编译警告
     OLED_Init();
     menu_engine_init(&menu_home);
+    LOG_I(TAG_DISP,"Display task started");
 
     while(1)
     {
@@ -49,7 +50,7 @@ static void displaytask(void* pvParameters)
 
         if(btn_service_getnum(&btn, wait_ticks) == COMMON_ERR_OK){
            event = translate(&btn);
-           if(event) LOG_I(TAG_DISP,"Received menu event %d", event);
+           if(event) LOG_D(TAG_DISP,"Received menu event %d", event);
         }
 
         // 接收MPU6050处理任务发来的数据
@@ -57,6 +58,9 @@ static void displaytask(void* pvParameters)
         // 接收ADC电池电压采集任务发来的数据
 
         menu_engine_tick(event);
+
+        //测试
+        //osal_task_delay(pdMS_TO_TICKS(20));
 
 #if STACK_MONITOR_ENABLE
         static uint32_t last_monitor_time = 0;

@@ -23,6 +23,8 @@ static osal_queue_handle_t btn_event_queue; /* 按键事件队列 */
 static osal_timer_handle_t btn_scan_timer;  /* 按键扫描定时器 */
 
 /****************** 私有函数声明 ******************/
+static void btn_scan_timer_start_deferred(void *param1, uint32_t param2); /* 延迟启动按键扫描定时器回调函数 */
+static void btn_scan_timer_stop_deferred(void *param1, uint32_t param2);  /* 延迟停止按键扫描定时器回调函数 */
 static void btn_callback(ButtonEvent event, void *user_data); /* 按键事件回调函数 */
 static void btn_scan_timer_callback(osal_timer_handle_t xTimer); /* 按键扫描定时器回调函数 */
 
@@ -97,12 +99,15 @@ void button_serve_start_timer(void){
 }
 
 /**
- * 函    数：启动按键扫描定时器（从中断服务例程中调用）
+ * 函    数：延迟启动按键扫描定时器（从中断服务例程中调用）
+ * 注：由于直接在中断中开启定时器会绑定中断执行时的tick，
+ *    由于tickless唤醒后需要蓝软件定时器服务任务跳过补偿按键扫描定时器的回调，以避免影响消抖
+ *    因此需要在中断中延迟启动定时器，避免绑定中断执行时的tick，而是绑定更新后的tick（定时器任务中调用）
  */
 void button_serve_start_timer_from_isr(void){
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    osal_timer_start_from_isr(btn_scan_timer, 0, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    BaseType_t osal_higher_priority_task_woken = pdFALSE;
+    osal_timer_deferred(btn_scan_timer_start_deferred, &osal_higher_priority_task_woken);
+    portYIELD_FROM_ISR(osal_higher_priority_task_woken);
 }
 
 /**
@@ -112,7 +117,32 @@ void button_serve_stop_timer(void){
     osal_timer_stop(btn_scan_timer, 0);  
 }
 
+/**
+ * 函    数：从中断服务例程中延迟停止按键扫描定时器
+ */
+void button_serve_stop_timer_from_isr(void){
+    BaseType_t osal_higher_priority_task_woken = pdFALSE;
+    osal_timer_deferred(btn_scan_timer_stop_deferred, &osal_higher_priority_task_woken);
+    portYIELD_FROM_ISR(osal_higher_priority_task_woken);
+}
+
+
 /*=====================私有函数=====================*/
+
+/**
+ * 函    数：延迟启动按键扫描定时器回调函数（从中断服务例程中调用）
+ */
+static void btn_scan_timer_start_deferred(void *param1, uint32_t param2){
+    (void)param1;
+    (void)param2;
+    osal_timer_start(btn_scan_timer, 0);
+}
+
+static void btn_scan_timer_stop_deferred(void *param1, uint32_t param2){
+    (void)param1;
+    (void)param2;
+    osal_timer_stop(btn_scan_timer, 0);
+}
 
 /**
  * 函    数：按键事件回调函数
@@ -122,6 +152,12 @@ static void btn_callback(ButtonEvent event, void *user_data)
     Btn_pkg_t pkg;
     pkg.event = event;
     pkg.id = (uint8_t)(uintptr_t)user_data; /* 将用户数据转换为按键ID */
+
+    /* 诊断日志：BTN_CFM 事件入队时记录事件类型，用于排查误触发来源 */
+    if (pkg.id == BTN_CFM) {
+        LOG_D(TAG_BTN, "BTN_CFM event queued: type=%d", (int)event);
+    }
+
     if(osal_queue_send(btn_event_queue, &pkg, 0) != OSAL_OK )
     {
         // 可选：日志记录或错误计数，方便排查
@@ -134,6 +170,16 @@ static void btn_callback(ButtonEvent event, void *user_data)
 static void btn_scan_timer_callback(osal_timer_handle_t xTimer)
 {
     (void)xTimer;
+
+    /* 诊断日志：btn_cfm 消抖前置状态 + 当前 PA0 电平
+       MPU INT = 195ms HIGH + 5ms LOW → 定时器 10ms 后读 PA0 应为 HIGH(1)
+       按键按下 → PA0 持续 LOW(0) 数百 ms                                */
+    // {
+    //     uint8_t cfm_gpio = HAL_GPIO_ReadPin(BTN_CFM_GPIO_Port, BTN_CFM_Pin);
+    //     LOG_D(TAG_BTN, "CFM scan: GPIO=%d state=%d flv=%d dbc=%d",
+    //           cfm_gpio, (int)btn_cfm.state, (int)btn_cfm.filtered_level, (int)btn_cfm.debounce_cnt);
+    // }
+
     /* 定时器回调中调用扫描函数，更新按键状态并触发事件 */
     button_ticks(&btn_last);
     button_ticks(&btn_next);

@@ -9,8 +9,9 @@
 #include "mpu6050_service.h"
 
 // 根据初始化时写入 MPU6050_GYRO_CONFIG 寄存器的值来决定
-#define MPU6050_ACCEL_FS_SEL 0 // 0=±2g, 1=±4g, 2=±8g, 3=±16g
-#define MPU6050_QUEUE_LENGTH 5
+#define MPU6050_ACCEL_FS_SEL 0     //  mpu加速度计量程选择，0: ±2g, 1: ±4g, 2: ±8g, 3: ±16g
+#define MPU6050_QUEUE_LENGTH 5     // 队列长度，决定了 MPU6050 处理任务能缓存多少个 Attitude_t 数据包
+#define MPU6050_ERROR_INTERVAL 220 //快速唤醒间隔，5Hz为220,20Hz为60,10Hz为120,50Hz为12
 
 #if (MPU6050_ACCEL_FS_SEL == 0)
   #define ACCEL_SCALE 16384.0f
@@ -89,6 +90,13 @@ static void mpu6050task(void* pvParameters)
     {
        if(osal_task_notify_wait(0, 0xFFFFFFFF, NULL, OSAL_WAIT_FOREVER) == pdTRUE) // 等待任务通知
        {
+            // 唤醒后先检查并退出运动检测，
+            // 因为tickless函数无法保证唤醒后立即退出运动检测再进入mpu任务函数
+            if(mpu6050_is_in_motion_detection_mode()) {
+                mpu6050_exit_motion_detection_mode();
+                LOG_I(TAG_MPU, "MPU6050 exited motion detection mode");
+            }
+
             uint32_t now = osal_get_tick();
             uint32_t interval = now - last_wake_time;
             last_wake_time = now;
@@ -96,7 +104,7 @@ static void mpu6050task(void* pvParameters)
             // 检测连续唤醒的情况，如果间隔大于60ms，认为是快速唤醒
             // 因为快速唤醒说明无法读取mpu的数据
             // 此时Hal库的硬件i2c读写会出现一个25msBUSY超时等待，三次重发就会超过60ms
-            if(interval > 60){
+            if(interval > MPU6050_ERROR_INTERVAL) {
                 rapid_count++;
                 LOG_D(TAG_MPU, "MPU6050 rapid wakeup detected, interval: %lu ms, count: %lu", interval, rapid_count);
             }else{
@@ -110,7 +118,7 @@ static void mpu6050task(void* pvParameters)
                 MPU6050_Reset_i2c(); // 复位 MPU6050 I2C 驱动，重新初始化 I2C 驱动
                 rapid_count = 0; // 重置计数器
             }
-
+            
             LOG_D(TAG_MPU, "MPU6050 waked up");
            // 处理 MPU6050 数据
            if(MPU_IsDataReady()) {
@@ -134,6 +142,9 @@ static void mpu6050task(void* pvParameters)
                 // 由于INT引脚与BTN_CFM共用PA0，可能会导致误读，因此在此处不打印错误日志，也不进行处理
                 LOG_D(TAG_MPU, "MPU6050 Data Not Ready");
             }
+            //测试
+            //osal_task_delay(pdMS_TO_TICKS(20));
+
        }
 
 #if STACK_MONITOR_ENABLE

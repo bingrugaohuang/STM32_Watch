@@ -103,9 +103,12 @@ typedef struct{
 
 void MPU6050_Reset_i2c(void); // 复位 MPU6050 I2C 驱动，重新初始化 I2C 驱动
 void MPU6050_Init(void);
+
 uint8_t MPU_IsDataReady(void);
 uint8_t MPU_Get_RawData(MPU_RawData_t *raw_data);
+
 void mpu6050_enter_motion_detection_mode(uint8_t mot_thr, uint8_t mot_dur, uint8_t wake_freq);
 void mpu6050_exit_motion_detection_mode(void);
+uint8_t mpu6050_is_in_motion_detection_mode(void);
 
 #endif /* MPU6050_DRIVER_H */

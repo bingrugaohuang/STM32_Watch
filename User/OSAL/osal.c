@@ -111,6 +111,15 @@ void osal_timer_start_from_isr( osal_timer_handle_t xTimer, uint32_t ulBlockTime
 }
 
 /**
+  * 函    数：延迟执行命令（从中断上下文调用）
+  * 注：      需要自己定义一个 PendedFunction_t 类型的回调函数作为参数传入
+  */
+void osal_timer_deferred( PendedFunction_t pxFunction, BaseType_t *pxHigherPriorityTaskWoken )
+{
+    xTimerPendFunctionCallFromISR(pxFunction, 0, 0, pxHigherPriorityTaskWoken);
+}
+
+/**
   * 函    数：停止定时器
   */
 void osal_timer_stop( osal_timer_handle_t xTimer, uint32_t ulBlockTime )

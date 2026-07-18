@@ -29,7 +29,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "common_macro.h"
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
@@ -39,7 +39,12 @@ extern "C" {
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+#if MPU_MOT_TEST_ENABLE
+void mot_test_gpio_init(void);
+void mot_test_gpio_set_high(void);
+void mot_test_gpio_set_low(void);
+void mot_test_gpio_togle_pin(void);
+#endif
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

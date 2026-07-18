@@ -8,6 +8,9 @@
 
 static const I2C_Driver_t *i2c_drv = NULL;
 
+// 全局标志，表示是否处于运动检测模式
+static uint8_t g_mpu_in_motion_detection_mode = 0; 
+
 // 复位 MPU6050 I2C 驱动，重新初始化 I2C 驱动
 void MPU6050_Reset_i2c(void){
     if(i2c_drv != NULL && i2c_drv->init != NULL){
@@ -131,7 +134,7 @@ void MPU6050_Init(void){
   
     // 进入低功耗，仅保留加速度计用于计步或者抬手亮屏,唤醒频率设置为5Hz
     // 0x87为20Hz
-    MPU_Write_Byte(MPU_PWR_MGMT2_REG, 0x87);
+    MPU_Write_Byte(MPU_PWR_MGMT2_REG, 0x47);
 
     // 0x80: Active Low, Push-Pull, Pulse
     MPU_Write_Byte(MPU_INTBP_CFG_REG, 0x00); 
@@ -171,8 +174,13 @@ uint8_t MPU_Get_RawData(MPU_RawData_t *raw_data){
 }
 
 // 进入运动检测模式接口
+// mot_thr: 运动阈值，单位为 mg，范围为 0~255
+// mot_dur: 运动持续时间，单位为 ms，范围为 0~255
+// wake_freq: 唤醒频率，单位为 Hz，范围为 0~3，对应 1.25Hz、5Hz、20Hz、40Hz
 void mpu6050_enter_motion_detection_mode(uint8_t mot_thr, uint8_t mot_dur, uint8_t wake_freq){
-   
+    // 设置全局标志，表示进入运动检测模式
+    g_mpu_in_motion_detection_mode = 1;
+
     //先关中断并清状态，避免旧中断被锁存后影响本次入睡
     MPU_Write_Byte(MPU_INT_EN_REG, 0x00);
     //读取 INT_STATUS 清除中断状态
@@ -181,10 +189,10 @@ void mpu6050_enter_motion_detection_mode(uint8_t mot_thr, uint8_t mot_dur, uint8
     //未检测到运动时，运动检测计数器值减1，不加唤醒延迟
     MPU_Write_Byte(MPU_MDETECT_CTRL_REG, 0x01);
 
-    //运动阈值，检测阈值寄存器0X1F,单位mg,寄存器值*4mg=实际检测阈值 
+    //运动阈值，检测阈值寄存器0X1F,单位1mg,寄存器值=实际检测阈值 
     MPU_Write_Byte(MPU_MOTION_DET_REG, mot_thr);	 
 
-    //检测时间20ms 单位1ms 寄存器0X20
+    //检测时间，单位1ms 寄存器0X20
     MPU_Write_Byte(MPU_MOTION_DUR_REG, mot_dur);  
 
     //配置高通滤波器为5Hz，满量程为±2g
@@ -204,18 +212,24 @@ void mpu6050_enter_motion_detection_mode(uint8_t mot_thr, uint8_t mot_dur, uint8
 
 // 退出运动检测模式接口
 void mpu6050_exit_motion_detection_mode(void){
-    
-    //禁用运动中断
+    // 清除全局标志，表示退出运动检测模式
+    g_mpu_in_motion_detection_mode = 0; 
+
+    // 禁用运动中断
     MPU_Write_Byte(MPU_INT_EN_REG, 0x00);
-    //读取 INT_STATUS 清除中断状态
+    // 读取 INT_STATUS 清除中断状态
     MPU_Read_Byte(MPU_INT_STA_REG); 
     
-    //恢复唤醒频率为20Hz
-    MPU_Write_Byte(MPU_PWR_MGMT2_REG, 0x87);
+    // 恢复唤醒频率为20Hz
+    MPU_Write_Byte(MPU_PWR_MGMT2_REG, 0x47);
 
     // 恢复加速度计配置：±2g，无高通滤波
     MPU_Write_Byte(MPU_ACCEL_CFG_REG, 0x00);
 
     //使能数据就绪中断（每次采样完成，INT引脚拉低）
     MPU_Write_Byte(MPU_INT_EN_REG, 0x01);
+}
+
+uint8_t mpu6050_is_in_motion_detection_mode(void){
+    return g_mpu_in_motion_detection_mode;
 }

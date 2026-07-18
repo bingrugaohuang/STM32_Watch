@@ -22,7 +22,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "common_macro.h"
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
@@ -50,8 +50,14 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pins : BTN_CFM_Pin BTN_NEXT_Pin BTN_LAST_Pin */
-  GPIO_InitStruct.Pin = BTN_CFM_Pin|BTN_NEXT_Pin|BTN_LAST_Pin;
+  /*Configure GPIO pin : BTN_CFM_Pin */
+  GPIO_InitStruct.Pin = BTN_CFM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(BTN_CFM_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : BTN_NEXT_Pin BTN_LAST_Pin */
+  GPIO_InitStruct.Pin = BTN_NEXT_Pin|BTN_LAST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -69,5 +75,36 @@ void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 2 */
+#if MPU_MOT_TEST_ENABLE
 
+#define MPU_INT_Pin GPIO_PIN_0
+#define MPU_INT_GPIO_Port GPIOB
+
+void mot_test_gpio_init(void){
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+
+    /*Configure GPIO pin : PB0 for tickless timing marker */
+    GPIO_InitStruct.Pin = MPU_INT_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    HAL_GPIO_Init(MPU_INT_GPIO_Port, &GPIO_InitStruct);
+
+}
+
+void mot_test_gpio_set_high(void){
+  HAL_GPIO_WritePin(MPU_INT_GPIO_Port, MPU_INT_Pin, GPIO_PIN_SET);
+}
+
+void mot_test_gpio_set_low(void){
+  HAL_GPIO_WritePin(MPU_INT_GPIO_Port, MPU_INT_Pin, GPIO_PIN_RESET);
+}
+
+void mot_test_gpio_togle_pin(void){
+  HAL_GPIO_TogglePin(MPU_INT_GPIO_Port, MPU_INT_Pin);
+}
+#endif
 /* USER CODE END 2 */

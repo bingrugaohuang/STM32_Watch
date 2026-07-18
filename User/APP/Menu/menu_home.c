@@ -46,7 +46,7 @@ static void home_on_enter(MenuNode_t *self)
     (void)self;
     self->cursor = 0;
     int i;
-    LOG_I(TAG_MENU,"Entering Home menu");
+    LOG_D(TAG_MENU,"Entering Home menu");
     OLED_Clear();
     OLED_Update();
     
@@ -74,7 +74,7 @@ static void home_on_exit(MenuNode_t *self)
 {
     (void)self;
     int i;
-    LOG_I(TAG_MENU,"Exiting Home menu");
+    LOG_D(TAG_MENU,"Exiting Home menu");
     // 1. 抹除文字，只保留中间那条横线
     OLED_ClearArea(16, 0, 97, 40); // 清除主页内容区域，保留底部横线
     OLED_ClearArea(22, 50, 72, 8); // 清除步数显示区域
@@ -145,12 +145,12 @@ static MenuResult_t home_on_input(MenuNode_t *self, MenuEvent_t event)
     case MENU_EVENT_CONFIRM_SHORT:
         self->cursor = 0;
         menu_engine_set_animating(1); //设置动画状态
-        LOG_I(TAG_MENU,"Menu:%s->%s",self->title, self->children[self->cursor]->title);
+        LOG_D(TAG_MENU,"Menu:%s->%s",self->title, self->children[self->cursor]->title);
         return MENU_RESULT_ENTER;
     case MENU_EVENT_CONFIRM_LONG:
         self->cursor = 1;
         menu_engine_set_animating(1); //设置动画状态
-        LOG_I(TAG_MENU,"Menu:%s->%s", self->title,self->children[self->cursor]->title);
+        LOG_D(TAG_MENU,"Menu:%s->%s", self->title,self->children[self->cursor]->title);
         return MENU_RESULT_ENTER;
     default:
         break;

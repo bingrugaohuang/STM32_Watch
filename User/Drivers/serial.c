@@ -192,6 +192,9 @@ static void serial_tx_task(void *pvParameters)
 
         s_dma_busy = 1;
         serial_start_dma(msg.pData, msg.size);
+
+        //测试
+        //osal_task_delay(pdMS_TO_TICKS(10)); 
 #if STACK_MONITOR_ENABLE
         static uint32_t last_monitor_time = 0;
         uint32_t current_time = osal_get_tick();

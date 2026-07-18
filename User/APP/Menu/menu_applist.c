@@ -247,10 +247,10 @@ static MenuResult_t applist_on_input(MenuNode_t *self, MenuEvent_t event)
                 start_animation(self, 1); //向右滑动
             }else if(event == MENU_EVENT_CONFIRM_SHORT){
                 if(self->cursor){
-                    LOG_I(TAG_APPLIST,"Menu:%s->%s", self->title, self->children[self->cursor]->title);
+                    LOG_D(TAG_APPLIST,"Menu:%s->%s", self->title, self->children[self->cursor]->title);
                 }
                 else{
-                    LOG_I(TAG_APPLIST,"Menu:%s->%s", self->title, self->parent->title);
+                    LOG_D(TAG_APPLIST,"Menu:%s->%s", self->title, self->parent->title);
                 }
                  return (self->cursor == 0) ? 
                  MENU_RESULT_BACK : MENU_RESULT_ENTER;

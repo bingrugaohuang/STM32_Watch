@@ -12,6 +12,10 @@
 #include "common_macro.h"
 #include "mpu6050_driver.h"
 
+#if MPU_MOT_TEST_ENABLE
+#include "gpio.h"
+#endif
+
 #include "task_service.h"
 //测试
 //#include "i2c_test.h"
@@ -38,6 +42,11 @@ static void total_init(void)
   log_init();              // Service 层
   hardfault_debug_init();  // MiddleWares/Debug（配置相关寄存器，准备 HardFault 调试）
   MPU6050_Init();          // Driver 层
+// mpu运动检测模式测试初始化
+#if MPU_MOT_TEST_ENABLE
+  mot_test_gpio_init();    // Core/Src/gpio.c
+#endif
+    
   LOG_I(TAG_MAIN, "System boot...");
 }
 

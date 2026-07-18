@@ -19,9 +19,11 @@ extern void Error_Handler(void);   /* 错误处理函数，定义在 main.c 中 
 #define I2C1_OLED_TEST_ENABLE  0   /* 1 = 使能 OLED I2C test, 0 = disable */
 #define I2C2_SW_ENABLE         0   /* 1 = 使用软件模拟 I2C2，0 = 使用硬件 I2C2 */   
 
-#define STACK_MONITOR_ENABLE  1    /* 1 = 使能任务栈高水位监控，0 = 禁用 */
+#define STACK_MONITOR_ENABLE   1   /* 1 = 使能任务栈高水位监控，0 = 禁用 */
 
-#define USE_HARDFAULT_HANDLER 0    /* 1 = 使用自定义硬件故障处理，0 = 不使用 */
+#define USE_HARDFAULT_HANDLER  1   /* 1 = 使用自定义硬件故障处理，0 = 不使用 */
+
+#define MPU_MOT_TEST_ENABLE    1   /* 1 = 使能 MPU6050 运动检测耗时测试，0 = 禁用 */
 
 /* 断言*/
 #define G_ASSERT( x )    do { if (!(x)) { /* 可选：添加错误处理或日志输出 */Error_Handler();/* return;*/ } } while (0)

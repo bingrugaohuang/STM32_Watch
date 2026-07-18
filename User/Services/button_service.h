@@ -44,11 +44,27 @@ void button_service_init(void);
 void button_serve_start_timer(void);
 
 /*
+ * 函    数：button_serve_start_timer_from_isr
+ * 参    数：无
+ * 返 回 值：无
+ * 说    明：从中断服务例程中延迟启动按键扫描定时器。
+ */
+void button_serve_start_timer_from_isr(void);
+
+/*
  * 函    数：button_serve_stop_timer
  * 参    数：无
  * 返 回 值：无
  * 说    明：停止按键扫描定时器。
  */
 void button_serve_stop_timer(void);
+
+/*
+ * 函    数：button_serve_stop_timer_from_isr
+ * 参    数：无
+ * 返 回 值：无
+ * 说    明：从中断服务例程中延迟停止按键扫描定时器。
+ */
+void button_serve_stop_timer_from_isr(void);
 
 #endif /* BUTTON_SERVICE_H */
