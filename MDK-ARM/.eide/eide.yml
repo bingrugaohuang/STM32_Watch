@@ -136,6 +136,7 @@ virtualFolder:
         - path: ../User/Services/mpu6050_service.c
         - path: ../User/Services/stackmonitor_service.c
         - path: ../User/Services/task_service.h
+        - path: ../User/Services/sleepmgr_service.c
       folders: []
     - name: BSP
       files:

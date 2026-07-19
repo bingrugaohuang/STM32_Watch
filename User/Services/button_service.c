@@ -21,6 +21,7 @@ static Button btn_cfm;   /* 确认 */
 /* 私有变量*/
 static osal_queue_handle_t btn_event_queue; /* 按键事件队列 */
 static osal_timer_handle_t btn_scan_timer;  /* 按键扫描定时器 */
+static uint8_t g_btn_ready = 0;             /* 按键服务初始化完成标志 */
 
 /****************** 私有函数声明 ******************/
 static void btn_scan_timer_start_deferred(void *param1, uint32_t param2); /* 延迟启动按键扫描定时器回调函数 */
@@ -85,7 +86,22 @@ void button_service_init(void)
         Error_Handler();
     }
 
+    g_btn_ready = 0; /* 按键服务初始化完成标志,需要等到mpu初始化完成后再开启 */
     //osal_timer_start(btn_scan_timer, 0);
+}
+
+/**
+ * 函    数：设置按键服务初始化完成标志
+ */
+void button_serve_set_ready(void){
+    g_btn_ready = 1;
+}
+
+/**
+ * 函    数：获取按键服务初始化完成标志
+ */
+uint8_t button_serve_is_ready(void){
+    return g_btn_ready;
 }
 
 /**

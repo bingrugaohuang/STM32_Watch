@@ -678,6 +678,11 @@
               <FilePath>..\User\Services\mpu6050_service.c</FilePath>
             </File>
             <File>
+              <FileName>sleepmgr_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Services\sleepmgr_service.c</FilePath>
+            </File>
+            <File>
               <FileName>stackmonitor_service.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Services\stackmonitor_service.c</FilePath>

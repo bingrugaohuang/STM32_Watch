@@ -145,6 +145,7 @@ void MPU6050_Init(void){
     // 验证通信
     uint8_t who_am_i = MPU_Read_Byte(MPU_WHO_AM_I);
     LOG_I(TAG_MPU, "MPU6050 WHO_AM_I: 0x%02X", who_am_i);
+
 }
 
 // 检查 MPU6050 数据是否准备好

@@ -23,7 +23,7 @@
   #define ACCEL_SCALE 2048.0f
 #endif
 
-extern void button_serve_start_timer(void); // 声明外部函数，用于启动按键扫描定时器
+extern void button_serve_set_ready(void); // 声明外部函数,用于设置按键服务初始化完成标志
 
 /* ========================静态变量=====================*/
 // MPU6050 队列句柄
@@ -77,9 +77,11 @@ static uint8_t mpu6050_sendqueue(Attitude_t *attitude){
 // MPU6050 处理任务函数
 static void mpu6050task(void* pvParameters)
 {
+    LOG_I(TAG_MPU, "MPU6050 task started");
     (void)pvParameters; // 避免未使用参数的编译警告
     bsp_exti_register_callback(mpu6050_callback); // 注册中断回调函数
 
+    button_serve_set_ready(); // 设置按键服务初始化完成标志
     // 初始化步数检测器
     step_detector_init();
 

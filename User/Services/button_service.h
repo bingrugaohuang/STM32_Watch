@@ -34,6 +34,22 @@ int btn_service_getnum(Btn_pkg_t *pkg, uint32_t timeout);
 void button_service_init(void);
 
 /*
+ * 函    数：button_serve_set_ready
+ * 参    数：ready - 按键服务初始化完成标志
+ * 返 回 值：无
+ * 说    明：设置按键服务初始化完成标志，用于控制按键扫描定时器的启动。
+ */
+void button_serve_set_ready(void);
+
+/*
+ * 函    数：button_serve_get_ready
+ * 参    数：无
+ * 返 回 值：按键服务初始化完成标志
+ * 说    明：获取按键服务初始化完成标志，用于判断是否可以启动按键扫描定时器。
+ */
+uint8_t button_serve_get_ready(void);
+
+/*
  * 函    数：button_serve_start_timer
  * 参    数：无
  * 返 回 值：无
